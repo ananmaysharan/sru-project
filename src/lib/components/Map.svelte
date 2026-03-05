@@ -8,6 +8,7 @@
 	import { Combobox, Slider } from 'bits-ui';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import XIcon from '@lucide/svelte/icons/x';
+	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import * as Select from '$lib/components/ui/select';
 	import communeLookup from '$lib/data/commune-lookup.json';
 	const OVERSEAS_REGIONS = [
@@ -317,7 +318,7 @@
 
 <div class="flex flex-col md:flex-row h-full w-full min-h-100">
 	<!-- Sidebar -->
-	<div class="w-full md:w-96 shrink-0 border border-gray-200 bg-white p-4 flex flex-col gap-4">
+	<div class="w-full md:w-84 shrink-0 border border-gray-200 bg-white p-4 flex flex-col gap-4">
 
 
 		<!-- Search -->
@@ -443,51 +444,9 @@
 			</div>
 		</div>
 
-		<!-- Territory navigation -->
-		<div>
-			<p class="text-xs font-medium text-gray-500 mb-1.5">Navigate</p>
-			<div class="flex gap-1">
-				<Button
-					variant={activeTerritory === 'mainland' ? 'default' : 'outline'}
-					size="sm"
-					class="flex-1"
-					onclick={() => { activeTerritory = 'mainland'; activeRegion = null; flyTo(MAINLAND_CENTER, MAINLAND_ZOOM); }}
-				>
-					Mainland
-				</Button>
-				<Button
-					variant={activeTerritory === 'overseas' ? 'default' : 'outline'}
-					size="sm"
-					class="flex-1"
-					onclick={() => { activeTerritory = 'overseas'; activeRegion = null; }}
-				>
-					Overseas
-				</Button>
-			</div>
-			{#if activeTerritory === 'overseas'}
-				<div class="flex flex-col gap-1 mt-1.5">
-					{#each OVERSEAS_REGIONS as region}
-						<Button
-							variant={activeRegion === region.name ? 'default' : 'outline'}
-							size="sm"
-							class="w-full justify-start"
-							onclick={() => { activeRegion = region.name; flyTo(region.center, region.zoom); }}
-						>
-							{region.name}
-						</Button>
-					{/each}
-				</div>
-			{/if}
-		</div>
-	</div>
-
-	<!-- Map -->
-	<div class="flex-1 border-t border-r border-b border-gray-200 relative min-h-[400px]">
-		<div bind:this={mapContainer} class="h-full w-full"></div>
-
 		<!-- Legend -->
-		<div class="absolute bottom-2 left-2 z-10 bg-white/90 backdrop-blur-sm rounded-md border border-gray-200 px-3 py-2 text-xs shadow-sm">
-			<p class="font-semibold text-gray-700 mb-1.5">
+		<div class="mt-auto">
+			<p class="text-xs font-medium text-gray-500 mb-1.5">
 				{activeMetric === 'rate' ? 'SRU Rate (%)' : 'Social Units'}
 			</p>
 			<div class="flex flex-col gap-0.5">
@@ -499,7 +458,7 @@
 							class="w-4 h-3 rounded-sm inline-block border border-gray-200"
 							style="background:{colors[i]}"
 						></span>
-						<span class="text-gray-600">
+						<span class="text-xs text-gray-600">
 							{#if i === breaks.length - 1}
 								≥ {breakpoint}{activeMetric === 'rate' ? '%' : ''}
 							{:else}
@@ -510,6 +469,50 @@
 				{/each}
 			</div>
 		</div>
+	</div>
+
+	<!-- Map + Navigation -->
+	<div class="flex-1 flex flex-col border-t border-r border-b border-gray-200 relative min-h-100">
+		<!-- Territory navigation bar -->
+		<div class="border-b border-gray-200 bg-white flex items-center gap-1 p-1.5 shrink-0">
+			{#if activeTerritory === 'overseas'}
+				<Button
+					variant="outline"
+					size="sm"
+					onclick={() => { activeTerritory = null; activeRegion = null; }}
+				>
+					<ArrowLeftIcon class="size-4" />
+				</Button>
+				{#each OVERSEAS_REGIONS as region}
+					<Button
+						variant="outline"
+						size="sm"
+						class="flex-1"
+						onclick={() => { activeRegion = region.name; flyTo(region.center, region.zoom); }}
+					>
+						{region.name}
+					</Button>
+				{/each}
+			{:else}
+				<Button
+					variant="outline"
+					size="sm"
+					class="flex-1"
+					onclick={() => { activeTerritory = null; activeRegion = null; flyTo(MAINLAND_CENTER, MAINLAND_ZOOM); }}
+				>
+					Mainland
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					class="flex-1"
+					onclick={() => { activeTerritory = 'overseas'; activeRegion = null; }}
+				>
+					Overseas
+				</Button>
+			{/if}
+		</div>
+		<div bind:this={mapContainer} class="flex-1 w-full"></div>
 
 		<!-- Hover tooltip -->
 		{#if tooltip}
