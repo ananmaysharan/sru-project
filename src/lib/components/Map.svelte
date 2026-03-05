@@ -41,6 +41,7 @@
 	let searchQuery = $state('');
 	let searchOpen = $state(false);
 	let searchValue = $state<string | undefined>(undefined);
+	let searchInputEl: HTMLDivElement;
 
 	let filteredRegions = $derived(
 		searchQuery.length >= 2
@@ -341,7 +342,7 @@
 					searchOpen = false;
 				}}
 			>
-				<div class="relative">
+				<div class="relative" bind:this={searchInputEl}>
 					<SearchIcon class="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
 					<Combobox.Input
 						placeholder="Search for a place..."
@@ -352,13 +353,13 @@
 						<button
 							type="button"
 							class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-							onclick={() => { searchQuery = ''; searchValue = undefined; searchOpen = false; flyTo(MAINLAND_CENTER, MAINLAND_ZOOM); }}
+							onclick={() => { searchQuery = ''; searchValue = undefined; searchOpen = false; const input = searchInputEl?.querySelector('input'); if (input) input.value = ''; flyTo(MAINLAND_CENTER, MAINLAND_ZOOM); }}
 						>
 							<XIcon class="size-4" />
 						</button>
 					{/if}
 				</div>
-				<Combobox.Content class="!w-(--bits-combobox-anchor-width) max-h-64 overflow-y-auto rounded-md border bg-popover p-1 shadow-md" sideOffset={4}>
+				<Combobox.Content class="!w-(--bits-combobox-anchor-width) max-h-64 overflow-y-auto rounded-md border bg-popover p-1 shadow-md z-50" sideOffset={4}>
 					{#if filteredRegions.length === 0 && filteredCommunes.length === 0}
 						<div class="px-2 py-1.5 text-sm text-muted-foreground">No results found.</div>
 					{/if}
