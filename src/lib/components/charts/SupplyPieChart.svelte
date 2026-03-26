@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { socialHousingByRegion2022 } from '$lib/data/region-supply-summary';
+	import { socialHousingByRegion2022 } from '$lib/data/charts/region-supply-summary';
+	import { departmentSupply2022 } from '$lib/data/charts/department-supply-summary';
 
 	let chartEl: HTMLDivElement;
-	let showingOutreMer = $state(false);
+	let drillLabel: string | null = $state(null);
 	let chartInstance: ReturnType<typeof import('echarts')['init']> | null = null;
 
-	const OUTRE_MER = ['Guadeloupe', 'Martinique', 'Guyane', 'La Réunion', 'Mayotte'];
+	const OUTRE_MER_CODES = ['01', '02', '03', '04', '06'];
 
 	const metro = socialHousingByRegion2022
-		.filter((d) => !OUTRE_MER.includes(d.region))
+		.filter((d) => !OUTRE_MER_CODES.includes(d.regionCode))
 		.sort((a, b) => b.social - a.social);
 
 	const outreMer = socialHousingByRegion2022
-		.filter((d) => OUTRE_MER.includes(d.region))
+		.filter((d) => OUTRE_MER_CODES.includes(d.regionCode))
 		.sort((a, b) => b.social - a.social);
 
 	const outreMerTotal = outreMer.reduce((s, d) => s + d.social, 0);
@@ -24,12 +25,14 @@
 		const data = metro.map((d) => ({
 			name: d.region,
 			value: d.social,
-			rate: d.rate
+			rate: d.rate,
+			regionCode: d.regionCode
 		}));
 		data.push({
 			name: 'Outre-mer',
 			value: outreMerTotal,
-			rate: outreMerRate
+			rate: outreMerRate,
+			regionCode: 'outre-mer'
 		});
 		return data;
 	}
@@ -40,6 +43,17 @@
 			value: d.social,
 			rate: d.rate
 		}));
+	}
+
+	function getDepartmentData(regionCode: string) {
+		return departmentSupply2022
+			.filter((d) => d.regionCode === regionCode && d.social > 0)
+			.sort((a, b) => b.social - a.social)
+			.map((d) => ({
+				name: d.department,
+				value: d.social,
+				rate: d.rate
+			}));
 	}
 
 	function buildOption(data: { name: string; value: number; rate: number }[]) {
@@ -87,13 +101,14 @@
 	}
 
 	function showMain() {
-		showingOutreMer = false;
+		drillLabel = null;
 		chartInstance?.setOption(buildOption(getMainData()), true);
 	}
 
-	function showOutreMer() {
-		showingOutreMer = true;
-		chartInstance?.setOption(buildOption(getOutreMerData()), true);
+	function drillInto(name: string, data: { name: string; value: number; rate: number }[]) {
+		if (data.length === 0) return;
+		drillLabel = name;
+		chartInstance?.setOption(buildOption(data), true);
 	}
 
 	onMount(() => {
@@ -104,8 +119,13 @@
 			chartInstance.setOption(buildOption(getMainData()));
 
 			chartInstance.on('click', (params: any) => {
-				if (params.name === 'Outre-mer' && !showingOutreMer) {
-					showOutreMer();
+				if (!drillLabel) {
+					const regionCode = params.data.regionCode;
+					if (regionCode === 'outre-mer') {
+						drillInto('Outre-mer', getOutreMerData());
+					} else if (regionCode) {
+						drillInto(params.name, getDepartmentData(regionCode));
+					}
 				}
 			});
 
@@ -121,7 +141,7 @@
 </script>
 
 <div class="relative h-full w-full">
-	{#if showingOutreMer}
+	{#if drillLabel}
 		<button
 			class="absolute top-0 left-0 z-10 flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 transition-colors"
 			onclick={showMain}

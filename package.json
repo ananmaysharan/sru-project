@@ -11,11 +11,12 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:e2e": "playwright test",
-		"test": "npm run test:e2e"
+		"test": "npm run test:e2e",
+		"optimize-images": "node scripts/optimize-images.js"
 	},
 	"devDependencies": {
 		"@internationalized/date": "^3.12.0",
-		"@lucide/svelte": "^0.561.0",
+		"@lucide/svelte": "^1.6.0",
 		"@playwright/test": "^1.58.1",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-static": "^3.0.10",
@@ -25,6 +26,8 @@
 		"@tailwindcss/vite": "^4.1.18",
 		"bits-ui": "^2.16.3",
 		"clsx": "^2.1.1",
+		"embla-carousel-svelte": "^8.6.0",
+		"sharp": "^0.34.5",
 		"svelte": "^5.49.2",
 		"svelte-check": "^4.3.6",
 		"tailwind-merge": "^3.5.0",
@@ -35,6 +38,7 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@sanity-labs/logo-soup": "^1.2.2",
 		"echarts": "^6.0.0",
 		"maplibre-gl": "^5.18.0",
 		"pmtiles": "^4.4.0"

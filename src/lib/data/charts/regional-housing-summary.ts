@@ -1,0 +1,20 @@
+export const regionalHousing = [
+	{ region: 'Île-de-France', regionCode: '11', per10k: 1117, singleFamilyPct: 2.9, multiFamilyPct: 97.1, rentPerSqm: 7.38 },
+	{ region: 'Martinique', regionCode: '02', per10k: 1005, singleFamilyPct: 0.4, multiFamilyPct: 99.6, rentPerSqm: 5.87 },
+	{ region: 'Guadeloupe', regionCode: '01', per10k: 998, singleFamilyPct: 22.0, multiFamilyPct: 78.0, rentPerSqm: 6.42 },
+	{ region: 'Hauts-de-France', regionCode: '32', per10k: 993, singleFamilyPct: 37.1, multiFamilyPct: 62.9, rentPerSqm: 5.94 },
+	{ region: 'La Réunion', regionCode: '04', per10k: 967, singleFamilyPct: 12.8, multiFamilyPct: 87.2, rentPerSqm: 6.40 },
+	{ region: 'Normandie', regionCode: '28', per10k: 938, singleFamilyPct: 24.0, multiFamilyPct: 76.0, rentPerSqm: 5.64 },
+	{ region: 'Grand Est', regionCode: '44', per10k: 782, singleFamilyPct: 13.2, multiFamilyPct: 86.8, rentPerSqm: 5.75 },
+	{ region: 'Centre-Val de Loire', regionCode: '24', per10k: 765, singleFamilyPct: 25.5, multiFamilyPct: 74.5, rentPerSqm: 5.57 },
+	{ region: 'Auvergne-Rhône-Alpes', regionCode: '84', per10k: 731, singleFamilyPct: 9.2, multiFamilyPct: 90.8, rentPerSqm: 6.15 },
+	{ region: 'Guyane', regionCode: '03', per10k: 699, singleFamilyPct: 25.4, multiFamilyPct: 74.6, rentPerSqm: 6.59 },
+	{ region: 'Bourgogne-Franche-Comté', regionCode: '27', per10k: 683, singleFamilyPct: 13.9, multiFamilyPct: 86.1, rentPerSqm: 5.61 },
+	{ region: "Provence-Alpes-Côte d'Azur", regionCode: '93', per10k: 655, singleFamilyPct: 7.1, multiFamilyPct: 92.9, rentPerSqm: 6.27 },
+	{ region: 'Pays de la Loire', regionCode: '52', per10k: 625, singleFamilyPct: 26.1, multiFamilyPct: 73.9, rentPerSqm: 5.77 },
+	{ region: 'Bretagne', regionCode: '53', per10k: 552, singleFamilyPct: 22.1, multiFamilyPct: 77.9, rentPerSqm: 5.72 },
+	{ region: 'Occitanie', regionCode: '76', per10k: 534, singleFamilyPct: 17.1, multiFamilyPct: 82.9, rentPerSqm: 5.93 },
+	{ region: 'Nouvelle-Aquitaine', regionCode: '75', per10k: 530, singleFamilyPct: 23.5, multiFamilyPct: 76.5, rentPerSqm: 5.85 },
+	{ region: 'Corse', regionCode: '94', per10k: 451, singleFamilyPct: 9.2, multiFamilyPct: 90.8, rentPerSqm: 6.08 },
+	{ region: 'Mayotte', regionCode: '06', per10k: 86, singleFamilyPct: 35.4, multiFamilyPct: 64.6, rentPerSqm: 8.54 }
+];

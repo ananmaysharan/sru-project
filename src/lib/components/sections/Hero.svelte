@@ -23,10 +23,12 @@
 		</div>
 	</div>
 
-	<nav class="flex justify-between gap-4 py-4">
-		<a href="#introduction" class="w-full px-4 py-2 border hover:underline">Intro</a>
-		<a href="#supply" class="w-full px-4 py-2 border hover:underline">Supply</a>
-		<a href="#socio-econometrics" class="w-full px-4 border py-2 hover:underline">Socio Econometrics</a>
-		<a href="#demographics" class="w-full px-4 py-2 border hover:underline">Demographics + Environmental Health</a>
+	<nav class="flex flex-col md:flex-row gap-4 py-4">
+		<a href="#introduction" class="md:flex-1 px-4 py-2 border hover:underline">Introduction</a>
+		<a href="#supply" class="md:flex-1 px-4 py-2 border hover:underline">Numbers</a>
+		<a href="#socio-econometrics" class="md:flex-1 px-4 py-2 border hover:underline">Lived Experiences</a>
+		<a href="#demographics" class="md:flex-1 px-4 py-2 border hover:underline">Health Outcomes</a>
+		<a href="#acknowledgements" class="md:flex-1 px-4 py-2 border hover:underline">Acknowledgements</a>
+		<a href="#bibliography" class="md:flex-1 px-4 py-2 border hover:underline">Bibliography</a>
 	</nav>
 </section>

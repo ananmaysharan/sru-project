@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { supplyByYear } from '$lib/data/supply-summary';
+	import { supplyByYear } from '$lib/data/charts/supply-summary';
 
 	let chartEl: HTMLDivElement;
 
@@ -26,15 +26,17 @@
 				},
 				yAxis: {
 					type: 'value',
-					min: 2900000,
+					min: 3000000,
 					axisLabel: {
 						formatter: (v: number) => `${(v / 1_000_000).toFixed(1)}M`
 					}
 				},
 				series: [
 					{
-						type: 'bar',
+						type: 'line',
 						data: supplyByYear.map((d) => d.total),
+						smooth: true,
+						lineStyle: { color: '#3b82f6', width: 2 },
 						itemStyle: { color: '#3b82f6' }
 					}
 				],

@@ -1,19 +1,19 @@
 <script lang="ts">
-	import Hero from '$lib/components/Hero.svelte';
-	import Introduction from '$lib/components/Introduction.svelte';
-	import Supply from '$lib/components/Supply.svelte';
+	import Hero from '$lib/components/sections/Hero.svelte';
+	import Introduction from '$lib/components/sections/Introduction.svelte';
+	import Supply from '$lib/components/sections/Supply.svelte';
+	import SocioEconometrics from '$lib/components/sections/SocioEconometrics.svelte';
+	import HealthOutcomes from '$lib/components/sections/HealthOutcomes.svelte';
+	import Acknowledgements from '$lib/components/sections/Acknowledgements.svelte';
+	import Bibliography from '$lib/components/sections/Bibliography.svelte';
+	import Footer from '$lib/components/sections/Footer.svelte';
 </script>
 
 <Hero />
 <Introduction />
 <Supply />
-
-<section id="socio-econometrics" class="px-8 py-12">
-	<h2 class="text-3xl font-bold">Socio Econometrics</h2>
-	<p class="mt-2 text-lg text-gray-600">WIP</p>
-</section>
-
-<section id="demographics" class="px-8 py-12">
-	<h2 class="text-3xl font-bold">Demographics + Environmental Health</h2>
-	<p class="mt-2 text-lg text-gray-600">WIP</p>
-</section>
+<SocioEconometrics />
+<HealthOutcomes />
+<Acknowledgements />
+<Bibliography />
+<Footer />
