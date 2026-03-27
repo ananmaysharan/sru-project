@@ -1,3 +1,7 @@
+<script>
+	import { base } from '$app/paths';
+</script>
+
 <section id="introduction" class="px-8 py-12">
 	<h2 class="text-3xl font-bold">Introduction</h2>
 	<p class="mt-2 text-lg text-gray-600">25 years of fair-share housing provision</p>
@@ -11,7 +15,7 @@
 			diverse in design, size, and location.			</p>
 		</div>
 		<div class="w-full border border-gray-200">
-			<img src="/timeline.png" alt="Timeline of French social housing legislation from Loi SRU (2000) to Loi 3DS (2022)" class="w-full h-auto rounded-lg" />
+			<img src="{base}/timeline.png" alt="Timeline of French social housing legislation from Loi SRU (2000) to Loi 3DS (2022)" class="w-full h-auto rounded-lg" />
 		</div>
 
 	</div>
