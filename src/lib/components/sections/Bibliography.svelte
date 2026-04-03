@@ -1,4 +1,5 @@
-<section id="bibliography" class="px-8 py-12">
+<section id="bibliography" class="py-12">
+	<div class="max-w-3xl mx-auto ">
 	<h2 class="text-3xl font-bold">Bibliography</h2>
 
 	<div class="mt-6 space-y-8 text-base text-gray-700">
@@ -72,5 +73,6 @@
 				<li>"Les sanctions de la Loi SRU n'ont pas d'effet incitatif", <em>La Gazette des Communes</em> (posted October 1, 2021).</li>
 			</ul>
 		</div>
+	</div>
 	</div>
 </section>
