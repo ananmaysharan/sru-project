@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { asset } from '$app/paths';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import type { CarouselAPI } from '$lib/components/ui/carousel/context.js';
@@ -54,7 +54,7 @@
 					<Carousel.Item>
 						<div class="flex flex-col items-center justify-center">
 							<img
-								src="{image.full}"
+								src={asset(image.full)}
 								alt={image.caption || image.id}
 								class="max-h-[75vh] w-auto max-w-full object-contain mx-auto"
 								loading={Math.abs(i - startIndex) <= 1 ? 'eager' : 'lazy'}

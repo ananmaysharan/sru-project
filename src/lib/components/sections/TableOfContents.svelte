@@ -1,28 +1,28 @@
-<section id="toc" class="py-12">
-<nav class="max-w-3xl mx-auto " aria-label="Table of contents">
-	<ol class="border">
-		<li>
-			<a href="#introduction" class="block px-4 py-3 hover:underline">1. Introduction</a>
-		</li>
-		<li>
-			<a href="#supply" class="block px-4 py-3 hover:underline">2. Numbers</a>
-		</li>
-		<li>
-			<a href="#socio-econometrics" class="block px-4 py-3 hover:underline"
-				>3. Lived Experiences</a
-			>
-		</li>
-		<li>
-			<a href="#demographics" class="block px-4 py-3 hover:underline">4. Health Outcomes</a>
-		</li>
-		<li>
-			<a href="#acknowledgements" class="block px-4 py-3 hover:underline"
-				>5. Acknowledgements</a
-			>
-		</li>
-		<li>
-			<a href="#bibliography" class="block px-4 py-3 hover:underline">6. Bibliography</a>
-		</li>
-	</ol>
+<script lang="ts">
+	import { resolve } from '$app/paths';
+	import { siteRoutes, type SiteRoute } from '$lib/data/routes';
+
+	let { currentPath }: { currentPath: string } = $props();
+
+	function isActive(href: SiteRoute): boolean {
+		const resolved = resolve(href);
+		return currentPath === resolved || currentPath === resolved + '/';
+	}
+</script>
+
+<nav class="sticky top-0 z-50 border-b bg-white" aria-label="Table of contents">
+	<ul class="mx-auto flex max-w-5xl items-center justify-center">
+		{#each siteRoutes as section (section.href)}
+			<li>
+				<a
+					href={resolve(section.href)}
+					class="block px-4 py-3 text-sm hover:underline {isActive(section.href)
+						? 'font-medium'
+						: ''}"
+				>
+					{section.label}
+				</a>
+			</li>
+		{/each}
+	</ul>
 </nav>
-</section>

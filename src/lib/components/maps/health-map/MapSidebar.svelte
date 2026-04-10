@@ -3,20 +3,18 @@
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as Select from '$lib/components/ui/select';
-	import * as Tabs from '$lib/components/ui/tabs';
 	import {
 		mapState,
 		communeLookup,
-		departementLookup,
 		REGION_LOOKUP,
 		MAINLAND_CENTER,
 		MAINLAND_ZOOM,
 		METRIC_CONFIG,
-		type MetricType,
-		type TabType
+		BIVARIATE_COLORS,
+		type MetricType
 	} from './map-state.svelte.js';
 
-	let { onflyto, onupdate }: { onflyto: (center: [number, number], zoom: number) => void; onupdate: () => void } = $props();
+	let { onflyto }: { onflyto: (center: [number, number], zoom: number) => void } = $props();
 
 	let searchInputEl: HTMLDivElement;
 
@@ -25,9 +23,6 @@
 		if (v.startsWith('region:')) {
 			const region = REGION_LOOKUP.find((r) => r.name === v.slice(7));
 			if (region) onflyto(region.center, region.zoom);
-		} else if (v.startsWith('dept:')) {
-			const dept = departementLookup.find((d: { code: string }) => d.code === v.slice(5));
-			if (dept) onflyto(dept.center as [number, number], 9);
 		} else if (v.startsWith('commune:')) {
 			const commune = communeLookup.find((c: { code: string }) => c.code === v.slice(8));
 			if (commune) onflyto(commune.center as [number, number], 12);
@@ -36,15 +31,14 @@
 		mapState.searchOpen = false;
 	}
 
-	function handleTabChange(v: string) {
-		mapState.switchTab(v as TabType);
-		onupdate();
-	}
-
 	function handleMetricChange(v: string | undefined) {
 		if (!v) return;
 		mapState.switchMetric(v as MetricType);
-		onupdate();
+	}
+
+	function handleYearChange(v: string | undefined) {
+		if (!v) return;
+		mapState.setActiveYear(Number(v) as 2012 | 2014 | 2018 | 2020);
 	}
 
 	function clearSearch() {
@@ -58,16 +52,6 @@
 </script>
 
 <div class="w-full md:w-84 shrink-0 border border-gray-200 bg-white p-4 flex flex-col gap-4">
-	<!-- <h3 class="text-2xl font-semibold">Supply Map</h3> -->
-	<!-- Tabs -->
-	<Tabs.Root bind:value={mapState.activeTab} onValueChange={handleTabChange}>
-		<Tabs.List class="w-full">
-			<Tabs.Trigger value="communes">Communes</Tabs.Trigger>
-			<Tabs.Trigger value="departments">Départements</Tabs.Trigger>
-		</Tabs.List>
-	</Tabs.Root>
-
-	<!-- Search -->
 	<div>
 		<p class="text-xs font-medium text-gray-500 mb-1.5">Search</p>
 		<Combobox.Root
@@ -94,7 +78,7 @@
 				{/if}
 			</div>
 			<Combobox.Content class="w-(--bits-combobox-anchor-width)! max-h-64 overflow-y-auto rounded-md border bg-popover p-1 shadow-md z-50" sideOffset={4}>
-				{#if mapState.filteredRegions.length === 0 && mapState.filteredDepartements.length === 0 && mapState.filteredCommunes.length === 0}
+				{#if mapState.filteredRegions.length === 0 && mapState.filteredCommunes.length === 0}
 					<div class="px-2 py-1.5 text-sm text-muted-foreground">No results found.</div>
 				{/if}
 				{#if mapState.filteredRegions.length > 0}
@@ -111,24 +95,7 @@
 						{/each}
 					</Combobox.Group>
 				{/if}
-				{#if mapState.filteredRegions.length > 0 && (mapState.filteredDepartements.length > 0 || mapState.filteredCommunes.length > 0)}
-					<div role="separator" class="-mx-1 my-1 h-px bg-border"></div>
-				{/if}
-				{#if mapState.filteredDepartements.length > 0}
-					<Combobox.Group>
-						<Combobox.GroupHeading class="px-2 py-1.5 text-xs font-medium text-muted-foreground">Départements</Combobox.GroupHeading>
-						{#each mapState.filteredDepartements as dept}
-							<Combobox.Item
-								value="dept:{dept.code}"
-								label={dept.name}
-								class="relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none data-highlighted:bg-accent data-highlighted:text-accent-foreground"
-							>
-								{dept.name} <span class="text-muted-foreground ml-1">({dept.code})</span>
-							</Combobox.Item>
-						{/each}
-					</Combobox.Group>
-				{/if}
-				{#if mapState.filteredDepartements.length > 0 && mapState.filteredCommunes.length > 0}
+				{#if mapState.filteredRegions.length > 0 && mapState.filteredCommunes.length > 0}
 					<div role="separator" class="-mx-1 my-1 h-px bg-border"></div>
 				{/if}
 				{#if mapState.filteredCommunes.length > 0}
@@ -149,7 +116,6 @@
 		</Combobox.Root>
 	</div>
 
-	<!-- Metric select -->
 	<div>
 		<p class="text-xs font-medium text-gray-500 mb-1.5">Select Variable</p>
 		<Select.Root type="single" value={mapState.activeMetric} onValueChange={handleMetricChange}>
@@ -164,28 +130,50 @@
 		</Select.Root>
 	</div>
 
-	<!-- Legend -->
+	<div>
+		<p class="text-xs font-medium text-gray-500 mb-1.5">Year</p>
+		<Select.Root type="single" value={String(mapState.activeYear)} onValueChange={handleYearChange}>
+			<Select.Trigger class="w-full">
+				{mapState.activeYear}
+			</Select.Trigger>
+			<Select.Content>
+				{#each mapState.availableYears as year (year)}
+					<Select.Item value={String(year)} label={String(year)} />
+				{/each}
+			</Select.Content>
+		</Select.Root>
+	</div>
+
 	<div class="mt-auto">
-		<p class="text-xs font-medium text-gray-500 mb-1.5">
-			{mapState.currentConfig.label}
-		</p>
-		<div class="flex flex-col gap-0.5">
-			{#each mapState.currentConfig.breaks as breakpoint, i (breakpoint)}
-				{@const config = mapState.currentConfig}
-				<div class="flex items-center gap-1.5">
-					<span
-						class="w-4 h-3 rounded-sm inline-block border border-gray-200"
-						style="background:{config.colors[i]}"
-					></span>
-					<span class="text-xs text-gray-600">
-						{#if i === config.breaks.length - 1}
-							≥ {breakpoint}{config.suffix}
-						{:else}
-							{breakpoint}{config.suffix} – {config.breaks[i + 1]}{config.suffix}
-						{/if}
-					</span>
-				</div>
-			{/each}
-		</div>
+		<svg viewBox="0 0 108 96" class="w-full max-w-[170px]" aria-label="Bivariate legend">
+			<g transform="translate(28 10)">
+				{#each ['3', '2', '1'] as yLabel, rowIndex (yLabel)}
+					{#each ['A', 'B', 'C'] as xLabel, colIndex (xLabel)}
+						{@const cell = `${xLabel}${yLabel}` as keyof typeof BIVARIATE_COLORS}
+						<rect
+							x={colIndex * 16}
+							y={rowIndex * 16}
+							width="16"
+							height="16"
+							fill={BIVARIATE_COLORS[cell]}
+							stroke="#ffffff"
+						/>
+					{/each}
+				{/each}
+				<text x="24" y="58" text-anchor="middle" font-size="6" fill="#6b7280">
+					{mapState.currentConfig.label} →
+				</text>
+				<text
+					x="-17"
+					y="24"
+					text-anchor="middle"
+					font-size="6"
+					fill="#6b7280"
+					transform="rotate(-90 -17 24)"
+				>
+					SRU Rate →
+				</text>
+			</g>
+		</svg>
 	</div>
 </div>

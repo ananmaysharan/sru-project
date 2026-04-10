@@ -73,6 +73,20 @@
 				<li>"Les sanctions de la Loi SRU n'ont pas d'effet incitatif", <em>La Gazette des Communes</em> (posted October 1, 2021).</li>
 			</ul>
 		</div>
+
+		<div>
+			<h2 class="text-3xl font-bold text-gray-900">Acknowledgements</h2>
+			<div class="mt-6 space-y-6">
+				<div>
+					<h3 class="text-lg font-semibold text-gray-900">Research Assistantship Team</h3>
+					<p class="mt-1">Ananmay Sharan, Sebastian Rodriguez, Matt Thibodeau, Yihan Zhang, Anishta Khan</p>
+				</div>
+				<div>
+					<h3 class="text-lg font-semibold text-gray-900">Data Access and Policy Context</h3>
+					<p class="mt-1">Julie Bergeot, Cl&eacute;ment Petitimbert</p>
+				</div>
+			</div>
+		</div>
 	</div>
 	</div>
 </section>

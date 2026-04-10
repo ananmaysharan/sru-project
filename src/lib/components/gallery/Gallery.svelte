@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { asset } from '$app/paths';
 	import galleryData from '$lib/data/charts/gallery-manifest.json';
 	import GalleryLightbox from '$lib/components/gallery/GalleryLightbox.svelte';
 
@@ -20,7 +20,7 @@
 			onclick={() => openLightbox(i)}
 		>
 			<img
-				src="{image.thumb}"
+				src={asset(image.thumb)}
 				alt={image.caption || image.id}
 				loading="lazy"
 				class="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
