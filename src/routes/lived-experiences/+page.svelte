@@ -44,19 +44,19 @@
 			</Tabs.List>
 
 			{#each regions as region (region.value)}
-				<Tabs.Content value={region.value}>
+				<Tabs.Content value={region.value} class="max-w-3xl mx-auto">
 					{#if region.images.length > 0}
-						<div class="flex flex-col md:flex-row gap-4 m-4">
+						<div class="flex flex-col md:flex-row gap-4 mt-4">
 							{#each region.images as src}
 								<img
 									src={asset(src)}
 									alt="{region.label} plan"
-									class="w-full rounded border border-gray-200 {region.images.length === 1 ? 'max-w-3xl mx-auto' : 'md:flex-1 md:min-w-0'}"
+									class="w-full rounded border border-gray-200 {region.images.length === 1 ? '' : 'md:flex-1 md:min-w-0'}"
 								/>
 							{/each}
 						</div>
 					{:else}
-						<p class="m-4 text-sm text-gray-400 italic">No images yet.</p>
+						<p class="mt-4 text-sm text-gray-400 italic">No images yet.</p>
 					{/if}
 				</Tabs.Content>
 			{/each}

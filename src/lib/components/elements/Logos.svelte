@@ -23,7 +23,7 @@
 </script>
 
 {#if soup.isReady}
-	<div class="mt-3 grid w-full max-w-3xl mx-auto  grid-cols-2 place-items-center gap-x-2 gap-y-1 md:grid-cols-3">
+	<div class="mt-3 flex w-full max-w-6xl mx-auto flex-col items-center gap-y-4 px-6 md:flex-row md:flex-nowrap md:justify-between md:gap-x-4 md:gap-y-0">
 		{#each soup.normalizedLogos as logo, i (logo.src + i)}
 			<span
 				class="inline-block align-middle"

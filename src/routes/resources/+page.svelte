@@ -5,9 +5,7 @@
 <section id="resources" class="py-12">
 	<div class="max-w-3xl mx-auto">
 		<h2 class="text-3xl font-bold">Resources</h2>
-		<p class="mt-2 text-lg text-gray-600">SRU news index</p>
-		<p class="mt-1 text-sm text-gray-500">Updated {resourceDate}</p>
-
+		
 		<div class="mt-6 space-y-8 text-base text-gray-700">
 			{#each resourceSections as section (section.title)}
 				<div>

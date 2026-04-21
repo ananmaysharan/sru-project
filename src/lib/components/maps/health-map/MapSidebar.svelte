@@ -145,35 +145,35 @@
 	</div>
 
 	<div class="mt-auto">
-		<svg viewBox="0 0 108 96" class="w-full max-w-[170px]" aria-label="Bivariate legend">
-			<g transform="translate(28 10)">
+		<svg viewBox="0 0 80 72" class="w-full max-w-[120px]" aria-label="Bivariate legend">
+			<g transform="translate(20 4)">
 				{#each ['3', '2', '1'] as yLabel, rowIndex (yLabel)}
 					{#each ['A', 'B', 'C'] as xLabel, colIndex (xLabel)}
 						{@const cell = `${xLabel}${yLabel}` as keyof typeof BIVARIATE_COLORS}
 						<rect
-							x={colIndex * 16}
-							y={rowIndex * 16}
-							width="16"
-							height="16"
+							x={colIndex * 18}
+							y={rowIndex * 18}
+							width="18"
+							height="18"
 							fill={BIVARIATE_COLORS[cell]}
 							stroke="#ffffff"
 						/>
 					{/each}
 				{/each}
-				<text x="24" y="58" text-anchor="middle" font-size="6" fill="#6b7280">
-					{mapState.currentConfig.label} →
-				</text>
-				<text
-					x="-17"
-					y="24"
-					text-anchor="middle"
-					font-size="6"
-					fill="#6b7280"
-					transform="rotate(-90 -17 24)"
-				>
-					SRU Rate →
-				</text>
 			</g>
+			<text x="47" y="68" text-anchor="middle" font-size="6" fill="#6b7280">
+				{mapState.currentConfig.label} →
+			</text>
+			<text
+				x="10"
+				y="31"
+				text-anchor="middle"
+				font-size="6"
+				fill="#6b7280"
+				transform="rotate(-90 10 31)"
+			>
+				SRU Rate →
+			</text>
 		</svg>
 	</div>
 </div>

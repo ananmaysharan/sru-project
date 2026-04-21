@@ -43,6 +43,10 @@
 		}
 	}
 
+	$effect(() => {
+		applyChoropleth();
+	});
+
 	onMount(() => {
 		const protocol = new Protocol();
 		const regionsPmt = new PMTiles(REGIONS_PMTILES_URL);

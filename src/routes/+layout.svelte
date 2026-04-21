@@ -10,7 +10,11 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<TableOfContents currentPath={page.url.pathname} />
-{@render children()}
-<PageNavigation currentPath={page.url.pathname} />
-<Footer />
+<div class="flex min-h-screen flex-col">
+	<TableOfContents currentPath={page.url.pathname} />
+	<main class="flex-1">
+		{@render children()}
+		<PageNavigation currentPath={page.url.pathname} />
+	</main>
+	<Footer />
+</div>

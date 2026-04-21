@@ -3,6 +3,7 @@
 	import Map from "$lib/components/maps/main-map/Map.svelte";
 	import EuropeanMap from "$lib/components/maps/european-map/EuropeanMap.svelte";
 	import SupplyLineChart from "$lib/components/charts/SupplyLineChart.svelte";
+	import ResidencesStackedChart from "$lib/components/charts/ResidencesStackedChart.svelte";
 	import SupplyPieChart from "$lib/components/charts/SupplyPieChart.svelte";
 	import SupplyRegionalChart from "$lib/components/charts/SupplyRegionalChart.svelte";
 	import DromComCard from "$lib/components/charts/DromComCard.svelte";
@@ -23,6 +24,28 @@
 			pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
 			culpa qui officia deserunt mollit anim id est laborum.
 		</p>
+	</div>
+
+	<div class="max-w-3xl mx-auto mt-8">
+		<img
+			src={asset("/supply-infographic.png")}
+			alt="Supply infographic"
+			class="w-full h-auto border border-gray-200"
+		/>
+	</div>
+
+	<div class="max-w-3xl mx-auto mt-8">
+		<div class="border border-gray-200 rounded-none p-4">
+			<h4 class="text-sm font-semibold text-gray-700">
+				France: Main Type of Residences Occupied (1984–2023)
+			</h4>
+			<p class="text-xs text-gray-400 mb-2">
+				Millions of housing units (lodgements) per household
+			</p>
+			<div class="h-96">
+				<ResidencesStackedChart />
+			</div>
+		</div>
 	</div>
 
 	<div class="max-w-3xl mx-auto mt-8">

@@ -79,7 +79,7 @@
 			</div>
 		</div>
 
-			<div bind:this={mapContainer} class="w-full h-48"></div>
+			<div bind:this={mapContainer} class="w-full h-96"></div>
 
 	</div>
 </div>
