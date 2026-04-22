@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { createLogoSoup } from '@sanity-labs/logo-soup/svelte';
 	import { getVisualCenterTransform } from '@sanity-labs/logo-soup';
+	import { asset } from '$app/paths';
 
 	const logos: { src: string; alt: string }[] = [
-		{ src: '/logos/gsd.svg', alt: 'Harvard GSD' },
-		{ src: '/logos/harvard_university.svg', alt: 'Harvard University' },
-		{ src: '/logos/hdsi.png', alt: 'Harvard Data Science Initiative' },
-		{ src: '/logos/mellon_urban_initiative.png', alt: 'Harvard Mellon Urban Initiative' },
-		{ src: '/logos/hcjs.svg', alt: 'Harvard Joint Center for Housing Studies' },
-		{ src: '/logos/mtel.jpg', alt: 'French Ministry of Housing' }
+		{ src: asset('/logos/gsd.svg'), alt: 'Harvard GSD' },
+		{ src: asset('/logos/harvard_university.svg'), alt: 'Harvard University' },
+		{ src: asset('/logos/hdsi.png'), alt: 'Harvard Data Science Initiative' },
+		{ src: asset('/logos/mellon_urban_initiative.png'), alt: 'Harvard Mellon Urban Initiative' },
+		{ src: asset('/logos/hcjs.svg'), alt: 'Harvard Joint Center for Housing Studies' },
+		{ src: asset('/logos/mtel.jpg'), alt: 'French Ministry of Housing' }
 	];
 
 	const soup = createLogoSoup();

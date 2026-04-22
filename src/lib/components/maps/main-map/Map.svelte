@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { asset } from '$app/paths';
 	import maplibregl from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { Protocol, PMTiles } from 'pmtiles';
@@ -151,17 +152,17 @@
 				console.warn('PMTiles failed to load, falling back to GeoJSON', e);
 				map.addSource('regions', {
 					type: 'geojson',
-					data: '/regions_2025_outre_mer.geojson',
+					data: asset('/regions_2025_outre_mer.geojson'),
 					promoteId: 'code'
 				});
 				map.addSource('communes', {
 					type: 'geojson',
-					data: '/communes_2022_outre_mer.geojson',
+					data: asset('/communes_2022_outre_mer.geojson'),
 					promoteId: 'code'
 				});
 				map.addSource('departements', {
 					type: 'geojson',
-					data: '/departments_2022_outre_mer_100m.geojson',
+					data: asset('/departments_2022_outre_mer_100m.geojson'),
 					promoteId: 'code'
 				});
 			}
