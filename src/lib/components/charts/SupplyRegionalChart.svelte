@@ -47,14 +47,14 @@
 						name: 'Mainland',
 						type: 'bar',
 						stack: 'total',
-						itemStyle: { color: '#3b82f6' },
+						itemStyle: { color: '#8fa6aa' },
 						data: data.map((d) => (OUTRE_MER.includes(d.region) ? null : d.per10k))
 					},
 					{
 						name: 'Overseas',
 						type: 'bar',
 						stack: 'total',
-						itemStyle: { color: '#ef4444' },
+						itemStyle: { color: '#d8c891' },
 						data: data.map((d) => (OUTRE_MER.includes(d.region) ? d.per10k : null))
 					}
 				],

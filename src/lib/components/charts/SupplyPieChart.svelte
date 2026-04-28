@@ -56,8 +56,27 @@
 			}));
 	}
 
+	const PALETTE = [
+		'#4a596b', // deep slate
+		'#c9a96e', // honey gold
+		'#6b8e7a', // muted teal-green
+		'#b8675f', // dusty terracotta
+		'#8f9bb3', // powder blue
+		'#d8c891', // warm beige
+		'#4d7c70', // forest sage
+		'#d4a988', // peach tan
+		'#5e7a8a', // steel blue
+		'#a87655', // clay
+		'#9da283', // sage
+		'#7d6e8c', // dusty mauve
+		'#b5b08e', // khaki
+		'#3e5a5a', // deep teal
+		'#8a8074'  // warm gray
+	];
+
 	function buildOption(data: { name: string; value: number; rate: number }[]) {
 		return {
+			color: PALETTE,
 			tooltip: {
 				trigger: 'item',
 				formatter: (params: any) => {

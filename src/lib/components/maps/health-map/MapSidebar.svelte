@@ -38,7 +38,7 @@
 
 	function handleYearChange(v: string | undefined) {
 		if (!v) return;
-		mapState.setActiveYear(Number(v) as 2012 | 2014 | 2018 | 2020);
+		mapState.setActiveYear(Number(v) as 2012 | 2014 | 2017 | 2018 | 2020 | 2021);
 	}
 
 	function clearSearch() {
@@ -144,36 +144,48 @@
 		</Select.Root>
 	</div>
 
-	<div class="mt-auto">
-		<svg viewBox="0 0 80 72" class="w-full max-w-[120px]" aria-label="Bivariate legend">
-			<g transform="translate(20 4)">
-				{#each ['3', '2', '1'] as yLabel, rowIndex (yLabel)}
-					{#each ['A', 'B', 'C'] as xLabel, colIndex (xLabel)}
-						{@const cell = `${xLabel}${yLabel}` as keyof typeof BIVARIATE_COLORS}
-						<rect
-							x={colIndex * 18}
-							y={rowIndex * 18}
-							width="18"
-							height="18"
-							fill={BIVARIATE_COLORS[cell]}
-							stroke="#ffffff"
-						/>
+	<div class="mt-auto border-t border-gray-200 pt-4">
+		<p class="text-xs font-medium text-gray-500 mb-2">Legend</p>
+
+		<div class="flex items-stretch gap-2 w-fit">
+			<span class="self-center text-[10px] text-gray-500 [writing-mode:vertical-rl] rotate-180 whitespace-nowrap">
+				Social housing →
+			</span>
+			<div class="flex flex-col gap-1 w-fit">
+				<div class="flex flex-col">
+					{#each ['3', '2', '1'] as yLabel (yLabel)}
+						<div class="flex">
+							{#each ['A', 'B', 'C'] as xLabel (xLabel)}
+								{@const cell = `${xLabel}${yLabel}` as keyof typeof BIVARIATE_COLORS}
+								<div class="h-8 w-8" style="background-color: {BIVARIATE_COLORS[cell]};"></div>
+							{/each}
+						</div>
 					{/each}
-				{/each}
-			</g>
-			<text x="47" y="68" text-anchor="middle" font-size="6" fill="#6b7280">
-				{mapState.currentConfig.label} →
-			</text>
-			<text
-				x="10"
-				y="31"
-				text-anchor="middle"
-				font-size="6"
-				fill="#6b7280"
-				transform="rotate(-90 10 31)"
-			>
-				SRU Rate →
-			</text>
-		</svg>
+				</div>
+				<div class="flex items-center justify-between text-[10px] text-gray-500" style="width: 96px;">
+					<span>{mapState.currentConfig.xLow}</span>
+					<span>{mapState.currentConfig.xHigh}</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="mt-4 space-y-2">
+			<p class="text-[10px] font-medium uppercase tracking-wide text-gray-500">Key patterns</p>
+			{#each (['A1', 'A3', 'C1', 'C3'] as const) as cell (cell)}
+				{@const insight = mapState.currentConfig.insights[cell]}
+				<div class="flex gap-2">
+					<span
+						class="shrink-0 inline-flex h-4 w-5 items-center justify-center text-[9px] font-mono font-semibold text-gray-900 border border-gray-300"
+						style="background-color: {BIVARIATE_COLORS[cell]};"
+					>
+						{cell}
+					</span>
+					<div class="text-[11px] leading-tight">
+						<p class="font-medium text-gray-900">{insight.title}</p>
+						<p class="text-gray-600">{insight.body}</p>
+					</div>
+				</div>
+			{/each}
+		</div>
 	</div>
 </div>

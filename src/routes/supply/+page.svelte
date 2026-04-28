@@ -16,13 +16,7 @@
 			An increase in production, a geographic redistribution
 		</p>
 		<p class="mt-4 text-gray-700">
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-			aliquip ex ea commodo consequat. Duis aute irure dolor in
-			reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-			pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-			culpa qui officia deserunt mollit anim id est laborum.
+			Over the past two decades, France has steadily expanded its stock of social housing, but this growth has not been evenly shared across the country. New units have been concentrated in certain regions and large urban areas, while many affluent communes continue to under‑produce. These charts show both the overall rise in supply and the ways in which territory still structures who gets access to HLM.
 		</p>
 	</div>
 
@@ -48,7 +42,7 @@
 		</div>
 	</div>
 
-	<div class="max-w-3xl mx-auto mt-8">
+	<!-- <div class="max-w-3xl mx-auto mt-8">
 		<div class="border border-gray-200 rounded-none p-4">
 			<h4 class="text-sm font-semibold text-gray-700 mb-2">
 				Total Social Housing Units (2004–2022)
@@ -57,22 +51,12 @@
 				<SupplyLineChart />
 			</div>
 		</div>
-	</div>
+	</div> -->
 
 	<div class="max-w-3xl mx-auto">
 		<h3 class="mt-12 text-2xl font-semibold">Regional Breakdown</h3>
 		<p class="mt-4 text-gray-700">
-			Sed quis nisl accumsan enim porttitor dignissim eget nec felis. Cras
-			tempor sagittis ullamcorper. Nulla facilisi. Phasellus gravida
-			rhoncus viverra. Aenean ipsum nisl, volutpat in erat a, malesuada
-			lobortis ante. Nam egestas massa vitae ultrices fermentum. Nulla
-			facilisi. Integer ut gravida augue. Aenean in iaculis nunc, id
-			tincidunt justo. Phasellus sem erat, maximus a ullamcorper eu,
-			rhoncus at nulla. Nullam dui urna, tempus non mattis vel, tincidunt
-			quis massa. Nam placerat ex interdum ullamcorper lacinia. Vestibulum
-			mauris enim, ultricies ut posuere ut, venenatis quis quam. Class
-			aptent taciti sociosqu ad litora torquent per conubia nostra, per
-			inceptos himenaeos. Mauris ut erat lectus.
+			Looking at the data by region reveals stark contrasts in social‑housing provision. Some regions, often those with long‑standing public‑housing traditions or acute affordability pressures, host a large share of the national stock. Others remain well below national averages, illustrating how historical planning choices, local politics, and land markets shape where low‑income households can realistically live.
 		</p>
 	</div>
 	<div class="mx-12 mt-8 flex flex-col md:flex-row gap-4">
@@ -100,14 +84,7 @@
 	<div class="max-w-3xl mx-auto">
 		<h3 class="mt-12 text-2xl font-semibold">Supply Map</h3>
 		<p class="mt-4 text-gray-700">
-			Curabitur nisi dolor, sagittis eget consectetur eu, rutrum at ex.
-			Proin venenatis eu est nec ornare. Maecenas luctus accumsan
-			placerat. Nullam metus libero, pharetra vel felis in, vestibulum
-			condimentum erat. Aenean sapien orci, molestie eu mi vel, pretium
-			fringilla nisl. Proin vitae leo turpis. Vestibulum nec dolor
-			blandit, gravida mauris id, dignissim dolor. Phasellus gravida,
-			velit ut rhoncus accumsan, eros turpis suscipit urna, a iaculis mi
-			odio eget nibh.
+			This interactive map makes it possible to zoom in from regions to departments and communes to see how the SRU objectives translate on the ground. By toggling variables such as the SRU rate, users can identify territories that exceed, meet, or fall far short of the law’s targets. The map is a tool for visualizing spatial inequalities in access to social housing at multiple scales and over time.
 		</p>
 		<!-- <div class="mt-3 flex flex-col gap-1 text-sm text-gray-600">
 			<p><span class="font-medium text-gray-800">SRU Rate (%)</span> — Share of social housing units relative to the commune's total housing stock, as defined by Article 55 of the SRU law.</p>
@@ -126,14 +103,7 @@
 			Which communes did not meet their objectives?
 		</p>
 		<p class="mt-4 text-gray-700">
-			Proin blandit euismod nisi, sit amet varius nunc luctus id. Nullam
-			sit amet diam feugiat sapien varius placerat eu sed leo. Vivamus
-			magna erat, ullamcorper volutpat metus eu, congue auctor est. Morbi
-			ut dui non quam porta auctor. In tristique maximus felis in finibus.
-			Ut sit amet porta libero. Vivamus vitae fermentum eros, eu lacinia
-			turpis. Praesent erat mi, laoreet laoreet massa sit amet,
-			pellentesque venenatis tellus. Maecenas magna nisl, elementum sed
-			maximus venenatis, sollicitudin nec nulla. Vivamus ut urna magna.
+			Despite the overall increase in social‑housing units, many communes repeatedly fail to meet their legally required SRU quotas. This section tracks, year by year, which municipalities were officially declared non‑compliant and thus subject to financial penalties or a temporary loss of control over building permits. It highlights the persistence of local resistance and the limits of enforcement mechanisms.
 		</p>
 	</div>
 	<div class="mx-12 mt-4 flex flex-row gap-4">
@@ -153,8 +123,7 @@
 	<div class="max-w-3xl mx-auto">
 		<h3 class="mt-12 text-2xl font-semibold">Overseas Terrories</h3>
 		<p class="mt-4 text-gray-700">
-		Mauris a interdum sapien, lacinia imperdiet nulla. Etiam aliquet accumsan aliquam. Donec sodales sodales ante in fringilla. Nunc placerat lectus sed arcu fringilla sodales. Vestibulum volutpat maximus rhoncus. Sed varius nisi turpis, sed mollis risus blandit eleifend. Curabitur eleifend est pharetra arcu aliquet, vehicula scelerisque ante sollicitudin. Donec bibendum purus vel felis luctus efficitur. Ut et dolor faucibus, varius nisl sed, vestibulum metus. Duis dapibus diam non lorem rutrum, non feugiat lacus feugiat. Ut malesuada dictum lectus, ac euismod orci maximus in. Curabitur id pharetra justo, et sollicitudin nulla. Nullam iaculis velit id diam elementum, sit amet egestas ex pharetra.
-		</p>
+In France’s overseas territories, the dynamics of social housing are shaped by rapid demographic growth, colonial legacies, and high levels of poverty. Although some territories display relatively high formal SRU rates, the quantitative indicators often mask severe overcrowding, informal settlements, and inadequate infrastructure. Focusing on places like French Guiana shows how the housing question intersects with broader struggles over land, environment, and basic services.		</p>
 			<div class="mx-auto mt-6">
 		<DromComCard />
 	</div>
@@ -165,20 +134,7 @@
 	<div class="max-w-3xl mx-auto">
 		<h3 class="mt-12 text-2xl font-semibold">European Context</h3>
 		<p class="mt-4 text-gray-700">
-			Nunc sagittis cursus quam, ut pharetra justo egestas nec.
-			Suspendisse potenti. Nunc id leo sit amet augue dictum pharetra.
-			Praesent in lectus ut tortor sollicitudin scelerisque a vitae lorem.
-			Nulla viverra turpis non tellus porta, nec lobortis ante blandit.
-			Vivamus vehicula, ante et cursus convallis, nulla eros porttitor
-			diam, in tempor nunc felis sed augue. Aenean volutpat ac lectus non
-			lobortis. Maecenas ultrices tincidunt finibus. Nulla at lobortis
-			mauris. Nunc ut hendrerit mi, quis tempor lorem. Suspendisse
-			vulputate eu turpis eu tincidunt. In venenatis libero volutpat
-			mauris eleifend, porttitor maximus magna aliquet. Cras volutpat
-			magna ac elit laoreet pellentesque. Aliquam augue lectus, finibus
-			blandit fermentum nec, consectetur a arcu. Duis pellentesque massa
-			quis justo iaculis, vel posuere dui vulputate. Pellentesque interdum
-			nunc sed metus varius, id auctor est ultrices.
+			Placing France alongside its European neighbors underscores that social housing systems can be organized in very different ways. Some countries treat social housing as a large, universal sector, while others reserve it for the poorest households or have dramatically reduced their stock. Comparing these models helps situate the SRU law within a wider debate about how states use housing policy to regulate inequality and segregation.
 		</p>
 	</div>
 	<div class="mt-4">

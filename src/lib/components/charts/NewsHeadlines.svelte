@@ -1,54 +1,74 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
+	import GalleryLightbox from '$lib/components/gallery/GalleryLightbox.svelte';
 
 	type Headline = {
-		src: string;
-		alt: string;
+		id: string;
+		thumb: string;
+		full: string;
+		caption: string;
 	};
 
-	const headlines: Headline[] = [
-		{ src: '/headlines/March 2015.png', alt: 'March 2015 headline' },
-		{ src: '/headlines/September 2015.png', alt: 'September 2015 headline' },
-		{ src: '/headlines/October 2015.png', alt: 'October 2015 headline' },
-		{ src: '/headlines/April 2016.png', alt: 'April 2016 headline' },
-		{ src: '/headlines/April 2016 2.png', alt: 'April 2016 headline 2' },
-		{ src: '/headlines/July 2016.png', alt: 'July 2016 headline' },
-		{ src: '/headlines/April 2018.png', alt: 'April 2018 headline' },
-		{ src: '/headlines/September 2018.png', alt: 'September 2018 headline' },
-		{ src: '/headlines/December 2018.png', alt: 'December 2018 headline' },
-		{ src: '/headlines/January 2019.png', alt: 'January 2019 headline' },
-		{ src: '/headlines/September 2019.png', alt: 'September 2019 headline' },
-		{ src: '/headlines/November 2019.png', alt: 'November 2019 headline' },
-		{ src: '/headlines/December 2020.png', alt: 'December 2020 headline' },
-		{ src: '/headlines/December 2020 2.png', alt: 'December 2020 headline 2' },
-		{ src: '/headlines/November 2022.png', alt: 'November 2022 headline' },
-		{ src: '/headlines/November 2022 2.png', alt: 'November 2022 headline 2' },
-		{ src: '/headlines/March 2023.png', alt: 'March 2023 headline' },
-		{ src: '/headlines/January 2024.png', alt: 'January 2024 headline' },
-		{ src: '/headlines/February 2024.png', alt: 'February 2024 headline' },
-		{ src: '/headlines/April 2024.png', alt: 'April 2024 headline' },
-		{ src: '/headlines/April 2024 2.png', alt: 'April 2024 headline 2' },
-		{ src: '/headlines/June 2024.png', alt: 'June 2024 headline' },
-		{ src: '/headlines/October 2024.png', alt: 'October 2024 headline' }
+	const headlineFiles: { file: string; caption: string }[] = [
+		{ file: 'March 2015', caption: 'March 2015' },
+		{ file: 'September 2015', caption: 'September 2015' },
+		{ file: 'October 2015', caption: 'October 2015' },
+		{ file: 'April 2016', caption: 'April 2016' },
+		{ file: 'April 2016 2', caption: 'April 2016' },
+		{ file: 'July 2016', caption: 'July 2016' },
+		{ file: 'April 2018', caption: 'April 2018' },
+		{ file: 'September 2018', caption: 'September 2018' },
+		{ file: 'December 2018', caption: 'December 2018' },
+		{ file: 'January 2019', caption: 'January 2019' },
+		{ file: 'September 2019', caption: 'September 2019' },
+		{ file: 'November 2019', caption: 'November 2019' },
+		{ file: 'December 2020', caption: 'December 2020' },
+		{ file: 'December 2020 2', caption: 'December 2020' },
+		{ file: 'November 2022', caption: 'November 2022' },
+		{ file: 'November 2022 2', caption: 'November 2022' },
+		{ file: 'March 2023', caption: 'March 2023' },
+		{ file: 'January 2024', caption: 'January 2024' },
+		{ file: 'February 2024', caption: 'February 2024' },
+		{ file: 'April 2024', caption: 'April 2024' },
+		{ file: 'April 2024 2', caption: 'April 2024' },
+		{ file: 'June 2024', caption: 'June 2024' },
+		{ file: 'October 2024', caption: 'October 2024' }
 	];
+
+	const headlines: Headline[] = headlineFiles.map(({ file, caption }) => ({
+		id: file,
+		thumb: `/headlines/optimized/${file}-thumb.webp`,
+		full: `/headlines/optimized/${file}-full.webp`,
+		caption
+	}));
+
+	let lightboxOpen = $state(false);
+	let startIndex = $state(0);
+
+	function openLightbox(index: number) {
+		startIndex = index;
+		lightboxOpen = true;
+	}
 </script>
 
-<ul
-	aria-label="Chronological news headlines"
-	class="grid list-none gap-6 px-4"
-	style:grid-template-columns="repeat(auto-fit, minmax(16rem, 1fr))"
->
-	{#each headlines as headline (headline.src)}
-		<li
-			class="group relative flex aspect-[4/3] items-center justify-center border border-gray-200 bg-white p-4 shadow-sm transition-transform duration-200 ease-out hover:z-10 hover:scale-110 hover:shadow-[0_10px_24px_rgba(15,23,42,0.14)] focus-within:z-10 focus-within:scale-110"
-		>
-			<img
-				src={asset(headline.src)}
-				alt={headline.alt}
-				class="max-h-full max-w-full object-contain"
-				draggable="false"
-				loading="lazy"
-			/>
-		</li>
-	{/each}
-</ul>
+<div class="max-w-3xl mx-auto px-4">
+	<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
+		{#each headlines as headline, i (headline.id)}
+			<button
+				type="button"
+				class="group flex aspect-4/3 items-center justify-center overflow-hidden border border-gray-200 bg-white p-3 transition-transform duration-200 ease-out hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+				onclick={() => openLightbox(i)}
+			>
+				<img
+					src={asset(headline.thumb)}
+					alt={headline.caption || headline.id}
+					loading="lazy"
+					draggable="false"
+					class="max-h-full max-w-full object-contain"
+				/>
+			</button>
+		{/each}
+	</div>
+</div>
+
+<GalleryLightbox bind:open={lightboxOpen} {startIndex} images={headlines} />

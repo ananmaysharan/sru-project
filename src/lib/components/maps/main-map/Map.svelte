@@ -417,12 +417,12 @@
 			>
 				{#snippet children({ thumbs })}
 					<span class="bg-gray-200 relative h-1.5 w-full grow overflow-hidden rounded-full">
-						<Slider.Range class="bg-primary absolute h-full" />
+						<Slider.Range class="bg-[#8fa6aa] absolute h-full" />
 					</span>
 					{#each thumbs as thumb (thumb)}
 						<Slider.Thumb
 							index={thumb}
-							class="border-primary ring-ring/50 block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden"
+							class="border-[#8fa6aa] ring-[#8fa6aa]/30 block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden"
 						/>
 					{/each}
 				{/snippet}

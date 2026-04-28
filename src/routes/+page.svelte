@@ -77,8 +77,7 @@
 <section id="in-the-news" class="py-12">
 	<div class="max-w-3xl mx-auto">
 		<p class="mt-2 text-lg text-gray-600">
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-			ut labore et dolore magna aliqua.
+		Together, these media headlines trace how, over the years, the SRU law has been formally upheld as an instrument against territorial and social apartheid, even as local and national actors repeatedly seek to weaken or bypass its social-housing obligations, through budget cuts, legal challenges, strategic avoidance by mayors, and mobilized resident opposition to new social housing construction, particularly in wealthier communities.
 		</p>
 	</div>
 

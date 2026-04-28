@@ -12,7 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:e2e": "playwright test",
 		"test": "npm run test:e2e",
-		"optimize-images": "node scripts/optimize-images.js"
+		"optimize-images": "node scripts/optimize-images.js",
+		"optimize-headlines": "node scripts/optimize-headlines.js"
 	},
 	"devDependencies": {
 		"@internationalized/date": "^3.12.0",

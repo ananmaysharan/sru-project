@@ -3,7 +3,6 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import TableOfContents from '$lib/components/sections/TableOfContents.svelte';
 	import PageNavigation from '$lib/components/sections/PageNavigation.svelte';
-	import Footer from '$lib/components/sections/Footer.svelte';
 	import { page } from '$app/state';
 
 	let { children } = $props();
@@ -16,5 +15,4 @@
 		{@render children()}
 		<PageNavigation currentPath={page.url.pathname} />
 	</main>
-	<Footer />
 </div>

@@ -5,10 +5,10 @@
 	let chartEl: HTMLDivElement;
 
 	const series = [
-		{ name: 'Social Rental Tenants', key: 'socialRental' },
-		{ name: 'Private Rental Tenants', key: 'privateRental' },
-		{ name: 'Owner-Occupied (Mortgaged)', key: 'ownerMortgaged' },
-		{ name: 'Owner-Occupied (Mortgage-Free)', key: 'ownerMortgageFree' }
+		{ name: 'Social Rental Tenants', key: 'socialRental', color: '#4a596b' },
+		{ name: 'Private Rental Tenants', key: 'privateRental', color: '#b1b9bc' },
+		{ name: 'Owner-Occupied (Mortgaged)', key: 'ownerMortgaged', color: '#9da283' },
+		{ name: 'Owner-Occupied (Mortgage-Free)', key: 'ownerMortgageFree', color: '#d8c891' }
 	] as const;
 
 	onMount(() => {
@@ -46,6 +46,7 @@
 					name: s.name,
 					type: 'bar',
 					stack: 'total',
+					itemStyle: { color: s.color },
 					data: residencesByYear.map((d) => d[s.key]),
 					barWidth: '55%',
 					label: {

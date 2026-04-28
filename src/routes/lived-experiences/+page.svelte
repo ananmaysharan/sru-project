@@ -37,7 +37,7 @@
 
 	<div class="w-full  mt-8">
 		<Tabs.Root value="paris">
-			<Tabs.List class="w-full max-w-3xl mx-auto">
+			<Tabs.List variant="line" class="flex w-full max-w-3xl mx-auto">
 				{#each regions as region (region.value)}
 					<Tabs.Trigger value={region.value}>{region.label}</Tabs.Trigger>
 				{/each}

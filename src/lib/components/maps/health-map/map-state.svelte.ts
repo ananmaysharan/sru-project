@@ -1,8 +1,8 @@
 import bivariateData from '$lib/data/map/health-communes-bivariate.json';
 import communeLookup from '$lib/data/map/commune-lookup.json';
 
-type MetricType = 'income' | 'poverty' | 'elders' | 'left';
-type Year = 2012 | 2014 | 2018 | 2020;
+type MetricType = 'income' | 'poverty' | 'elders' | 'left' | 'dpe' | 'heat';
+type Year = 2012 | 2014 | 2017 | 2018 | 2020 | 2021;
 type CellCode = 'A1' | 'B1' | 'C1' | 'A2' | 'B2' | 'C2' | 'A3' | 'B3' | 'C3';
 
 type CellValue = {
@@ -48,7 +48,7 @@ export const COMMUNES_PMTILES_URL =
 export const REGIONS_PMTILES_URL =
 	'https://object.files.data.gouv.fr/hydra-pmtiles/hydra-pmtiles/36a02713-e1cf-45bc-8124-a43588c50443.pmtiles';
 
-export const YEARS = [2012, 2014, 2018, 2020] as const;
+export const YEARS = [2012, 2014, 2017, 2018, 2020, 2021] as const;
 
 export const BIVARIATE_COLORS: Record<CellCode, string> = {
 	A1: '#e8e8e8',
@@ -62,38 +62,122 @@ export const BIVARIATE_COLORS: Record<CellCode, string> = {
 	C3: '#3b4994'
 };
 
+type CornerCells = 'A1' | 'A3' | 'C1' | 'C3';
+
 export const METRIC_CONFIG: Record<
 	MetricType,
 	{
 		label: string;
+		shortName: string;
+		description: string;
 		xAxisLabel: string;
 		yAxisLabel: string;
+		xLow: string;
+		xHigh: string;
 		availableYears: Year[];
+		insights: Record<CornerCells, { title: string; body: string }>;
 	}
 > = {
 	income: {
 		label: 'Income',
+		shortName: 'Median income',
+		description:
+			'Median annual household income (€/year) from INSEE Filosofi tax records.',
 		xAxisLabel: 'Lower income → Higher income',
-		yAxisLabel: 'Lower SRU exposure → Higher SRU exposure',
-		availableYears: [2012, 2018]
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Low income',
+		xHigh: 'High income',
+		availableYears: [2012, 2018],
+		insights: {
+			A1: { title: 'Rural / struggling', body: 'Low income + low growth — stagnant policy.' },
+			A3: { title: 'Redistributive', body: 'Low income + high growth — investing despite a low tax base.' },
+			C1: { title: 'Exclusionary', body: 'High income + low growth — wealthy but supply-constrained.' },
+			C3: { title: 'Inclusive growth', body: 'High income + high growth — prosperous areas expanding affordable housing.' }
+		}
 	},
 	poverty: {
 		label: 'Poverty',
+		shortName: 'Poverty rate',
+		description:
+			'Share of population below 60% of the national median income.',
 		xAxisLabel: 'Lower poverty → Higher poverty',
-		yAxisLabel: 'Lower SRU exposure → Higher SRU exposure',
-		availableYears: [2012, 2018]
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Low poverty',
+		xHigh: 'High poverty',
+		availableYears: [2012, 2018],
+		insights: {
+			A1: { title: 'Expected low-need', body: 'Low poverty + low growth — limited demand pressure.' },
+			A3: { title: 'Inclusive expansion', body: 'Low poverty + high growth — building beyond local need.' },
+			C1: { title: 'Crisis zone', body: 'High poverty + low growth — need without response.' },
+			C3: { title: 'Strong response', body: 'High poverty + high growth — investment matching need.' }
+		}
 	},
 	elders: {
 		label: 'Elders',
-		xAxisLabel: 'Lower share of elders → Higher share of elders',
-		yAxisLabel: 'Lower SRU exposure → Higher SRU exposure',
-		availableYears: [2018]
+		shortName: 'Share of elders',
+		description: 'Share of population aged 65+ at the commune level.',
+		xAxisLabel: 'Fewer elders → More elders',
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Few elders',
+		xHigh: 'Many elders',
+		availableYears: [2018],
+		insights: {
+			A1: { title: 'Younger, stable', body: 'Few elders + low growth — limited demographic pressure.' },
+			A3: { title: 'Family-oriented growth', body: 'Few elders + high growth — building for incoming households.' },
+			C1: { title: 'Aging without renewal', body: 'Many elders + low growth — older stock, no replenishment.' },
+			C3: { title: 'Aging with investment', body: 'Many elders + high growth — adapting stock for older residents.' }
+		}
 	},
 	left: {
-		label: 'Left Vote',
-		xAxisLabel: 'Lower left vote → Higher left vote',
-		yAxisLabel: 'Lower SRU exposure → Higher SRU exposure',
-		availableYears: [2014, 2020]
+		label: 'Election Winner',
+		shortName: 'Municipal election winner',
+		description:
+			'Political orientation of the winning party or coalition in the municipal election: Left, Center or Right.',
+		xAxisLabel: 'Left → Center → Right',
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Left',
+		xHigh: 'Right',
+		availableYears: [2014, 2020],
+		insights: {
+			A1: { title: 'Rhetoric without delivery', body: 'Left winner + low growth.' },
+			A3: { title: 'Left prioritizing housing', body: 'Left winner + high growth.' },
+			C1: { title: 'Market-oriented', body: 'Right winner + low growth — limited intervention.' },
+			C3: { title: 'Consensus policy', body: 'Right winner + high growth — Right also expanding.' }
+		}
+	},
+	dpe: {
+		label: 'DPE Energy Efficiency',
+		shortName: 'Building energy efficiency',
+		description:
+			'Share of buildings rated A, B or C in the ADEME DPE energy-performance database.',
+		xAxisLabel: 'Lower efficiency → Higher efficiency',
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Low efficiency',
+		xHigh: 'High efficiency',
+		availableYears: [2021],
+		insights: {
+			A1: { title: 'Dual vulnerability', body: 'Low efficiency + low growth — both lagging.' },
+			A3: { title: 'Retrofit opportunity', body: 'Low efficiency + high growth — new stock replacing old.' },
+			C1: { title: 'Mature efficient stock', body: 'High efficiency + low growth — already well-equipped.' },
+			C3: { title: 'Green & inclusive', body: 'High efficiency + high growth — best of both.' }
+		}
+	},
+	heat: {
+		label: 'Heat Islands (MAPUCE)',
+		shortName: 'Urban heat-island intensity',
+		description:
+			'Share of commune area (in m², from the MAPUCE 2017 dataset) classified as urban heat island — temperature anomaly >1 K above the rural baseline.',
+		xAxisLabel: 'Cooler → Hotter',
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Cool',
+		xHigh: 'Hot',
+		availableYears: [2017],
+		insights: {
+			A1: { title: 'Comfortable, limited need', body: 'Low heat + low growth.' },
+			A3: { title: 'Greenfield development', body: 'Low heat + high growth — building in cool peripheries.' },
+			C1: { title: 'Environmental injustice', body: 'High heat + low growth — exposed without response.' },
+			C3: { title: 'Compensatory policy', body: 'High heat + high growth — investment in hot areas.' }
+		}
 	}
 };
 
@@ -146,7 +230,7 @@ export class MapState {
 			: []
 	);
 
-	metricsForTab = ['income', 'poverty', 'elders', 'left'] as MetricType[];
+	metricsForTab = ['income', 'poverty', 'elders', 'left', 'dpe', 'heat'] as MetricType[];
 
 	switchMetric(metric: MetricType) {
 		this.activeMetric = metric;
