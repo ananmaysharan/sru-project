@@ -27,7 +27,7 @@
 </script>
 
 <section id="socio-econometrics" class="py-12">
-	<div class="max-w-3xl mx-auto ">
+	<div class="max-w-3xl mx-auto px-4 sm:px-6">
 		<h2 class="text-3xl font-bold">The Lived Experiences</h2>
 		<p class="mt-2 text-lg text-gray-600">
 			A zoom on four case studies, from Paris to Brittany, the French Riviera to the overseas
@@ -37,14 +37,17 @@
 
 	<div class="w-full  mt-8">
 		<Tabs.Root value="paris">
-			<Tabs.List variant="line" class="flex w-full max-w-3xl mx-auto">
+			<Tabs.List
+				variant="line"
+				class="flex w-full max-w-3xl mx-auto overflow-x-auto whitespace-nowrap px-4 sm:px-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+			>
 				{#each regions as region (region.value)}
-					<Tabs.Trigger value={region.value}>{region.label}</Tabs.Trigger>
+					<Tabs.Trigger value={region.value} class="shrink-0">{region.label}</Tabs.Trigger>
 				{/each}
 			</Tabs.List>
 
 			{#each regions as region (region.value)}
-				<Tabs.Content value={region.value} class="max-w-3xl mx-auto">
+				<Tabs.Content value={region.value} class="max-w-3xl mx-auto px-4 sm:px-6">
 					{#if region.images.length > 0}
 						<div class="flex flex-col md:flex-row gap-4 mt-4">
 							{#each region.images as src}

@@ -59,34 +59,40 @@
 		{/each}
 	</svg>
 
-	<!-- Legislation table — single grid so columns align vertically -->
-	<div class="mt-6 px-6 grid grid-cols-[auto_repeat(8,1fr)] gap-x-4 gap-y-3 items-start">
-		<!-- Row 1: Law names/dates -->
-		<div></div>
-		{#each legislations as law}
-			<div>
-				<h3 class="text-xs sm:text-sm font-bold text-red-800">{law.name}</h3>
-				<p class="text-[8px] sm:text-[10px] italic text-gray-600 leading-tight mt-0.5">{law.fullName}</p>
-				<p class="text-[7px] sm:text-[9px] text-gray-400 mt-1">{law.date}</p>
+	<!-- Legislation table — single grid so columns align vertically.
+	     Below sm, allow horizontal scrolling so the 9-column comparative table
+	     doesn't push the page past the viewport. -->
+	<div class="mt-6 overflow-x-auto sm:overflow-visible">
+		<div
+			class="grid grid-cols-[auto_repeat(8,minmax(80px,1fr))] gap-x-4 gap-y-3 items-start px-6 min-w-[640px] sm:min-w-0 sm:grid-cols-[auto_repeat(8,1fr)]"
+		>
+			<!-- Row 1: Law names/dates -->
+			<div></div>
+			{#each legislations as law}
+				<div>
+					<h3 class="text-xs sm:text-sm font-bold text-red-800">{law.name}</h3>
+					<p class="text-[8px] sm:text-[10px] italic text-gray-600 leading-tight mt-0.5">{law.fullName}</p>
+					<p class="text-[7px] sm:text-[9px] text-gray-400 mt-1">{law.date}</p>
+				</div>
+			{/each}
+
+			<!-- Row 2: Key Objectives -->
+			<div class="pr-2">
+				<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Key</p>
+				<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Objectives</p>
 			</div>
-		{/each}
+			{#each legislations as law}
+				<p class="text-[6px] sm:text-[8px] text-gray-600 leading-tight">{law.objectives}</p>
+			{/each}
 
-		<!-- Row 2: Key Objectives -->
-		<div class="pr-2">
-			<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Key</p>
-			<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Objectives</p>
+			<!-- Row 3: Key Sanctions -->
+			<div class="pr-2">
+				<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Key</p>
+				<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Sanctions</p>
+			</div>
+			{#each legislations as law}
+				<p class="text-[6px] sm:text-[8px] text-gray-600 leading-tight">{law.sanctions || '—'}</p>
+			{/each}
 		</div>
-		{#each legislations as law}
-			<p class="text-[6px] sm:text-[8px] text-gray-600 leading-tight">{law.objectives}</p>
-		{/each}
-
-		<!-- Row 3: Key Sanctions -->
-		<div class="pr-2">
-			<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Key</p>
-			<p class="text-[8px] sm:text-[10px] font-semibold text-gray-800">Sanctions</p>
-		</div>
-		{#each legislations as law}
-			<p class="text-[6px] sm:text-[8px] text-gray-600 leading-tight">{law.sanctions || '—'}</p>
-		{/each}
 	</div>
 </div>

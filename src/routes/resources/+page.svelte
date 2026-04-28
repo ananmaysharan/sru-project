@@ -3,7 +3,7 @@
 </script>
 
 <section id="resources" class="py-12">
-	<div class="max-w-3xl mx-auto">
+	<div class="max-w-3xl mx-auto px-4 sm:px-6">
 		<h2 class="text-3xl font-bold">Resources</h2>
 		
 		<div class="mt-6 space-y-8 text-base text-gray-700">
