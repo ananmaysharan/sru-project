@@ -28,9 +28,12 @@
 					bottom: 0,
 					left: 'center',
 					icon: 'rect',
-					itemWidth: 14,
-					itemHeight: 14,
-					textStyle: { fontSize: 12 }
+					itemWidth: 10,
+					itemHeight: 10,
+					itemGap: 8,
+					textStyle: { fontSize: 10 },
+					type: 'plain',
+					width: '100%'
 				},
 				xAxis: {
 					type: 'category',

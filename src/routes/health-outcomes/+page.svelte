@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Gallery from '$lib/components/gallery/Gallery.svelte';
 	import HealthMap from '$lib/components/maps/health-map/HealthMap.svelte';
 	import { METRIC_CONFIG } from '$lib/components/maps/health-map/map-state.svelte.js';
 </script>
@@ -43,10 +42,5 @@
 		<p>
 			<strong>Heat islands (MAPUCE)</strong> {METRIC_CONFIG.heat.description}
 		</p>
-	</div>
-	<div class="max-w-3xl mx-auto mt-8 px-4 sm:px-6">
-			<h3 class="text-xl font-bold">Gallery</h3>
-
-		<Gallery />
 	</div>
 </section>

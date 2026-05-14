@@ -107,44 +107,57 @@
 
 			map.setProjection({ type: 'globe' });
 
-			map.addLayer({
-				id: 'communes-fill',
-				type: 'fill',
-				source: 'communes',
-				...sl(communesSourceLayer),
-				paint: {
-					'fill-color': mapState.buildChoroplethExpression() as maplibregl.ExpressionSpecification,
-					'fill-opacity': [
-						'case',
-						['boolean', ['feature-state', 'hover'], false],
-						0.9,
-						0.7
-					]
-				}
-			});
+			// Insert all data layers below the first basemap symbol layer so
+			// toponyms render on top — the canonical MapLibre pattern.
+			const firstSymbolId = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
 
-			map.addLayer({
-				id: 'communes-border',
-				type: 'line',
-				source: 'communes',
-				...sl(communesSourceLayer),
-				paint: {
-					'line-color': '#d1d5db',
-					'line-width': 0.2,
-					'line-opacity': 0.3
-				}
-			});
+			map.addLayer(
+				{
+					id: 'communes-fill',
+					type: 'fill',
+					source: 'communes',
+					...sl(communesSourceLayer),
+					paint: {
+						'fill-color': mapState.buildChoroplethExpression() as maplibregl.ExpressionSpecification,
+						'fill-opacity': [
+							'case',
+							['boolean', ['feature-state', 'hover'], false],
+							0.9,
+							0.7
+						]
+					}
+				},
+				firstSymbolId
+			);
 
-			map.addLayer({
-				id: 'regions-border',
-				type: 'line',
-				source: 'regions',
-				...sl(regionsSourceLayer),
-				paint: {
-					'line-color': '#ddd',
-					'line-width': 1
-				}
-			});
+			map.addLayer(
+				{
+					id: 'communes-border',
+					type: 'line',
+					source: 'communes',
+					...sl(communesSourceLayer),
+					paint: {
+						'line-color': '#d1d5db',
+						'line-width': 0.2,
+						'line-opacity': 0.3
+					}
+				},
+				firstSymbolId
+			);
+
+			map.addLayer(
+				{
+					id: 'regions-border',
+					type: 'line',
+					source: 'regions',
+					...sl(regionsSourceLayer),
+					paint: {
+						'line-color': '#ddd',
+						'line-width': 1
+					}
+				},
+				firstSymbolId
+			);
 
 			map.on('mouseleave', 'communes-fill', () => {
 				map.getCanvas().style.cursor = '';

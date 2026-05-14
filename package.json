@@ -40,6 +40,8 @@
 	},
 	"dependencies": {
 		"@sanity-labs/logo-soup": "^1.2.2",
+		"@types/d3": "^7.4.3",
+		"d3": "^7.9.0",
 		"echarts": "^6.0.0",
 		"maplibre-gl": "^5.18.0",
 		"pmtiles": "^4.4.0"

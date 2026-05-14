@@ -1,46 +1,7 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
 	import GalleryLightbox from '$lib/components/gallery/GalleryLightbox.svelte';
-
-	type Headline = {
-		id: string;
-		thumb: string;
-		full: string;
-		caption: string;
-	};
-
-	const headlineFiles: { file: string; caption: string }[] = [
-		{ file: 'March 2015', caption: 'March 2015' },
-		{ file: 'September 2015', caption: 'September 2015' },
-		{ file: 'October 2015', caption: 'October 2015' },
-		{ file: 'April 2016', caption: 'April 2016' },
-		{ file: 'April 2016 2', caption: 'April 2016' },
-		{ file: 'July 2016', caption: 'July 2016' },
-		{ file: 'April 2018', caption: 'April 2018' },
-		{ file: 'September 2018', caption: 'September 2018' },
-		{ file: 'December 2018', caption: 'December 2018' },
-		{ file: 'January 2019', caption: 'January 2019' },
-		{ file: 'September 2019', caption: 'September 2019' },
-		{ file: 'November 2019', caption: 'November 2019' },
-		{ file: 'December 2020', caption: 'December 2020' },
-		{ file: 'December 2020 2', caption: 'December 2020' },
-		{ file: 'November 2022', caption: 'November 2022' },
-		{ file: 'November 2022 2', caption: 'November 2022' },
-		{ file: 'March 2023', caption: 'March 2023' },
-		{ file: 'January 2024', caption: 'January 2024' },
-		{ file: 'February 2024', caption: 'February 2024' },
-		{ file: 'April 2024', caption: 'April 2024' },
-		{ file: 'April 2024 2', caption: 'April 2024' },
-		{ file: 'June 2024', caption: 'June 2024' },
-		{ file: 'October 2024', caption: 'October 2024' }
-	];
-
-	const headlines: Headline[] = headlineFiles.map(({ file, caption }) => ({
-		id: file,
-		thumb: `/headlines/optimized/${file}-thumb.webp`,
-		full: `/headlines/optimized/${file}-full.webp`,
-		caption
-	}));
+	import { headlines } from '$lib/data/charts/news-headlines';
 
 	let lightboxOpen = $state(false);
 	let startIndex = $state(0);

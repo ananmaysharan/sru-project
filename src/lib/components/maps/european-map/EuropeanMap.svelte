@@ -88,42 +88,52 @@
 
 			const countriesFilter = ['in', ['get', 'ISO_A3'], ['literal', EUROPE_COUNTRY_CODES]] as any;
 
-			map.addLayer({
-				id: COUNTRIES_FILL_LAYER_ID,
-				type: 'fill',
-				source: COUNTRIES_SOURCE_ID,
-				filter: countriesFilter,
-				paint: {
-					'fill-color': [
-						'case',
-						['boolean', ['feature-state', 'selected'], false],
-						'#111827',
-						['boolean', ['feature-state', 'hover'], false],
-						'#374151',
-						'#6b7280'
-					],
-					'fill-opacity': [
-						'case',
-						['boolean', ['feature-state', 'selected'], false],
-						0.75,
-						['boolean', ['feature-state', 'hover'], false],
-						0.55,
-						0.35
-					]
-				}
-			});
+			// Insert all data layers below the first basemap symbol layer so
+			// toponyms render on top — the canonical MapLibre pattern.
+			const firstSymbolId = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
 
-			map.addLayer({
-				id: COUNTRIES_BORDER_LAYER_ID,
-				type: 'line',
-				source: COUNTRIES_SOURCE_ID,
-				filter: countriesFilter,
-				paint: {
-					'line-color': '#f9fafb',
-					'line-width': 0.6,
-					'line-opacity': 0.75
-				}
-			});
+			map.addLayer(
+				{
+					id: COUNTRIES_FILL_LAYER_ID,
+					type: 'fill',
+					source: COUNTRIES_SOURCE_ID,
+					filter: countriesFilter,
+					paint: {
+						'fill-color': [
+							'case',
+							['boolean', ['feature-state', 'selected'], false],
+							'#111827',
+							['boolean', ['feature-state', 'hover'], false],
+							'#374151',
+							'#6b7280'
+						],
+						'fill-opacity': [
+							'case',
+							['boolean', ['feature-state', 'selected'], false],
+							0.75,
+							['boolean', ['feature-state', 'hover'], false],
+							0.55,
+							0.35
+						]
+					}
+				},
+				firstSymbolId
+			);
+
+			map.addLayer(
+				{
+					id: COUNTRIES_BORDER_LAYER_ID,
+					type: 'line',
+					source: COUNTRIES_SOURCE_ID,
+					filter: countriesFilter,
+					paint: {
+						'line-color': '#f9fafb',
+						'line-width': 0.6,
+						'line-opacity': 0.75
+					}
+				},
+				firstSymbolId
+			);
 
 			map.on('mouseenter', COUNTRIES_FILL_LAYER_ID, () => {
 				map.getCanvas().style.cursor = 'pointer';

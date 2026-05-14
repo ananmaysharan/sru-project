@@ -171,77 +171,96 @@
 
 			map.setProjection({ type: 'globe' });
 
-			// --- Communes layers (visible by default) ---
-			map.addLayer({
-				id: 'communes-fill',
-				type: 'fill',
-				source: 'communes',
-				...sl(communesSourceLayer),
-				paint: {
-					'fill-color': mapState.buildChoroplethExpression() as maplibregl.ExpressionSpecification,
-					'fill-opacity': [
-						'case',
-						['boolean', ['feature-state', 'hover'], false],
-						0.9,
-						0.7
-					]
-				}
-			});
+			// Insert all data layers below the first basemap symbol layer so
+			// toponyms render on top — the canonical MapLibre pattern.
+			const firstSymbolId = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
 
-			map.addLayer({
-				id: 'communes-border',
-				type: 'line',
-				source: 'communes',
-				...sl(communesSourceLayer),
-				paint: {
-					'line-color': '#d1d5db',
-					'line-width': 0.2,
-					'line-opacity': 0.3
-				}
-			});
+			// --- Communes layers (visible by default) ---
+			map.addLayer(
+				{
+					id: 'communes-fill',
+					type: 'fill',
+					source: 'communes',
+					...sl(communesSourceLayer),
+					paint: {
+						'fill-color': mapState.buildChoroplethExpression() as maplibregl.ExpressionSpecification,
+						'fill-opacity': [
+							'case',
+							['boolean', ['feature-state', 'hover'], false],
+							0.9,
+							0.7
+						]
+					}
+				},
+				firstSymbolId
+			);
+
+			map.addLayer(
+				{
+					id: 'communes-border',
+					type: 'line',
+					source: 'communes',
+					...sl(communesSourceLayer),
+					paint: {
+						'line-color': '#d1d5db',
+						'line-width': 0.2,
+						'line-opacity': 0.3
+					}
+				},
+				firstSymbolId
+			);
 
 			// --- Departements layers (hidden by default) ---
-			map.addLayer({
-				id: 'departements-fill',
-				type: 'fill',
-				source: 'departements',
-				...sl(departementsSourceLayer),
-				layout: { visibility: 'none' },
-				paint: {
-					'fill-color': 'transparent',
-					'fill-opacity': [
-						'case',
-						['boolean', ['feature-state', 'hover'], false],
-						0.9,
-						0.7
-					]
-				}
-			});
+			map.addLayer(
+				{
+					id: 'departements-fill',
+					type: 'fill',
+					source: 'departements',
+					...sl(departementsSourceLayer),
+					layout: { visibility: 'none' },
+					paint: {
+						'fill-color': 'transparent',
+						'fill-opacity': [
+							'case',
+							['boolean', ['feature-state', 'hover'], false],
+							0.9,
+							0.7
+						]
+					}
+				},
+				firstSymbolId
+			);
 
-			map.addLayer({
-				id: 'departements-border',
-				type: 'line',
-				source: 'departements',
-				...sl(departementsSourceLayer),
-				layout: { visibility: 'none' },
-				paint: {
-					'line-color': '#9ca3af',
-					'line-width': 0.5,
-					'line-opacity': 0.6
-				}
-			});
+			map.addLayer(
+				{
+					id: 'departements-border',
+					type: 'line',
+					source: 'departements',
+					...sl(departementsSourceLayer),
+					layout: { visibility: 'none' },
+					paint: {
+						'line-color': '#9ca3af',
+						'line-width': 0.5,
+						'line-opacity': 0.6
+					}
+				},
+				firstSymbolId
+			);
 
 			// --- Regions border overlay ---
-			map.addLayer({
-				id: 'regions-border',
-				type: 'line',
-				source: 'regions',
-				...sl(regionsSourceLayer),
-				paint: {
-					'line-color': '#ddd',
-					'line-width': 1
-				}
-			});
+			map.addLayer(
+				{
+					id: 'regions-border',
+					type: 'line',
+					source: 'regions',
+					...sl(regionsSourceLayer),
+					paint: {
+						'line-color': '#ddd',
+						'line-width': 1
+					}
+				},
+				firstSymbolId
+			);
 
 			// --- Hover for communes ---
 			map.on('mouseleave', 'communes-fill', () => {
