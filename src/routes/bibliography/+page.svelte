@@ -85,6 +85,10 @@
 					<h3 class="text-lg font-semibold text-gray-900">Research Assistantship Team</h3>
 					<p class="mt-1">Ananmay Sharan, Sebastian Rodriguez, Matt Thibodeau, Yihan Zhang, Anishta Khan</p>
 				</div>
+				<div>
+					<h3 class="text-lg font-semibold text-gray-900">Photography</h3>
+					<p class="mt-1">All images developed in partnership with docar films.</p>
+				</div>
 			</div>
 		</div>
 	</div>

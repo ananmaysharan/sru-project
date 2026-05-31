@@ -117,7 +117,7 @@
     </div>
 
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h3 class="mt-12 text-2xl font-semibold">Non-Compliance</h3>
+        <h3 class="mt-12 text-2xl font-semibold">Non-Compliance (2005–2022)</h3>
         <p class="mt-2 text-lg text-gray-600">
             Which communes did not meet their objectives?
         </p>

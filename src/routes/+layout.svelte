@@ -10,9 +10,9 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <div class="flex min-h-screen flex-col">
-	<TableOfContents currentPath={page.url.pathname} />
+	<TableOfContents routeId={page.route.id} />
 	<main class="flex-1">
 		{@render children()}
-		<PageNavigation currentPath={page.url.pathname} />
+		<PageNavigation routeId={page.route.id} />
 	</main>
 </div>

@@ -1,87 +1,46 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { asset } from "$app/paths";
-    import HeroChart from "$lib/components/charts/HeroChart.svelte";
     import SocialHousingStockChart from "$lib/components/charts/SocialHousingStockChart.svelte";
     import Logos from "$lib/components/elements/Logos.svelte";
+    import { STORY_PHASES, phaseProgress } from "$lib/data/charts/scroll-story";
 
-    let storyEl: HTMLElement;
-    let scrollProgress = $state(0);
-    let autoStart = $state(false);
-    let chartReady = $state(false);
+    let storyEl = $state<HTMLElement>();
     let navHeight = $state(56);
-    let scrollLocked = false;
+    let scrollY = $state(0);
+    let innerHeight = $state(0);
 
-    function lockScroll() {
-        if (scrollLocked) return;
-        scrollLocked = true;
-        document.body.style.overflow = "hidden";
-    }
-
-    function unlockScroll() {
-        if (!scrollLocked) return;
-        scrollLocked = false;
-        document.body.style.overflow = "";
-    }
-
-    function handleChartComplete() {
-        chartReady = true;
-        unlockScroll();
-    }
-
-    onMount(() => {
-        const measureNav = () => {
-            const nav = document.querySelector(
-                'nav[aria-label="Table of contents"]',
-            ) as HTMLElement | null;
-            navHeight = nav?.offsetHeight ?? 56;
-        };
-        measureNav();
-
-        // Track scroll progress through the sticky story section. The h2
-        // anchor sits at the top of the sticky frame, which itself is pinned
-        // at top: navHeight, so scrollProgress = 0 the moment the section's
-        // top reaches the nav bar's bottom edge.
-        const handler = () => {
-            if (!storyEl) return;
-            const sectionRect = storyEl.getBoundingClientRect();
-            if (sectionRect.top <= navHeight && !autoStart) {
-                autoStart = true;
-                if (!chartReady) lockScroll();
-            }
-            const total = Math.max(
-                1,
-                navHeight +
-                    storyEl.offsetHeight -
-                    window.innerHeight,
-            );
-            const scrolled = navHeight - sectionRect.top;
-            scrollProgress = Math.max(0, Math.min(1, scrolled / total));
-        };
-        window.addEventListener("scroll", handler, { passive: true });
-        window.addEventListener("resize", () => {
-            measureNav();
-            handler();
-        });
-        handler();
-        return () => {
-            window.removeEventListener("scroll", handler);
-            unlockScroll();
-        };
+    // Normalized scroll progress (0 → 1) through the pinned story section. The
+    // sticky frame is pinned at top: navHeight, so progress is 0 the moment the
+    // section's top reaches the nav's bottom edge and 1 once it has fully
+    // scrolled through. Both the chart and the caption below read from this.
+    const progress = $derived.by(() => {
+        // Touch scroll + viewport so this recomputes as the user scrolls.
+        scrollY;
+        innerHeight;
+        if (!storyEl) return 0;
+        const top = storyEl.getBoundingClientRect().top;
+        const total = Math.max(
+            1,
+            navHeight + storyEl.offsetHeight - innerHeight,
+        );
+        return Math.max(0, Math.min(1, (navHeight - top) / total));
     });
 
-    // Scroll phases within the sticky scroll container:
-    //   0.00–0.45  policies wipe out (opacity 1 → 0)
-    //   0.55–0.85  paragraph crossfade + chart zoom to 2015–2024
-    //   ≥0.95      news headline thumbnails animate in
-    const policiesOpacity = $derived(
-        Math.max(0, Math.min(1, 1 - scrollProgress / 0.45)),
-    );
-    const swapProgress = $derived(
-        Math.max(0, Math.min(1, (scrollProgress - 0.55) / 0.3)),
-    );
-    const newsVisible = $derived(swapProgress >= 0.95);
+    // The caption crossfades in step with the chart's zoom beat.
+    const swapProgress = $derived(phaseProgress(progress, STORY_PHASES.zoom));
+
+    function measureNav() {
+        const nav = document.querySelector(
+            'nav[aria-label="Table of contents"]',
+        ) as HTMLElement | null;
+        navHeight = nav?.offsetHeight ?? 56;
+    }
+
+    onMount(measureNav);
 </script>
+
+<svelte:window bind:scrollY bind:innerHeight onresize={measureNav} />
 
 <section class="relative w-full h-screen">
     <img
@@ -156,13 +115,14 @@
     bind:this={storyEl}
     id="story-scroll"
     class="relative"
-    style="height: 250vh;"
+    style="height: 400vh;"
 >
     <div
         class="sticky overflow-hidden flex flex-col"
         style="top: {navHeight}px; height: calc(100vh - {navHeight}px);"
     >
-        <!-- Crossfading paragraph block — the h2 acts as the scroll anchor -->
+        <!-- Crossfading caption — the heading swaps from the data story to the
+             news story in step with the chart's zoom beat. -->
         <div
             class="relative max-w-3xl mx-auto px-6 pt-6 w-full"
             style="height: 240px;"
@@ -199,13 +159,7 @@
 
         <!-- Chart fills the remaining viewport -->
         <div class="flex-1 w-full min-h-0">
-            <SocialHousingStockChart
-                {policiesOpacity}
-                zoomProgress={swapProgress}
-                {autoStart}
-                {newsVisible}
-                oncomplete={handleChartComplete}
-            />
+            <SocialHousingStockChart {progress} />
         </div>
     </div>
 </section>

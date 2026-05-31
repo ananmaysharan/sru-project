@@ -1,9 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import * as d3 from "d3";
-    import PlayIcon from "@lucide/svelte/icons/play";
-    import PauseIcon from "@lucide/svelte/icons/pause";
-    import FastForwardIcon from "@lucide/svelte/icons/fast-forward";
     import {
         socialHousingStock,
         type SocialHousingStockYear,
@@ -11,15 +8,34 @@
     import { legislations } from "$lib/data/charts/hero-timeline";
     import { headlines } from "$lib/data/charts/news-headlines";
     import { asset } from "$app/paths";
+    import { STORY_PHASES, phaseProgress } from "$lib/data/charts/scroll-story";
+
+    interface Props {
+        /** Normalized scroll progress through the story section, 0 → 1. */
+        progress?: number;
+    }
+    let { progress = 0 }: Props = $props();
+
+    // --- Scroll choreography ------------------------------------------------
+    // Each beat reads its own 0 → 1 slice of the overall scroll progress.
+    const lineProgress = $derived(phaseProgress(progress, STORY_PHASES.line));
+    const policiesProgress = $derived(
+        phaseProgress(progress, STORY_PHASES.policies),
+    );
+    const zoomProgress = $derived(phaseProgress(progress, STORY_PHASES.zoom));
+    const newsProgress = $derived(phaseProgress(progress, STORY_PHASES.news));
+
+    // Policies fade out as the zoom begins (the cards belong to the 2000–2014
+    // span that scrolls off-screen). `cardsVisible` gates their staggered entry.
+    const cardsVisible = $derived(policiesProgress > 0);
+    const policiesOpacity = $derived(1 - zoomProgress);
+    const newsVisible = $derived(newsProgress > 0);
 
     const BLUE = "#06738b";
-    const ANIM_MS = 7000;
 
-    const BOX_HEIGHT = 220;
     const BOX_OFFSET = 50;
     const CARD_GAP = 16;
     const CARD_INSET = 12;
-    const CARDS_DELAY_MS = 1000;
     const CARDS_STAGGER_MS = 80;
     const CARDS_DUR_MS = 450;
 
@@ -29,7 +45,7 @@
 
     const SHOW_GRIDLINES = false;
 
-    const margin = { top: 40, right: 100, bottom: 290, left: 100 };
+    const margin = { top: 40, right: 100, left: 100 };
 
     const milestoneYears = new Set([2000, 2005, 2010, 2015, 2020]);
     const milestones = socialHousingStock.filter((d) =>
@@ -37,6 +53,10 @@
     );
 
     const straightYears = new Set([2000, 2007, 2014, 2017]);
+
+    const ZOOM_START_YEAR = 2000;
+    const ZOOM_END_LEFT = 2015;
+    const ZOOM_RIGHT = 2025;
 
     function fractionalYear(dateStr: string): number {
         const d = new Date(dateStr);
@@ -73,15 +93,10 @@
         return CARD_INSET + i * (cardW + CARD_GAP) + cardW / 2;
     }
 
-    // -- Headline drag/edit mode --------------------------------------------
-    // Hand-authored positions for each headline (top-left in chart-container
-    // pixels, with `-translate-x-1/2` applied so x is the box's center).
-    // dragMode lets you nudge these in the browser and copy the new
-    // positions back over this map.
+    // -- Headline grid ------------------------------------------------------
     // Headlines flow into a 9-column × 3-row grid below the chart. Each
     // entry's column corresponds to its rough year cluster; rows go
-    // top-to-bottom by date within the column. Column counts (left → right)
-    // are 2 / 2 / 3 / 3 / 3 / 2 / 2 / 3 / 3.
+    // top-to-bottom by date within the column.
     type HeadlineGridPos = { col: number; row: number };
 
     const HEADLINE_GRID: Record<string, HeadlineGridPos> = {
@@ -110,7 +125,9 @@
         "October 2024": { col: 9, row: 3 },
     };
 
-    const GRID_TOP = 182;
+    // Vertical gap from the x-axis baseline down to the first row of the news
+    // grid, keeping the headline boxes clear of the year labels.
+    const GRID_OFFSET = 44;
     const HL_BOX_H = 40;
     const COL_GAP = 12;
     const ROW_GAP = 8;
@@ -119,6 +136,76 @@
     const HL_HOVER_SCALE = 2.5;
 
     let hoveredId = $state<string | null>(null);
+
+    // Extend the data with a synthetic 2025 point that holds the 2024 value, so
+    // the line carries flat from 2024 → 2025 and labels can travel into 2025.
+    const extendedStock: SocialHousingStockYear[] = [
+        ...socialHousingStock,
+        {
+            year: 2025,
+            units: socialHousingStock[socialHousingStock.length - 1].units,
+        },
+    ];
+
+    let containerEl: HTMLDivElement;
+    let pathEl: SVGPathElement | null = $state(null);
+
+    let width = $state(0);
+    let height = $state(0);
+
+    let tipX = $state(0);
+    let tipY = $state(0);
+    let tipYear = $state(socialHousingStock[0].year);
+    let tipValue = $state(socialHousingStock[0].units);
+
+    // Leading edge of the reveal clip. Tracks the draw all the way to 2025,
+    // while the tip dot/label above park at 2024 (the last real data point).
+    let revealX = $state(0);
+
+    // Measured height of the legislation-card row. The row sizes to its content
+    // (see bind:clientHeight below) so the chart area is never padded with the
+    // dead space a fixed card height would leave.
+    let cardsHeight = $state(0);
+
+    // Below-axis budget: the year labels plus whichever block — the policy cards
+    // or the 3-row news grid — is taller (they share the same band at different
+    // scroll beats). Deriving it means trimming the cards grows the plot
+    // automatically, with no hardcoded chart height.
+    const newsBlock = GRID_OFFSET + 3 * HL_BOX_H + 2 * ROW_GAP;
+    const marginBottom = $derived(
+        Math.max(BOX_OFFSET + cardsHeight, newsBlock) + 8,
+    );
+
+    const domainLeft = $derived(
+        ZOOM_START_YEAR + (ZOOM_END_LEFT - ZOOM_START_YEAR) * zoomProgress,
+    );
+
+    const xScale = $derived(
+        d3
+            .scaleLinear()
+            .domain([domainLeft, ZOOM_RIGHT])
+            .range([margin.left, Math.max(margin.left, width - margin.right)])
+            .clamp(true),
+    );
+
+    // Gap reserved between the bottom of the plotted line and the x-axis year
+    // labels, so the milestone value labels (which hang below their dots) and
+    // the floating tip label always clear the years.
+    const AXIS_GAP = 56;
+
+    // Y-domain hugs the data extent (~3.99M → 5.37M) with only a sliver of
+    // padding, so the rises and the 2014 / 2021 dips read as steep peaks and
+    // troughs. Axis-label clearance is handled separately by AXIS_GAP below,
+    // which frees the floor to sit right under the data minimum.
+    const yScale = $derived(
+        d3
+            .scaleLinear()
+            .domain([3_950_000, 5_400_000])
+            .range([
+                Math.max(margin.top, height - marginBottom - AXIS_GAP),
+                margin.top,
+            ]),
+    );
 
     function getHeadlinePos(h: { id: string; frac: number }): {
         x: number;
@@ -134,121 +221,22 @@
                     2;
             return {
                 x: gLeft + (g.col - 1) * (HL_BOX_W + COL_GAP) + HL_BOX_W / 2,
-                y: GRID_TOP + (g.row - 1) * (HL_BOX_H + ROW_GAP),
+                y:
+                    height -
+                    marginBottom +
+                    GRID_OFFSET +
+                    (g.row - 1) * (HL_BOX_H + ROW_GAP),
             };
         }
         return {
             x: xScale(h.frac),
-            y: height - margin.bottom + HL_OFFSET,
+            y: height - marginBottom + HL_OFFSET,
         };
     }
 
-    interface Props {
-        policiesOpacity?: number;
-        zoomProgress?: number;
-        autoStart?: boolean;
-        newsVisible?: boolean;
-        oncomplete?: () => void;
-    }
-    let {
-        policiesOpacity = 1,
-        zoomProgress = 0,
-        autoStart = true,
-        newsVisible = false,
-        oncomplete,
-    }: Props = $props();
-
-    const ZOOM_START_YEAR = 2000;
-    const ZOOM_END_LEFT = 2015;
-    const ZOOM_RIGHT = 2025;
-
-    // Extend the data with a synthetic 2025 point that holds the 2024
-    // value, so the chart line carries flat from 2024 → 2025 and the
-    // tip / year labels can travel into 2025.
-    const extendedStock: SocialHousingStockYear[] = [
-        ...socialHousingStock,
-        {
-            year: 2025,
-            units: socialHousingStock[socialHousingStock.length - 1].units,
-        },
-    ];
-
-    let containerEl: HTMLDivElement;
-    let pathEl: SVGPathElement | null = $state(null);
-
-    let width = $state(0);
-    let height = $state(0);
-
-    let progress = $state(0);
-    let tipX = $state(0);
-    let tipY = $state(0);
-    let tipYear = $state(socialHousingStock[0].year);
-    let tipValue = $state(socialHousingStock[0].units);
-    let playing = $state(false);
-    let ready = $state(false);
-    let cardsVisible = $state(false);
-
-    let elapsed = 0;
-    let runStart = 0;
-    let raf = 0;
-    let cardsTimer: ReturnType<typeof setTimeout> | null = null;
-
-    function clearCardsTimer() {
-        if (cardsTimer !== null) {
-            clearTimeout(cardsTimer);
-            cardsTimer = null;
-        }
-    }
-
-    function scheduleCards(delay: number) {
-        clearCardsTimer();
-        if (delay <= 0) {
-            cardsVisible = true;
-            oncomplete?.();
-        } else {
-            cardsTimer = setTimeout(() => {
-                cardsVisible = true;
-                oncomplete?.();
-                cardsTimer = null;
-            }, delay);
-        }
-    }
-
-    onMount(() => {
-        const ro = new ResizeObserver((entries) => {
-            const rect = entries[0].contentRect;
-            width = rect.width;
-            height = rect.height;
-        });
-        ro.observe(containerEl);
-        return () => {
-            ro.disconnect();
-            cancelAnimationFrame(raf);
-            clearCardsTimer();
-        };
-    });
-
-    const domainLeft = $derived(
-        ZOOM_START_YEAR + (ZOOM_END_LEFT - ZOOM_START_YEAR) * zoomProgress,
-    );
-
-    const xScale = $derived(
-        d3
-            .scaleLinear()
-            .domain([domainLeft, ZOOM_RIGHT])
-            .range([margin.left, Math.max(margin.left, width - margin.right)])
-            .clamp(true),
-    );
-
-    const yScale = $derived(
-        d3
-            .scaleLinear()
-            .domain([1_000_000, 5_500_000])
-            .range([Math.max(margin.top, height - margin.bottom), margin.top]),
-    );
-
-    // Animation path stops at 2024 — the moving tip + label never enter
-    // the synthetic 2025 segment.
+    // The animated line runs 2000 → 2025. The flat 2024 → 2025 carry is part of
+    // the same path, so it gets drawn as a continuation of the scroll-driven
+    // reveal rather than appearing all at once.
     const linePath = $derived(
         width === 0
             ? ""
@@ -258,18 +246,11 @@
                   .y((d) => yScale(d.units))
                   .curve(d3.curveLinear)
                   .defined((d) => d.year >= domainLeft - 0.001)(
-                  socialHousingStock,
+                  extendedStock,
               ) ?? ""),
     );
 
-    // Static extension from 2024 → 2025, drawn after the animation finishes.
-    const extensionPath = $derived.by(() => {
-        if (width === 0) return "";
-        const a = socialHousingStock[socialHousingStock.length - 1];
-        const b = extendedStock[extendedStock.length - 1];
-        if (a.year < domainLeft - 0.001) return "";
-        return `M ${xScale(a.year)},${yScale(a.units)} L ${xScale(b.year)},${yScale(b.units)}`;
-    });
+    const ready = $derived(!!pathEl && width > 0 && linePath !== "");
 
     const bisectYear = d3.bisector<SocialHousingStockYear, number>(
         (d) => d.year,
@@ -279,10 +260,21 @@
         if (!pathEl) return;
         const total = pathEl.getTotalLength();
         const pt = pathEl.getPointAtLength(total * p);
-        tipX = pt.x;
-        tipY = pt.y;
+        revealX = pt.x;
 
-        const yearF = xScale.invert(pt.x);
+        // Park the tip dot + label at the last real data point (2024); the flat
+        // 2024 → 2025 carry keeps drawing past them via revealX.
+        const last = socialHousingStock[socialHousingStock.length - 1];
+        const lastX = xScale(last.year);
+        if (pt.x >= lastX) {
+            tipX = lastX;
+            tipY = yScale(last.units);
+        } else {
+            tipX = pt.x;
+            tipY = pt.y;
+        }
+
+        const yearF = xScale.invert(Math.min(pt.x, lastX));
         const idx = bisectYear(socialHousingStock, yearF);
         const a = socialHousingStock[Math.max(0, idx - 1)];
         const b =
@@ -300,77 +292,25 @@
         }
     }
 
-    function tick(now: number) {
-        const t = Math.min(1, (elapsed + (now - runStart)) / ANIM_MS);
-        progress = t;
-        updateTipFromProgress(t);
-
-        if (t < 1 && playing) {
-            raf = requestAnimationFrame(tick);
-        } else if (t >= 1) {
-            elapsed = ANIM_MS;
-            playing = false;
-            scheduleCards(CARDS_DELAY_MS);
-        }
-    }
-
-    function play() {
-        if (!pathEl || playing) return;
-        if (elapsed >= ANIM_MS) elapsed = 0;
-        playing = true;
-        runStart = performance.now();
-        raf = requestAnimationFrame(tick);
-    }
-
-    function pause() {
-        if (!playing) return;
-        elapsed = Math.min(ANIM_MS, elapsed + (performance.now() - runStart));
-        playing = false;
-        cancelAnimationFrame(raf);
-    }
-
-    function replay() {
-        cancelAnimationFrame(raf);
-        clearCardsTimer();
-        cardsVisible = false;
-        elapsed = 0;
-        progress = 0;
-        playing = true;
-        runStart = performance.now();
-        raf = requestAnimationFrame(tick);
-    }
-
-    function skipToEnd() {
-        cancelAnimationFrame(raf);
-        elapsed = ANIM_MS;
-        playing = false;
-        progress = 1;
-        updateTipFromProgress(1);
-        scheduleCards(0);
-    }
-
-    // Auto-start once the path is mounted, sized, and autoStart is true.
-    $effect(() => {
-        if (!pathEl || !linePath || width === 0 || ready || !autoStart) return;
-        ready = true;
-        const startPt = pathEl.getPointAtLength(0);
-        tipX = startPt.x;
-        tipY = startPt.y;
-        play();
+    onMount(() => {
+        const ro = new ResizeObserver((entries) => {
+            const rect = entries[0].contentRect;
+            width = rect.width;
+            height = rect.height;
+        });
+        ro.observe(containerEl);
+        return () => ro.disconnect();
     });
 
-    // Re-anchor the tip whenever the path / scale changes (e.g. scroll-
-    // driven zoom). Without this, tipX / tipY stay frozen at the pixel
-    // values from the last animation frame and the dot drifts to whatever
-    // data year happens to sit under that old pixel in the new scale,
-    // while the extension line repositions correctly — producing a
-    // disconnected line + dot pair.
+    // Re-anchor the tip whenever the draw progress or the scale changes. The
+    // moving tip + reveal clip are both driven by scroll, so there is no RAF
+    // loop — the line is drawn exactly as far as the reader has scrolled.
     $effect(() => {
-        // Touch the reactive inputs so this effect tracks them.
+        lineProgress;
         linePath;
         width;
-        if (!pathEl || !ready || playing) return;
-        updateTipFromProgress(progress);
+        if (!pathEl || width === 0 || linePath === "") return;
+        updateTipFromProgress(lineProgress);
     });
 
     const formatValue = (v: number) => `${(v / 1_000_000).toFixed(2)}M`;
@@ -381,17 +321,17 @@
     class="relative m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] bg-white"
 >
     {#if width > 0 && height > 0}
-        {@const axisY = height - margin.bottom}
+        {@const axisY = height - marginBottom}
         <svg {width} {height} class="block" style="overflow: visible;">
             <defs>
                 <clipPath id="shs-reveal">
-                    <rect x="0" y="0" width={tipX} {height} />
+                    <rect x="0" y="0" width={revealX} {height} />
                 </clipPath>
             </defs>
 
             {#if SHOW_GRIDLINES}
                 <g>
-                    {#each extendedStock as d}
+                    {#each extendedStock as d (d.year)}
                         {@const x = xScale(d.year)}
                         <line
                             x1={x}
@@ -407,11 +347,10 @@
             {/if}
 
             <!-- Connectors from each card up to its date on the data line.
-                 Right-angled with a per-card rail Y so horizontal segments
-                 don't share lines. Fade in (staggered) when cards appear.
-                 Outer group carries scroll-driven policiesOpacity. -->
+                 Outer group carries scroll-driven policiesOpacity; inner
+                 groups stagger in once cardsVisible flips true. -->
             <g style="opacity: {policiesOpacity};">
-                {#each decoratedLegislations as law, i}
+                {#each decoratedLegislations as law, i (law.date)}
                     {@const cardX = cardCenterX(i, width)}
                     {@const dateX = xScale(law.frac)}
                     {@const cardTopY = axisY + BOX_OFFSET}
@@ -461,23 +400,9 @@
                 />
             </g>
 
-            <!-- 2024 → 2025 extension. Drawn outside the reveal clip so it
-                 fades in only once the animation has reached the end. -->
-            <path
-                d={extensionPath}
-                fill="none"
-                stroke={BLUE}
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="opacity: {progress >= 1
-                    ? 1
-                    : 0}; transition: opacity 300ms ease-out;"
-            />
-
             <!-- 5-year milestone dots (drop-behind, fixed once passed) -->
             <g>
-                {#each milestones as m}
+                {#each milestones as m (m.year)}
                     {@const mx = xScale(m.year)}
                     {@const my = yScale(m.units)}
                     {#if tipX >= mx - 0.5 && m.year >= domainLeft - 0.001}
@@ -486,7 +411,7 @@
                 {/each}
             </g>
 
-            {#if ready && progress < 1}
+            {#if ready && lineProgress < 1}
                 <circle
                     cx={tipX}
                     cy={tipY}
@@ -500,14 +425,14 @@
             {/if}
 
             <!-- Year labels — white stroke + paint-order trick halos the
-                 glyphs, so gridlines break around the text shape only. -->
+                 glyphs so gridlines break around the text shape only. -->
             <g
                 paint-order="stroke"
                 stroke="white"
                 stroke-width="3"
                 stroke-linejoin="round"
             >
-                {#each extendedStock as d}
+                {#each extendedStock as d (d.year)}
                     {@const x = xScale(d.year)}
                     {#if d.year >= domainLeft - 0.001}
                         <text
@@ -524,10 +449,9 @@
             </g>
 
             <!-- Headline connector line: only drawn for the currently
-                 hovered headline. Right-angled elbow with a straight bias
-                 when the box's x is near the headline's date. -->
+                 hovered headline. -->
             <g style="opacity: {newsVisible ? 1 : 0};">
-                {#each decoratedHeadlines as h}
+                {#each decoratedHeadlines as h (h.id)}
                     {#if h.frac >= domainLeft - 0.001 && hoveredId === h.id}
                         {@const pos = getHeadlinePos(h)}
                         {@const lineX = xScale(h.frac)}
@@ -557,7 +481,7 @@
             </g>
         </svg>
 
-        {#each milestones as m}
+        {#each milestones as m (m.year)}
             {@const mx = xScale(m.year)}
             {@const my = yScale(m.units)}
             {#if tipX >= mx - 0.5 && m.year >= domainLeft - 0.001}
@@ -575,7 +499,10 @@
             {/if}
         {/each}
 
-        {#if ready}
+        <!-- Floating current-value label. Hidden on milestone years so it
+             never doubles up with the permanent milestone label sitting at the
+             same point (including the 2000 start). -->
+        {#if ready && !milestoneYears.has(tipYear)}
             <div
                 class="absolute pointer-events-none select-none -translate-x-1/2 whitespace-nowrap text-center"
                 style="left: {tipX}px; top: {tipY + 14}px; color: {BLUE};"
@@ -589,15 +516,16 @@
             </div>
         {/if}
 
-        <!-- Legislation cards: appear after a brief pause once the animation
-             ends, arranged in a flex row spanning the container edges. The
-             outer container carries scroll-driven policiesOpacity. -->
+        <!-- Legislation cards: fade in (staggered) during the policies beat and
+             fade out as the zoom begins. The outer container carries
+             scroll-driven policiesOpacity. -->
         <div
+            bind:clientHeight={cardsHeight}
             class="absolute pointer-events-none select-none flex"
             style="left: {CARD_INSET}px; right: {CARD_INSET}px; top: {axisY +
-                BOX_OFFSET}px; height: {BOX_HEIGHT}px; gap: {CARD_GAP}px; opacity: {policiesOpacity};"
+                BOX_OFFSET}px; gap: {CARD_GAP}px; opacity: {policiesOpacity};"
         >
-            {#each decoratedLegislations as law, i}
+            {#each decoratedLegislations as law, i (law.date)}
                 <div
                     class="flex-1 min-w-0 border border-gray-300 bg-white"
                     style="opacity: {cardsVisible
@@ -606,7 +534,7 @@
                         ? i * CARDS_STAGGER_MS
                         : 0}ms;"
                 >
-                    <div class="flex h-full flex-col overflow-hidden p-2">
+                    <div class="flex flex-col overflow-hidden p-2">
                         <div
                             class="text-xs font-bold leading-tight text-gray-900"
                         >
@@ -649,11 +577,9 @@
             {/each}
         </div>
 
-        <!-- News headline screenshots: hover scales the box and reveals a
-             connector line to the headline's date on the data line. The
-             leftmost / rightmost columns anchor scaling at their inner
-             edge so the zoomed-up box never goes off the chart. -->
-        {#each decoratedHeadlines as h, i}
+        <!-- News headline screenshots: reveal during the news beat; hover
+             scales the box and draws a connector to its date on the line. -->
+        {#each decoratedHeadlines as h, i (h.id)}
             {#if h.frac >= domainLeft - 0.001}
                 {@const pos = getHeadlinePos(h)}
                 {@const isHovered = hoveredId === h.id}
@@ -685,28 +611,5 @@
                 </div>
             {/if}
         {/each}
-
-        <div class="absolute top-2 right-2 flex items-center gap-1.5">
-            <button
-                type="button"
-                onclick={() => (playing ? pause() : play())}
-                aria-label={playing ? "Pause" : "Play"}
-                class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
-            >
-                {#if playing}
-                    <PauseIcon class="h-4 w-4" />
-                {:else}
-                    <PlayIcon class="h-4 w-4" />
-                {/if}
-            </button>
-            <button
-                type="button"
-                onclick={skipToEnd}
-                aria-label="Skip to end"
-                class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
-            >
-                <FastForwardIcon class="h-4 w-4" />
-            </button>
-        </div>
     {/if}
 </div>

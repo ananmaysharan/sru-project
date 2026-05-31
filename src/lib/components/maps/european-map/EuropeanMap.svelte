@@ -66,15 +66,11 @@
 		mapInstance = new maplibregl.Map({
 			container: mapContainer,
 			style: 'https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC',
-			center: [10, 52],
+			center: [10, 54.5],
 			zoom: 2.8,
+			minZoom: 2.8,
 			attributionControl: false
 		});
-
-		// mapInstance.setMaxBounds([
-		// 	[-30, 30],
-		// 	[45, 73]
-		// ]);
 
 		mapInstance.on('load', () => {
 			const map = mapInstance;

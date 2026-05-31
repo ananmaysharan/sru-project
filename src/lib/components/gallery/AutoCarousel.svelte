@@ -14,6 +14,14 @@
 
 	let index = $state(0);
 	let paused = $state(false);
+	let landscape = $state<boolean[]>([]);
+
+	function onImageLoad(event: Event, i: number) {
+		const img = event.currentTarget as HTMLImageElement;
+		if (img.naturalWidth > img.naturalHeight) {
+			landscape[i] = true;
+		}
+	}
 
 	onMount(() => {
 		if (images.length <= 1) return;
@@ -35,9 +43,10 @@
 			<img
 				src={asset(image.src)}
 				alt={image.alt ?? ''}
-				class="absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ease-in-out"
+				class="absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out {landscape[i] ? 'object-cover' : 'object-contain'}"
 				style:opacity={i === index ? 1 : 0}
 				loading={i === 0 ? 'eager' : 'lazy'}
+				onload={(e) => onImageLoad(e, i)}
 			/>
 		{/each}
 	</div>
