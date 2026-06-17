@@ -4,7 +4,7 @@
 	import PlayIcon from '@lucide/svelte/icons/play';
 	import PauseIcon from '@lucide/svelte/icons/pause';
 
-	type Image = { src: string; alt?: string };
+	type Image = { src: string; alt?: string; caption?: string };
 
 	let {
 		images,
@@ -49,32 +49,38 @@
 				onload={(e) => onImageLoad(e, i)}
 			/>
 		{/each}
+
+		{#if images.length > 1}
+			<div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/40 to-transparent p-3">
+				<div class="flex gap-1.5">
+					{#each images as _, i}
+						<button
+							type="button"
+							aria-label="Go to slide {i + 1}"
+							class="w-2 h-2 rounded-full transition-colors {i === index ? 'bg-white' : 'bg-white/50'}"
+							onclick={() => (index = i)}
+						></button>
+					{/each}
+				</div>
+				<button
+					type="button"
+					aria-label={paused ? 'Play' : 'Pause'}
+					class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30"
+					onclick={() => (paused = !paused)}
+				>
+					{#if paused}
+						<PlayIcon class="h-4 w-4" />
+					{:else}
+						<PauseIcon class="h-4 w-4" />
+					{/if}
+				</button>
+			</div>
+		{/if}
 	</div>
 
-	{#if images.length > 1}
-		<div class="mt-3 flex items-center justify-between gap-3">
-			<div class="flex gap-1.5">
-				{#each images as _, i}
-					<button
-						type="button"
-						aria-label="Go to slide {i + 1}"
-						class="w-2 h-2 rounded-full transition-colors {i === index ? 'bg-gray-800' : 'bg-gray-300'}"
-						onclick={() => (index = i)}
-					></button>
-				{/each}
-			</div>
-			<button
-				type="button"
-				aria-label={paused ? 'Play' : 'Pause'}
-				class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
-				onclick={() => (paused = !paused)}
-			>
-				{#if paused}
-					<PlayIcon class="h-4 w-4" />
-				{:else}
-					<PauseIcon class="h-4 w-4" />
-				{/if}
-			</button>
-		</div>
+	{#if images.some((img) => img.caption)}
+		<p class="mt-3 min-h-[3rem] text-sm leading-relaxed text-gray-600">
+			{images[index]?.caption ?? ''}
+		</p>
 	{/if}
 </div>

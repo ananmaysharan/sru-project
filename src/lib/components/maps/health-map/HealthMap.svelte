@@ -8,13 +8,16 @@
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import MapSidebar from './MapSidebar.svelte';
 	import {
-		mapState,
+		mapState as DEFAULT_MAP_STATE,
+		MapState,
 		COMMUNES_PMTILES_URL,
 		REGIONS_PMTILES_URL,
 		OVERSEAS_REGIONS,
 		MAINLAND_CENTER,
 		MAINLAND_ZOOM
 	} from './map-state.svelte.js';
+
+	let { mapState = DEFAULT_MAP_STATE }: { mapState?: MapState } = $props();
 
 	let mapContainer: HTMLDivElement;
 	let mapInstance: maplibregl.Map | null = $state(null);
@@ -220,7 +223,7 @@
 </script>
 
 <div class="flex flex-col md:flex-row h-full w-full min-h-100">
-	<MapSidebar onflyto={flyTo} />
+	<MapSidebar {mapState} onflyto={flyTo} />
 
 	<div class="flex-1 flex flex-col border-t border-r border-b border-gray-200 relative min-h-100">
 		<div class="border-b border-gray-200 bg-white flex items-center gap-1 p-1.5 shrink-0">

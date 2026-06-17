@@ -42,7 +42,7 @@
 
 <svelte:window bind:scrollY bind:innerHeight onresize={measureNav} />
 
-<section class="relative w-full h-screen">
+<section class="relative w-full min-h-screen">
     <img
         src={asset("/intro-hero.webp")}
         alt="View from a Parisian balcony"
@@ -53,7 +53,7 @@
     ></div>
 
     <div
-        class="relative h-full max-w-5xl mx-auto px-6 flex flex-col justify-end items-center pb-16 text-white text-center"
+        class="relative min-h-screen max-w-5xl mx-auto px-6 flex flex-col justify-end items-center pt-24 pb-16 text-white text-center"
     >
         <h1
             class="text-5xl md:text-7xl lg:text-8xl font-medium leading-[1.05] tracking-tight"
@@ -63,7 +63,7 @@
         <p class="mt-4 text-lg md:text-xl text-white/80">Magda Maaoui</p>
 
         <div
-            class="mt-8 max-w-2xl flex flex-col gap-4 text-base md:text-lg leading-relaxed text-white/90"
+            class="mt-6 max-w-2xl flex flex-col gap-3 text-sm md:text-base leading-relaxed text-white/90"
         >
             <p>
                 Twenty-five years ago, in December 2000, the SRU Law (Loi
@@ -99,6 +99,51 @@
                 the mission of rebalancing social housing stocks, and hence
                 unlocking access to better amenities and resources, has indeed
                 overall been met.
+            </p>
+
+            <p>
+                This project dashboard translates that empirical work into an
+                exploratory tool. It lets users map where social housing stocks
+                have grown, compare trajectories across communes, and link SRU
+                implementation to income, poverty, age structure, politics,
+                energy performance, and exposure to heat. By making these
+                patterns visible at a glance, the aim is not only to assess
+                whether legal targets were numerically met, but also to question
+                how and where rebalancing has occurred, and with what
+                implications for health and environmental justice.
+            </p>
+
+            <p>
+                At the same time, I deliberately focus on the “moving to
+                opportunity” side of the story—how the SRU law has opened up
+                higher‑opportunity geographies to social housing residents over
+                the past twenty‑five years. I do so without minimizing the
+                crucial research and policy work that continues to document
+                lower‑income neighborhoods where social housing remains highly
+                concentrated. For more detailed analyses of these territories and
+                their persistent inequalities, readers can turn to national data
+                portals and dashboards such as
+                <a
+                    href="https://sig.ville.gouv.fr/"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="underline underline-offset-2 hover:text-white"
+                    >SIG Ville</a
+                >, the
+                <a
+                    href="https://www.onpv.fr/donnees"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="underline underline-offset-2 hover:text-white"
+                    >Observatoire national de la politique de la ville (ONPV)</a
+                >, and
+                <a
+                    href="https://www.insee.fr/fr/statistiques/2500477"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="underline underline-offset-2 hover:text-white"
+                    >INSEE’s datasets on quartiers prioritaires</a
+                >.
             </p>
         </div>
     </div>

@@ -1,7 +1,7 @@
 import bivariateData from '$lib/data/map/health-communes-bivariate.json';
 import communeLookup from '$lib/data/map/commune-lookup.json';
 
-type MetricType = 'income' | 'poverty' | 'elders' | 'left' | 'dpe' | 'heat';
+type MetricType = 'income' | 'poverty' | 'elders' | 'left' | 'dpe' | 'heat' | 'green' | 'health';
 type Year = 2012 | 2014 | 2017 | 2018 | 2020 | 2021;
 type CellCode = 'A1' | 'B1' | 'C1' | 'A2' | 'B2' | 'C2' | 'A3' | 'B3' | 'C3';
 
@@ -64,6 +64,15 @@ export const BIVARIATE_COLORS: Record<CellCode, string> = {
 
 type CornerCells = 'A1' | 'A3' | 'C1' | 'C3';
 
+// Colors for the "corner-only" map (second map): top-right (C3, high amenity +
+// high social-housing growth) in dark blue, top-left (A3, low amenity + high
+// social-housing growth) in red. Every other cell renders neutral.
+export const CORNER_COLORS: Partial<Record<CellCode, string>> = {
+	C3: '#1e3a8a',
+	A3: '#b91c1c'
+};
+export const CORNER_NEUTRAL = '#eef0f2';
+
 export const METRIC_CONFIG: Record<
 	MetricType,
 	{
@@ -79,10 +88,10 @@ export const METRIC_CONFIG: Record<
 	}
 > = {
 	income: {
-		label: 'Income',
+		label: 'Median household income',
 		shortName: 'Median income',
 		description:
-			'Median annual household income (€/year) from INSEE Filosofi tax records.',
+			'Median annual household income (€/year) in each commune, taken from INSEE’s FiloSoFi tax records. This provides a snapshot of the typical economic resources available to residents.',
 		xAxisLabel: 'Lower income → Higher income',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Low income',
@@ -96,10 +105,10 @@ export const METRIC_CONFIG: Record<
 		}
 	},
 	poverty: {
-		label: 'Poverty',
+		label: 'Share of residents in poverty',
 		shortName: 'Poverty rate',
 		description:
-			'Share of population below 60% of the national median income.',
+			'Share of the population living on less than 60% of the national median income—Europe’s standard threshold for monetary poverty. Higher values indicate communes where a larger proportion of residents are in income poverty.',
 		xAxisLabel: 'Lower poverty → Higher poverty',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Low poverty',
@@ -113,9 +122,10 @@ export const METRIC_CONFIG: Record<
 		}
 	},
 	elders: {
-		label: 'Elders',
+		label: 'Older adult share (65+)',
 		shortName: 'Share of elders',
-		description: 'Share of population aged 65+ at the commune level.',
+		description:
+			'Share of the population aged 65 and over at the commune level. This indicator helps identify places with more residents who are generally more vulnerable to housing conditions, energy insecurity, and extreme temperatures.',
 		xAxisLabel: 'Fewer elders → More elders',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Few elders',
@@ -129,10 +139,10 @@ export const METRIC_CONFIG: Record<
 		}
 	},
 	left: {
-		label: 'Election Winner',
+		label: 'Municipal political leadership',
 		shortName: 'Municipal election winner',
 		description:
-			'Political orientation of the winning party or coalition in the municipal election: Left, Center or Right.',
+			'Political orientation of the winning party or coalition in the most recent municipal election, coded as Left, Center, or Right. This gives a rough proxy for local political priorities that may shape housing policy and implementation of the SRU law.',
 		xAxisLabel: 'Left → Center → Right',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Left',
@@ -146,10 +156,10 @@ export const METRIC_CONFIG: Record<
 		}
 	},
 	dpe: {
-		label: 'DPE Energy Efficiency',
+		label: 'DPE energy-efficient building share (A-C)',
 		shortName: 'Building energy efficiency',
 		description:
-			'Share of buildings rated A, B or C in the ADEME DPE energy-performance database.',
+			'Share of residential buildings in each commune rated A, B, or C in France’s DPE (Diagnostic de performance énergétique) energy‑performance database. Higher values indicate a larger proportion of relatively energy‑efficient housing, with implications for both emissions and indoor comfort.',
 		xAxisLabel: 'Lower efficiency → Higher efficiency',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Low efficiency',
@@ -163,10 +173,10 @@ export const METRIC_CONFIG: Record<
 		}
 	},
 	heat: {
-		label: 'Heat Islands (MAPUCE)',
+		label: 'Urban heat island exposure',
 		shortName: 'Urban heat-island intensity',
 		description:
-			'Share of commune area (in m², from the MAPUCE 2017 dataset) classified as urban heat island — temperature anomaly >1 K above the rural baseline.',
+			'Share of the commune’s surface area classified as an urban heat island in the MAPUCE 2017 dataset. We define heat‑island zones as areas where the temperature anomaly is more than 1 K (≈1°C) above the surrounding rural baseline—an indicator of residents’ exposure to urban overheating.',
 		xAxisLabel: 'Cooler → Hotter',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Cool',
@@ -177,6 +187,40 @@ export const METRIC_CONFIG: Record<
 			A3: { title: 'Greenfield development', body: 'Low heat + high growth — building in cool peripheries.' },
 			C1: { title: 'Environmental injustice', body: 'High heat + low growth — exposed without response.' },
 			C3: { title: 'Compensatory policy', body: 'High heat + high growth — investment in hot areas.' }
+		}
+	},
+	health: {
+		label: 'Health facility access',
+		shortName: 'Health facilities per 10k',
+		description:
+			'Number of health facilities per 10,000 residents in each commune, defined as HLT_PER_10K = (HLT_CNT / population) × 10,000. Facility counts (HLT_CNT) are derived from OpenStreetMap using the broad “Ampliada” definition (institutional, primary, and paramedical care), then normalized by population to avoid bias toward large, low-density communes. Higher values indicate better local access to health services.',
+		xAxisLabel: 'Fewer facilities → More facilities',
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Low access',
+		xHigh: 'High access',
+		availableYears: [2021],
+		insights: {
+			A1: { title: 'Underserved & static', body: 'Low facility access + low growth — limited services, no expansion.' },
+			A3: { title: 'Building into gaps', body: 'Low facility access + high growth — adding housing where health access lags.' },
+			C1: { title: 'Well-served, exclusionary', body: 'High facility access + low growth — amenity-rich areas not expanding social housing.' },
+			C3: { title: 'Access & inclusion', body: 'High facility access + high growth — expanding housing near health services.' }
+		}
+	},
+	green: {
+		label: 'Green Spaces',
+		shortName: 'Green-space coverage',
+		description:
+			'Share of commune area covered by green space (GRN_PCT) — vegetated patches as a percentage of total commune area.',
+		xAxisLabel: 'Less green → More green',
+		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
+		xLow: 'Less green',
+		xHigh: 'More green',
+		availableYears: [2021],
+		insights: {
+			A1: { title: 'Grey & static', body: 'Little green + low growth — built-up areas not expanding social housing.' },
+			A3: { title: 'Dense expansion', body: 'Little green + high growth — adding housing in low-green areas.' },
+			C1: { title: 'Green & exclusionary', body: 'Lots of green + low growth — leafy areas resisting social housing.' },
+			C3: { title: 'Green & inclusive', body: 'Lots of green + high growth — expanding housing while keeping green space.' }
 		}
 	}
 };
@@ -195,6 +239,12 @@ function getYearIndex(year: Year): number {
 }
 
 export class MapState {
+	cornerMode: boolean;
+
+	constructor(opts: { cornerMode?: boolean } = {}) {
+		this.cornerMode = opts.cornerMode ?? false;
+	}
+
 	activeMetric: MetricType = $state('income');
 	activeYear: Year = $state(2018);
 	searchQuery = $state('');
@@ -230,7 +280,7 @@ export class MapState {
 			: []
 	);
 
-	metricsForTab = ['income', 'poverty', 'elders', 'left', 'dpe', 'heat'] as MetricType[];
+	metricsForTab = ['income', 'poverty', 'elders', 'left', 'dpe', 'heat', 'green', 'health'] as MetricType[];
 
 	switchMetric(metric: MetricType) {
 		this.activeMetric = metric;
@@ -255,10 +305,19 @@ export class MapState {
 		for (const [code, info] of Object.entries(data)) {
 			const cell = info.years?.[this.activeYear]?.[this.activeMetric]?.cell;
 			if (!cell) continue;
-			expr.push(code, BIVARIATE_COLORS[cell]);
+			if (this.cornerMode) {
+				const color = CORNER_COLORS[cell];
+				if (!color) continue;
+				expr.push(code, color);
+			} else {
+				expr.push(code, BIVARIATE_COLORS[cell]);
+			}
 		}
 
-		expr.push('#f3f4f6');
+		// Guarantee at least one match/output pair so the `match` expression
+		// stays valid even if no commune falls in a corner cell this year.
+		expr.push(' __none__', this.cornerMode ? CORNER_NEUTRAL : '#f3f4f6');
+		expr.push(this.cornerMode ? CORNER_NEUTRAL : '#f3f4f6');
 		return expr;
 	}
 

@@ -31,6 +31,14 @@
     const policiesOpacity = $derived(1 - zoomProgress);
     const newsVisible = $derived(newsProgress > 0);
 
+    // The building skyline fades out fast right after the policies beat ends,
+    // so it disappears the moment the reader scrolls past it (rather than
+    // lingering through the whole zoom like the policy cards).
+    const skylineFade = $derived(
+        phaseProgress(progress, [STORY_PHASES.policies[1], STORY_PHASES.policies[1] + 0.03]),
+    );
+    const skylineOpacity = $derived(1 - skylineFade);
+
     const BLUE = "#06738b";
 
     const BOX_OFFSET = 50;
@@ -136,6 +144,72 @@
     const HL_HOVER_SCALE = 2.5;
 
     let hoveredId = $state<string | null>(null);
+
+    // --- Building skyline ---------------------------------------------------
+    // 17 cutout images that rise from the data line during the policies beat,
+    // recreating the printed "SRU at 25" infographic. Natural width/height ratio
+    // per source file (0–16).
+    const SKY_ASPECT: Record<number, number> = {
+        0: 527 / 960, 1: 519 / 388, 2: 281 / 407, 3: 876 / 585, 4: 716 / 553,
+        5: 521 / 359, 6: 446 / 323, 7: 665 / 428, 8: 382 / 295, 9: 637 / 462,
+        10: 1037 / 752, 11: 528 / 408, 12: 592 / 382, 13: 694 / 574,
+        14: 803 / 960, 15: 693 / 377, 16: 693 / 1000,
+    };
+    // Placement hand-arranged in /skyline-editor, normalized to the line ends:
+    //   x    — center position along the line span (0 = 2000 end, 1 = 2025 end)
+    //   w    — width as a fraction of the line span
+    //   lift — base offset from the line (0 = on the line, + = lifted above)
+    // Listed back → front so SVG paint order reproduces the chosen z-order.
+    const SKYLINE: { file: number; x: number; w: number; lift: number }[] = [
+        { file: 1, x: 0.1104, w: 0.1219, lift: -0.0304 },
+        { file: 14, x: 0.2349, w: 0.1166, lift: -0.0134 },
+        { file: 15, x: 0.4857, w: 0.1227, lift: 0.0002 },
+        { file: 16, x: 0.419, w: 0.1004, lift: -0.0277 },
+        { file: 3, x: 0.3702, w: 0.1714, lift: -0.028 },
+        { file: 2, x: 0.2903, w: 0.0833, lift: -0.019 },
+        { file: 0, x: 0.8841, w: 0.103, lift: -0.039 },
+        { file: 6, x: 0.9609, w: 0.1236, lift: -0.0197 },
+        { file: 7, x: 0.1517, w: 0.1483, lift: -0.0186 },
+        { file: 8, x: 0.2313, w: 0.0803, lift: -0.0122 },
+        { file: 9, x: 0.0448, w: 0.1331, lift: -0.0127 },
+        { file: 4, x: 0.4507, w: 0.1197, lift: -0.0297 },
+        { file: 12, x: 0.6343, w: 0.1305, lift: -0.0061 },
+        { file: 13, x: 0.5589, w: 0.1288, lift: -0.0269 },
+        { file: 5, x: 0.8535, w: 0.1359, lift: -0.0301 },
+        { file: 10, x: 0.8263, w: 0.2019, lift: -0.043 },
+        { file: 11, x: 0.7265, w: 0.1558, lift: -0.0503 },
+    ];
+
+    // Project name + caption per source file (from the printed "From left"
+    // legend; the left → right placement above follows that same order).
+    const BUILDING_INFO: Record<number, { name: string; detail: string }> = {
+        9: { name: "Tower Flower", detail: "30 social units · €4m · 2004 · Paris (17)" },
+        1: { name: "149 Rue des Suisses", detail: "social housing · 2000 · Paris (14)" },
+        7: { name: "Urban Collage", detail: "114 social units · €14.3m · 2012 · Champigny-sur-Marne" },
+        8: { name: "6 Social Housing Units", detail: "6 social units · €552k · 2019 · Rennes (Brittany)" },
+        14: { name: "Bois-le-Prêtre", detail: "96 social units · €11.25m · 2011 · Paris (17)" },
+        2: { name: "55 – Blache", detail: "6 social units · €940k · 2023 · Paris (10)" },
+        3: { name: "Les Artistes de Batignolles", detail: "46 social + 86 private · 2015 · Paris (17)" },
+        16: { name: "Home", detail: "92 social + 96 market · 2015 · Paris (13)" },
+        4: { name: "Arty Social Housing", detail: "40 social units · 2021 · Cesson-Sévigné (Brittany)" },
+        15: { name: "Rue Jean Bart", detail: "8 units · €1.9m · 2021 · Paris (6)" },
+        13: { name: "The Porous Block", detail: "76 social units · 2024 · Bagneux" },
+        12: { name: "Les Jasmins", detail: "38 social units · €4m · 2018 · La Réunion (DROM)" },
+        11: { name: "ES3 Collective Housing", detail: "48 social units · 2025 · Rennes (Brittany)" },
+        10: { name: "Olympic Village", detail: "83 social units · 2024 · Saint-Ouen-sur-Seine" },
+        5: { name: "8 Logements", detail: "8 social units · €1.1m · 2021 · Gignac-la-Nerthe (French Riviera)" },
+        0: { name: "START Ivry", detail: "98 social + 190 market · €43.3m · 2025 · Ivry-sur-Seine" },
+        6: { name: "Rue Fraizier", detail: "44 social units · 2025 · Saint-Denis" },
+    };
+
+    let hoveredFile = $state<number | null>(null);
+    let skyTipX = $state(0);
+    let skyTipY = $state(0);
+    function moveSkyTip(e: MouseEvent) {
+        const r = containerEl.getBoundingClientRect();
+        skyTipX = e.clientX - r.left;
+        skyTipY = e.clientY - r.top;
+    }
 
     // Extend the data with a synthetic 2025 point that holds the 2024 value, so
     // the line carries flat from 2024 → 2025 and labels can travel into 2025.
@@ -314,6 +388,26 @@
     });
 
     const formatValue = (v: number) => `${(v / 1_000_000).toFixed(2)}M`;
+
+    // Y of the data line at an arbitrary x pixel (line is piecewise-linear).
+    function lineYAtX(px: number): number {
+        return yScale(unitsAt(xScale.invert(px)));
+    }
+
+    // Clip polygon = everything ABOVE the line (only the BELOW-line area is
+    // masked, so imperfect bottom crops never show). The ceiling sits far above
+    // the chart (-4000) so tall buildings are never cut at the top.
+    const skylineClip = $derived.by(() => {
+        if (width === 0) return "";
+        const leftEdge = xScale(extendedStock[0].year);
+        const rightEdge = xScale(extendedStock[extendedStock.length - 1].year);
+        const linePts = extendedStock
+            .slice()
+            .reverse()
+            .map((d) => `${xScale(d.year)},${yScale(d.units)}`)
+            .join(" ");
+        return `${leftEdge},-4000 ${rightEdge},-4000 ${linePts}`;
+    });
 </script>
 
 <div
@@ -327,7 +421,53 @@
                 <clipPath id="shs-reveal">
                     <rect x="0" y="0" width={revealX} {height} />
                 </clipPath>
+                <clipPath id="shs-skyline">
+                    <polygon points={skylineClip} />
+                </clipPath>
             </defs>
+
+            <!-- Building skyline: cutouts rising from the data line during the
+                 policies beat. Clipped to the area above the line; fades with
+                 the policy cards (policiesOpacity) and zooms away on zoom. -->
+            {#if skylineOpacity > 0.001}
+                {@const leftEdge = xScale(extendedStock[0].year)}
+                {@const rightEdge = xScale(
+                    extendedStock[extendedStock.length - 1].year,
+                )}
+                {@const span = rightEdge - leftEdge}
+                <g
+                    clip-path="url(#shs-skyline)"
+                    style="opacity: {skylineOpacity}; pointer-events: {cardsVisible &&
+                    skylineFade < 0.99
+                        ? 'auto'
+                        : 'none'};"
+                >
+                    {#each SKYLINE as b, i (b.file)}
+                        {@const cx = leftEdge + b.x * span}
+                        {@const w = b.w * span}
+                        {@const h = w / SKY_ASPECT[b.file]}
+                        {@const baseY = lineYAtX(cx) - b.lift * span}
+                        <image
+                            href={asset(`/images/timeline/${b.file}.webp`)}
+                            x={cx - w / 2}
+                            y={baseY - h}
+                            width={w}
+                            height={h}
+                            preserveAspectRatio="none"
+                            role="img"
+                            aria-label={BUILDING_INFO[b.file]?.name}
+                            onmouseenter={() => (hoveredFile = b.file)}
+                            onmousemove={moveSkyTip}
+                            onmouseleave={() => (hoveredFile = null)}
+                            style="cursor: pointer; opacity: {cardsVisible
+                                ? 1
+                                : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {cardsVisible
+                                ? i * 40
+                                : 0}ms;"
+                        />
+                    {/each}
+                </g>
+            {/if}
 
             {#if SHOW_GRIDLINES}
                 <g>
@@ -512,6 +652,21 @@
                 </div>
                 <div class="text-[10px] opacity-70 leading-none mt-0.5">
                     total units
+                </div>
+            </div>
+        {/if}
+
+        <!-- Building hover tooltip: name + caption, follows the cursor. -->
+        {#if hoveredFile !== null && BUILDING_INFO[hoveredFile]}
+            <div
+                class="absolute z-30 pointer-events-none select-none -translate-x-1/2 -translate-y-full whitespace-nowrap rounded bg-gray-900/95 px-2.5 py-1.5 shadow-lg"
+                style="left: {skyTipX}px; top: {skyTipY - 14}px;"
+            >
+                <div class="text-xs font-semibold leading-tight text-white">
+                    {BUILDING_INFO[hoveredFile].name}
+                </div>
+                <div class="text-[10px] leading-tight text-white/70">
+                    {BUILDING_INFO[hoveredFile].detail}
                 </div>
             </div>
         {/if}

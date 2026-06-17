@@ -4,17 +4,22 @@
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as Select from '$lib/components/ui/select';
 	import {
-		mapState,
+		mapState as DEFAULT_MAP_STATE,
+		MapState,
 		communeLookup,
 		REGION_LOOKUP,
 		MAINLAND_CENTER,
 		MAINLAND_ZOOM,
 		METRIC_CONFIG,
 		BIVARIATE_COLORS,
+		CORNER_COLORS,
 		type MetricType
 	} from './map-state.svelte.js';
 
-	let { onflyto }: { onflyto: (center: [number, number], zoom: number) => void } = $props();
+	let {
+		onflyto,
+		mapState = DEFAULT_MAP_STATE
+	}: { onflyto: (center: [number, number], zoom: number) => void; mapState?: MapState } = $props();
 
 	let searchInputEl: HTMLDivElement;
 
@@ -147,45 +152,73 @@
 	<div class="mt-auto border-t border-gray-200 pt-4">
 		<p class="text-xs font-medium text-gray-500 mb-2">Legend</p>
 
-		<div class="flex items-stretch gap-2 w-fit">
-			<span class="self-center text-[10px] text-gray-500 [writing-mode:vertical-rl] rotate-180 whitespace-nowrap">
-				Social housing →
-			</span>
-			<div class="flex flex-col gap-1 w-fit">
-				<div class="flex flex-col">
-					{#each ['3', '2', '1'] as yLabel (yLabel)}
-						<div class="flex">
-							{#each ['A', 'B', 'C'] as xLabel (xLabel)}
-								{@const cell = `${xLabel}${yLabel}` as keyof typeof BIVARIATE_COLORS}
-								<div class="h-8 w-8" style="background-color: {BIVARIATE_COLORS[cell]};"></div>
-							{/each}
-						</div>
-					{/each}
-				</div>
-				<div class="flex items-center justify-between text-[10px] text-gray-500" style="width: 96px;">
-					<span>{mapState.currentConfig.xLow}</span>
-					<span>{mapState.currentConfig.xHigh}</span>
-				</div>
-			</div>
-		</div>
-
-		<div class="mt-4 space-y-2">
-			<p class="text-[10px] font-medium uppercase tracking-wide text-gray-500">Key patterns</p>
-			{#each (['A1', 'A3', 'C1', 'C3'] as const) as cell (cell)}
-				{@const insight = mapState.currentConfig.insights[cell]}
+		{#if mapState.cornerMode}
+			<div class="space-y-2.5">
 				<div class="flex gap-2">
 					<span
-						class="shrink-0 inline-flex h-4 w-5 items-center justify-center text-[9px] font-mono font-semibold text-gray-900 border border-gray-300"
-						style="background-color: {BIVARIATE_COLORS[cell]};"
-					>
-						{cell}
-					</span>
-					<div class="text-[11px] leading-tight">
-						<p class="font-medium text-gray-900">{insight.title}</p>
-						<p class="text-gray-600">{insight.body}</p>
+						class="shrink-0 h-4 w-5 border border-gray-300"
+						style="background-color: {CORNER_COLORS.C3};"
+					></span>
+					<p class="text-[11px] leading-tight text-gray-700">
+						<span class="font-medium text-gray-900">High social-housing growth in amenity-rich areas</span>
+						— top-right cell (C3): {mapState.currentConfig.xHigh}.
+					</p>
+				</div>
+				<div class="flex gap-2">
+					<span
+						class="shrink-0 h-4 w-5 border border-gray-300"
+						style="background-color: {CORNER_COLORS.A3};"
+					></span>
+					<p class="text-[11px] leading-tight text-gray-700">
+						<span class="font-medium text-gray-900">High social-housing growth in lower-amenity areas</span>
+						— cell A3: {mapState.currentConfig.xLow}.
+					</p>
+				</div>
+				<p class="text-[10px] text-gray-400">
+					All other communes shown neutral; only the two contrasting corners are highlighted.
+				</p>
+			</div>
+		{:else}
+			<div class="flex items-stretch gap-2 w-fit">
+				<span class="self-center text-[10px] text-gray-500 [writing-mode:vertical-rl] rotate-180 whitespace-nowrap">
+					Social housing →
+				</span>
+				<div class="flex flex-col gap-1 w-fit">
+					<div class="flex flex-col">
+						{#each ['3', '2', '1'] as yLabel (yLabel)}
+							<div class="flex">
+								{#each ['A', 'B', 'C'] as xLabel (xLabel)}
+									{@const cell = `${xLabel}${yLabel}` as keyof typeof BIVARIATE_COLORS}
+									<div class="h-8 w-8" style="background-color: {BIVARIATE_COLORS[cell]};"></div>
+								{/each}
+							</div>
+						{/each}
+					</div>
+					<div class="flex items-center justify-between text-[10px] text-gray-500" style="width: 96px;">
+						<span>{mapState.currentConfig.xLow}</span>
+						<span>{mapState.currentConfig.xHigh}</span>
 					</div>
 				</div>
-			{/each}
-		</div>
+			</div>
+
+			<div class="mt-4 space-y-2">
+				<p class="text-[10px] font-medium uppercase tracking-wide text-gray-500">Key patterns</p>
+				{#each (['A1', 'A3', 'C1', 'C3'] as const) as cell (cell)}
+					{@const insight = mapState.currentConfig.insights[cell]}
+					<div class="flex gap-2">
+						<span
+							class="shrink-0 inline-flex h-4 w-5 items-center justify-center text-[9px] font-mono font-semibold text-gray-900 border border-gray-300"
+							style="background-color: {BIVARIATE_COLORS[cell]};"
+						>
+							{cell}
+						</span>
+						<div class="text-[11px] leading-tight">
+							<p class="font-medium text-gray-900">{insight.title}</p>
+							<p class="text-gray-600">{insight.body}</p>
+						</div>
+					</div>
+				{/each}
+			</div>
+		{/if}
 	</div>
 </div>

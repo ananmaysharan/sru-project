@@ -1,6 +1,11 @@
 <script lang="ts">
 	import HealthMap from '$lib/components/maps/health-map/HealthMap.svelte';
-	import { METRIC_CONFIG } from '$lib/components/maps/health-map/map-state.svelte.js';
+	import { METRIC_CONFIG, MapState } from '$lib/components/maps/health-map/map-state.svelte.js';
+
+	// Second map: same indicators, but only the two contrasting corner cells are
+	// shown — C3 (high social-housing growth + amenity-rich) in dark blue and
+	// A3 (high social-housing growth + lower-amenity) in red.
+	const cornerMapState = new MapState({ cornerMode: true });
 </script>
 
 <section id="demographics" class="py-12">
@@ -14,33 +19,49 @@
 	<div class="max-w-7xl mx-auto h-[70vh] min-h-96 md:h-175 mt-8 px-4 sm:px-6">
 		<HealthMap />
 	</div>
+
+	<div class="max-w-3xl mx-auto mt-16 px-4 sm:px-6">
+		<h3 class="text-2xl font-bold">Where did social housing grow — amenity-rich vs. lower-amenity areas?</h3>
+		<p class="mt-2 text-gray-700">
+			The same indicators, restricted to the two contrasting corners of the bivariate legend.
+			In <span class="font-semibold text-[#1e3a8a]">dark blue</span>, communes with the highest
+			growth in social housing that are also amenity-rich (top-right cell, C3); in
+			<span class="font-semibold text-[#b91c1c]">red</span>, communes with high growth in social
+			housing but lower amenity levels (cell A3). All other communes are shown neutral.
+		</p>
+	</div>
+	<div class="max-w-7xl mx-auto h-[70vh] min-h-96 md:h-175 mt-8 px-4 sm:px-6">
+		<HealthMap mapState={cornerMapState} />
+	</div>
+
 	<div class="max-w-3xl mx-auto mt-10 px-4 sm:px-6 space-y-4 text-gray-700">
-				<h3 class="text-xl font-bold">Definitions</h3>
+				<h3 class="text-xl font-bold">Explanation of key health outcome metrics:</h3>
 
 
 		<p>
-			<strong>Social housing</strong> Change in
-			share of social housing at the commune level, measured in percentage points, split into
-			terciles (1 = lowest growth, 3 = highest growth).
+			<strong>Change in social housing share</strong> Change in the share of social housing at the
+			commune (municipality) level over the study period, measured in percentage points. We group
+			communes into three equal categories (“terciles”): 1 = lowest growth in social housing, 3 =
+			highest growth. This captures how actively each commune expanded its social housing stock.
 		</p>
 
 		<p>
-			<strong>Income</strong> {METRIC_CONFIG.income.description}
+			<strong>{METRIC_CONFIG.income.label}</strong> {METRIC_CONFIG.income.description}
 		</p>
 		<p>
-			<strong>Poverty</strong> {METRIC_CONFIG.poverty.description}
+			<strong>{METRIC_CONFIG.poverty.label}</strong> {METRIC_CONFIG.poverty.description}
 		</p>
 		<p>
-			<strong>Elders</strong> {METRIC_CONFIG.elders.description}
+			<strong>{METRIC_CONFIG.elders.label}</strong> {METRIC_CONFIG.elders.description}
 		</p>
 		<p>
-			<strong>Election winner</strong> {METRIC_CONFIG.left.description}
+			<strong>{METRIC_CONFIG.left.label}</strong> {METRIC_CONFIG.left.description}
 		</p>
 		<p>
-			<strong>DPE energy efficiency</strong> {METRIC_CONFIG.dpe.description}
+			<strong>{METRIC_CONFIG.dpe.label}</strong> {METRIC_CONFIG.dpe.description}
 		</p>
 		<p>
-			<strong>Heat islands (MAPUCE)</strong> {METRIC_CONFIG.heat.description}
+			<strong>{METRIC_CONFIG.heat.label}</strong> {METRIC_CONFIG.heat.description}
 		</p>
 	</div>
 </section>
