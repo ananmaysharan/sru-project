@@ -161,7 +161,6 @@
 					></span>
 					<p class="text-[11px] leading-tight text-gray-700">
 						<span class="font-medium text-gray-900">High social-housing growth in amenity-rich areas</span>
-						— top-right cell (C3): {mapState.currentConfig.xHigh}.
 					</p>
 				</div>
 				<div class="flex gap-2">
@@ -171,7 +170,6 @@
 					></span>
 					<p class="text-[11px] leading-tight text-gray-700">
 						<span class="font-medium text-gray-900">High social-housing growth in lower-amenity areas</span>
-						— cell A3: {mapState.currentConfig.xLow}.
 					</p>
 				</div>
 				<p class="text-[10px] text-gray-400">
