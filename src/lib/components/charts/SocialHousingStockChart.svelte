@@ -31,6 +31,15 @@
     const policiesOpacity = $derived(1 - zoomProgress);
     const newsVisible = $derived(newsProgress > 0);
 
+    // Newspaper backdrop (NYT scrollytelling): a washed-out texture that eases
+    // in at the top through the news beat. Smoothstep on newsProgress so the
+    // fade is gentle; capped low so the data line stays legible on top.
+    const NEWSPAPER_MAX_OPACITY = 0.24;
+    const newspaperOpacity = $derived.by(() => {
+        const p = newsProgress;
+        return p * p * (3 - 2 * p) * NEWSPAPER_MAX_OPACITY;
+    });
+
     // The building skyline fades out fast right after the policies beat ends,
     // so it disappears the moment the reader scrolls past it (rather than
     // lingering through the whole zoom like the policy cards).
@@ -420,8 +429,23 @@
 
 <div
     bind:this={containerEl}
-    class="relative m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] bg-white"
+    class="relative isolate m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] bg-white"
 >
+    <!-- Newspaper texture backdrop: washed-out, covering the full chart (graph
+         + headline grid) during the news beat. Gradient-masked so it eases in
+         at the top and out at the bottom — no hard edges. Sits behind the SVG
+         (-z-10, contained by `isolate` above) so the line and labels read on
+         top of it. -->
+    {#if newspaperOpacity > 0.001}
+        <div
+            class="pointer-events-none absolute -inset-x-4 inset-y-0 -z-10 bg-cover bg-center"
+            style="opacity: {newspaperOpacity};
+                background-image: url({asset('/images/newspaper-bg.webp')});
+                -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.5) 97%, rgba(0,0,0,0) 100%);
+                mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.5) 97%, rgba(0,0,0,0) 100%);"
+        ></div>
+    {/if}
+
     {#if width > 0 && height > 0}
         {@const axisY = height - marginBottom}
         <svg {width} {height} class="block" style="overflow: visible;">
@@ -631,12 +655,15 @@
             </g>
         </svg>
 
-        {#each milestones as m (m.year)}
+        {#each milestones as m, i (m.year)}
             {@const mx = xScale(m.year)}
             {@const my = yScale(m.units)}
             {#if tipX >= mx - 0.5 && m.year >= domainLeft - 0.001}
                 <div
-                    class="absolute pointer-events-none select-none -translate-x-1/2 whitespace-nowrap text-center bg-white px-1.5 py-1"
+                    class="absolute pointer-events-none select-none -translate-x-1/2 whitespace-nowrap text-center px-1.5 py-1 {i <
+                    2
+                        ? ''
+                        : 'bg-white'}"
                     style="left: {mx}px; top: {my + 12}px; color: {BLUE};"
                 >
                     <div class="text-sm font-semibold leading-none">
