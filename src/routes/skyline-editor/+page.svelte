@@ -7,16 +7,17 @@
         type SocialHousingStockYear,
     } from "$lib/data/charts/social-housing-stock";
 
-    // Natural width/height ratio for each source file (0..16).
+    // Natural width/height ratio for each source file, numbered by visual order from left → right.
     const ASPECT: Record<number, number> = {
-        0: 527 / 960, 1: 519 / 388, 2: 281 / 407, 3: 876 / 585, 4: 716 / 553,
-        5: 521 / 359, 6: 446 / 323, 7: 665 / 428, 8: 382 / 295, 9: 637 / 462,
-        10: 1037 / 752, 11: 528 / 408, 12: 592 / 382, 13: 694 / 574,
-        14: 803 / 960, 15: 693 / 377, 16: 693 / 1000,
+        0: 637 / 462, 1: 519 / 388, 2: 665 / 428, 3: 382 / 295,
+        4: 803 / 960, 5: 281 / 407, 6: 876 / 585, 7: 693 / 1000,
+        8: 716 / 553, 9: 693 / 377, 10: 694 / 574, 11: 592 / 382,
+        12: 528 / 408, 13: 1037 / 752, 14: 521 / 359, 15: 527 / 960,
+        16: 446 / 323,
     };
 
     // Current best-guess left → right order (file indices).
-    const INITIAL_ORDER = [9, 1, 2, 5, 14, 15, 4, 16, 6, 3, 7, 8, 11, 12, 10, 0, 13];
+    const INITIAL_ORDER = Array.from({ length: 17 }, (_, i) => i);
 
     type Building = {
         id: number; file: number; aspect: number;
@@ -177,7 +178,7 @@
             <!-- Line only (no fill), drawn on top so it stays visible -->
             <svg {width} {height} class="absolute inset-0 pointer-events-none" style="z-index:500;">
                 <path d={linePath} fill="none" stroke="#06738b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
-                {#each milestoneYears as y}
+                {#each milestoneYears as y (y)}
                     <circle cx={xScale(y)} cy={yScale(unitsAt(y))} r="3.5" fill="#06738b" />
                     <text x={xScale(y)} y={yScale(unitsAt(y)) + 16} text-anchor="middle" font-size="11" font-weight="600" fill="#06738b">{fmt(unitsAt(y))}</text>
                 {/each}

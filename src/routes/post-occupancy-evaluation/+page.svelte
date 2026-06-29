@@ -1,6 +1,31 @@
 <script lang="ts">
     import AutoCarousel from "$lib/components/gallery/AutoCarousel.svelte";
 
+    let activeRegion = $state("Paris");
+    let activeLabel = $state("Samaritaine");
+    let activeDark = $state(true);
+    let panelEls = $state<HTMLElement[]>([]);
+
+    $effect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        const el = entry.target as HTMLElement;
+                        activeRegion = el.dataset.region ?? "";
+                        activeLabel = el.dataset.label ?? "";
+                        activeDark = el.dataset.dark === "true";
+                    }
+                }
+            },
+            { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
+        );
+        for (const el of panelEls) {
+            if (el) observer.observe(el);
+        }
+        return () => observer.disconnect();
+    });
+
     function slug(s: string) {
         return s
             .toLowerCase()
@@ -122,10 +147,13 @@
 
     const regions = [
         "Paris",
-        "Brittany",
-        "French Riviera",
-        "Overseas Territories",
+        // Temporarily hidden:
+        // "Brittany",
+        // "French Riviera",
+        // "Overseas Territories",
     ];
+
+    const galleryAspect = "h-[95vh]";
 </script>
 
 <section id="socio-econometrics" class="py-12">
@@ -144,11 +172,14 @@
             shared, rigorous, and repeatable ways of assessing life in these
             developments—combining quantitative indicators (comfort, health,
             maintenance, environmental performance) with qualitative insights on
-            dignity, everyday use, and social relations. The goal is to move
-            beyond compliance metrics and architectural intentions, and to build
-            an evidence base that allows us to identify what actually works,
-            what fails, and how future projects and policies should be revised.
-            This page will serve as a living platform to gather tools, case
+            dignity, everyday use, and social relations.
+        </p>
+        <p class="mt-2 text-gray-600">
+            The goal is to move beyond compliance metrics and architectural
+            intentions, and to build an evidence base that allows us to identify
+            what actually works, what fails, and how future projects and
+            policies should be revised. This page will serve as a living
+            platform to gather tools, case
             studies, and collaborations around post‑occupancy evaluations in
             social housing, and to invite others to join this agenda.
         </p>
@@ -160,6 +191,7 @@
         </p>
     </div>
 
+    <!-- Temporarily hidden region nav:
     <div class="max-w-3xl mx-auto mt-8 px-4 sm:px-6">
         <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
             {#each regions as region (region)}
@@ -172,43 +204,72 @@
             {/each}
         </nav>
     </div>
+    -->
 
-    <div
-        id={slug("Paris")}
-        class="max-w-3xl mx-auto mt-12 px-4 sm:px-6 scroll-mt-24"
-    >
-        <h1 class="text-4xl font-bold">Paris</h1>
-    </div>
-    <div class="mt-6 space-y-12">
-        {#each parisProjects as project (project.label)}
-            <div class="max-w-3xl mx-auto px-4 sm:px-6">
-                <h2 class="text-2xl font-bold mb-4">{project.label}</h2>
-                <AutoCarousel images={project.images} />
+    <div class="relative mt-12">
+        <!-- Floating section label: stays pinned below the nav across all
+             regions and updates to the section currently in view. -->
+        <div class="pointer-events-none sticky top-16 z-30 h-0">
+            <div
+                class="px-4 py-4 sm:px-6 transition-colors duration-300 {activeDark
+                    ? 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]'
+                    : 'text-gray-900'}"
+            >
+                <h1 class="text-4xl font-bold leading-tight">
+                    {activeRegion}{#if activeLabel}<br /><span
+                            class="font-normal">{activeLabel}</span
+                        >{/if}
+                </h1>
             </div>
-        {/each}
-    </div>
-
-    <div
-        id={slug("Brittany")}
-        class="max-w-3xl mx-auto mt-16 px-4 sm:px-6 scroll-mt-24"
-    >
-        <h1 class="text-4xl font-bold">Brittany</h1>
-        <div class="mt-6">
-            <AutoCarousel images={brittanyImages} />
         </div>
-    </div>
 
-    <div
-        id={slug("French Riviera")}
-        class="max-w-3xl mx-auto mt-16 px-4 sm:px-6 scroll-mt-24"
-    >
-        <h1 class="text-4xl font-bold">French Riviera</h1>
-    </div>
+        <div id={slug("Paris")} class="scroll-mt-24">
+            {#each parisProjects as project, i (project.label)}
+                <section
+                    bind:this={panelEls[i]}
+                    data-region="Paris"
+                    data-label={project.label}
+                    data-dark="true"
+                    class="relative"
+                >
+                    <AutoCarousel
+                        images={project.images}
+                        aspect={galleryAspect}
+                        interval={6000}
+                    />
+                </section>
+            {/each}
+        </div>
 
-    <div
-        id={slug("Overseas Territories")}
-        class="max-w-3xl mx-auto mt-16 px-4 sm:px-6 scroll-mt-24"
-    >
-        <h1 class="text-4xl font-bold">Overseas Territories</h1>
+        <!-- Temporarily hidden: Brittany, French Riviera, Overseas Territories
+        <div
+            id={slug("Brittany")}
+            bind:this={panelEls[4]}
+            data-region="Brittany"
+            data-label=""
+            data-dark="true"
+            class="relative mt-16 min-h-screen scroll-mt-24 py-8"
+        >
+            <AutoCarousel images={brittanyImages} aspect={galleryAspect} />
+        </div>
+
+        <div
+            id={slug("French Riviera")}
+            bind:this={panelEls[5]}
+            data-region="French Riviera"
+            data-label=""
+            data-dark="false"
+            class="mt-16 min-h-screen scroll-mt-24"
+        ></div>
+
+        <div
+            id={slug("Overseas Territories")}
+            bind:this={panelEls[6]}
+            data-region="Overseas Territories"
+            data-label=""
+            data-dark="false"
+            class="mt-16 min-h-screen scroll-mt-24"
+        ></div>
+        -->
     </div>
 </section>

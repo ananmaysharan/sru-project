@@ -148,12 +148,13 @@
     // --- Building skyline ---------------------------------------------------
     // 17 cutout images that rise from the data line during the policies beat,
     // recreating the printed "SRU at 25" infographic. Natural width/height ratio
-    // per source file (0–16).
+    // per source file, numbered by visual order from left → right.
     const SKY_ASPECT: Record<number, number> = {
-        0: 527 / 960, 1: 519 / 388, 2: 281 / 407, 3: 876 / 585, 4: 716 / 553,
-        5: 521 / 359, 6: 446 / 323, 7: 665 / 428, 8: 382 / 295, 9: 637 / 462,
-        10: 1037 / 752, 11: 528 / 408, 12: 592 / 382, 13: 694 / 574,
-        14: 803 / 960, 15: 693 / 377, 16: 693 / 1000,
+        0: 637 / 462, 1: 519 / 388, 2: 665 / 428, 3: 382 / 295,
+        4: 803 / 960, 5: 281 / 407, 6: 876 / 585, 7: 693 / 1000,
+        8: 716 / 553, 9: 693 / 377, 10: 694 / 574, 11: 592 / 382,
+        12: 528 / 408, 13: 1037 / 752, 14: 521 / 359, 15: 527 / 960,
+        16: 446 / 323,
     };
     // Placement hand-arranged in /skyline-editor, normalized to the line ends:
     //   x    — center position along the line span (0 = 2000 end, 1 = 2025 end)
@@ -162,44 +163,44 @@
     // Listed back → front so SVG paint order reproduces the chosen z-order.
     const SKYLINE: { file: number; x: number; w: number; lift: number }[] = [
         { file: 1, x: 0.1104, w: 0.1219, lift: -0.0304 },
-        { file: 14, x: 0.2349, w: 0.1166, lift: -0.0134 },
-        { file: 15, x: 0.4857, w: 0.1227, lift: 0.0002 },
-        { file: 16, x: 0.419, w: 0.1004, lift: -0.0277 },
-        { file: 3, x: 0.3702, w: 0.1714, lift: -0.028 },
-        { file: 2, x: 0.2903, w: 0.0833, lift: -0.019 },
-        { file: 0, x: 0.8841, w: 0.103, lift: -0.039 },
-        { file: 6, x: 0.9609, w: 0.1236, lift: -0.0197 },
-        { file: 7, x: 0.1517, w: 0.1483, lift: -0.0186 },
-        { file: 8, x: 0.2313, w: 0.0803, lift: -0.0122 },
-        { file: 9, x: 0.0448, w: 0.1331, lift: -0.0127 },
-        { file: 4, x: 0.4507, w: 0.1197, lift: -0.0297 },
-        { file: 12, x: 0.6343, w: 0.1305, lift: -0.0061 },
-        { file: 13, x: 0.5589, w: 0.1288, lift: -0.0269 },
-        { file: 5, x: 0.8535, w: 0.1359, lift: -0.0301 },
-        { file: 10, x: 0.8263, w: 0.2019, lift: -0.043 },
-        { file: 11, x: 0.7265, w: 0.1558, lift: -0.0503 },
+        { file: 4, x: 0.2349, w: 0.1166, lift: -0.0134 },
+        { file: 9, x: 0.4857, w: 0.1227, lift: 0.0002 },
+        { file: 7, x: 0.419, w: 0.1004, lift: -0.0277 },
+        { file: 6, x: 0.3702, w: 0.1714, lift: -0.028 },
+        { file: 5, x: 0.2903, w: 0.0833, lift: -0.019 },
+        { file: 15, x: 0.8841, w: 0.103, lift: -0.039 },
+        { file: 16, x: 0.9609, w: 0.1236, lift: -0.0197 },
+        { file: 2, x: 0.1517, w: 0.1483, lift: -0.0186 },
+        { file: 3, x: 0.2313, w: 0.0803, lift: -0.0122 },
+        { file: 0, x: 0.0448, w: 0.1331, lift: -0.0127 },
+        { file: 8, x: 0.4507, w: 0.1197, lift: -0.0297 },
+        { file: 11, x: 0.6343, w: 0.1305, lift: -0.0061 },
+        { file: 10, x: 0.5589, w: 0.1288, lift: -0.0269 },
+        { file: 14, x: 0.8535, w: 0.1359, lift: -0.0301 },
+        { file: 13, x: 0.8263, w: 0.2019, lift: -0.043 },
+        { file: 12, x: 0.7265, w: 0.1558, lift: -0.0503 },
     ];
+    const SKY_HOVER_SCALE = 1.09;
 
-    // Project name + caption per source file (from the printed "From left"
-    // legend; the left → right placement above follows that same order).
+    // Project name + caption per source file, numbered left → right.
     const BUILDING_INFO: Record<number, { name: string; detail: string }> = {
-        9: { name: "Tower Flower", detail: "30 social units · €4m · 2004 · Paris (17)" },
+        0: { name: "Tower Flower", detail: "30 social units · €4m · 2004 · Paris (17)" },
         1: { name: "149 Rue des Suisses", detail: "social housing · 2000 · Paris (14)" },
-        7: { name: "Urban Collage", detail: "114 social units · €14.3m · 2012 · Champigny-sur-Marne" },
-        8: { name: "6 Social Housing Units", detail: "6 social units · €552k · 2019 · Rennes (Brittany)" },
-        14: { name: "Bois-le-Prêtre", detail: "96 social units · €11.25m · 2011 · Paris (17)" },
-        2: { name: "55 – Blache", detail: "6 social units · €940k · 2023 · Paris (10)" },
-        3: { name: "Les Artistes de Batignolles", detail: "46 social + 86 private · 2015 · Paris (17)" },
-        16: { name: "Home", detail: "92 social + 96 market · 2015 · Paris (13)" },
-        4: { name: "Arty Social Housing", detail: "40 social units · 2021 · Cesson-Sévigné (Brittany)" },
-        15: { name: "Rue Jean Bart", detail: "8 units · €1.9m · 2021 · Paris (6)" },
-        13: { name: "The Porous Block", detail: "76 social units · 2024 · Bagneux" },
-        12: { name: "Les Jasmins", detail: "38 social units · €4m · 2018 · La Réunion (DROM)" },
-        11: { name: "ES3 Collective Housing", detail: "48 social units · 2025 · Rennes (Brittany)" },
-        10: { name: "Olympic Village", detail: "83 social units · 2024 · Saint-Ouen-sur-Seine" },
-        5: { name: "8 Logements", detail: "8 social units · €1.1m · 2021 · Gignac-la-Nerthe (French Riviera)" },
-        0: { name: "START Ivry", detail: "98 social + 190 market · €43.3m · 2025 · Ivry-sur-Seine" },
-        6: { name: "Rue Fraizier", detail: "44 social units · 2025 · Saint-Denis" },
+        2: { name: "Urban Collage", detail: "114 social units · €14.3m · 2012 · Champigny-sur-Marne" },
+        3: { name: "6 Social Housing Units", detail: "6 social units · €552k · 2019 · Rennes (Brittany)" },
+        4: { name: "Bois-le-Prêtre", detail: "96 social units · €11.25m · 2011 · Paris (17)" },
+        5: { name: "55 – Blache", detail: "6 social units · €940k · 2023 · Paris (10)" },
+        6: { name: "Les Artistes de Batignolles", detail: "46 social + 86 private · 2015 · Paris (17)" },
+        7: { name: "Home", detail: "92 social + 96 market · 2015 · Paris (13)" },
+        8: { name: "Arty Social Housing", detail: "40 social units · 2021 · Cesson-Sévigné (Brittany)" },
+        9: { name: "Rue Jean Bart", detail: "8 units · €1.9m · 2021 · Paris (6)" },
+        10: { name: "The Porous Block", detail: "76 social units · 2024 · Bagneux" },
+        11: { name: "Les Jasmins", detail: "38 social units · €4m · 2018 · La Réunion (DROM)" },
+        12: { name: "ES3 Collective Housing", detail: "48 social units · 2025 · Rennes (Brittany)" },
+        13: { name: "Olympic Village", detail: "83 social units · 2024 · Saint-Ouen-sur-Seine" },
+        14: { name: "8 Logements", detail: "8 social units · €1.1m · 2021 · Gignac-la-Nerthe (French Riviera)" },
+        15: { name: "START Ivry", detail: "98 social + 190 market · €43.3m · 2025 · Ivry-sur-Seine" },
+        16: { name: "Rue Fraizier", detail: "44 social units · 2025 · Saint-Denis" },
     };
 
     let hoveredFile = $state<number | null>(null);
@@ -209,6 +210,10 @@
         const r = containerEl.getBoundingClientRect();
         skyTipX = e.clientX - r.left;
         skyTipY = e.clientY - r.top;
+    }
+    function enterSkyline(file: number, e: MouseEvent) {
+        hoveredFile = file;
+        moveSkyTip(e);
     }
 
     // Extend the data with a synthetic 2025 point that holds the 2024 value, so
@@ -265,16 +270,19 @@
     // Gap reserved between the bottom of the plotted line and the x-axis year
     // labels, so the milestone value labels (which hang below their dots) and
     // the floating tip label always clear the years.
-    const AXIS_GAP = 56;
+    const AXIS_GAP = 40;
 
-    // Y-domain hugs the data extent (~3.99M → 5.37M) with only a sliver of
-    // padding, so the rises and the 2014 / 2021 dips read as steep peaks and
-    // troughs. Axis-label clearance is handled separately by AXIS_GAP below,
-    // which frees the floor to sit right under the data minimum.
+    // Y-domain floor sits right at the data minimum (2000 ≈ 4.00M) with the
+    // ceiling held at 5.40M, so the climb and the 2014 / 2021 dips read as
+    // steep peaks and troughs. The ceiling is deliberately NOT lowered to the
+    // data max: that would raise the 2024 peak and eat into the headroom the
+    // façade cutouts rise into. Extra drama instead comes from the smaller
+    // AXIS_GAP, which stretches the line downward (peak fixed → buildings stay
+    // anchored to the line and keep their top clearance).
     const yScale = $derived(
         d3
             .scaleLinear()
-            .domain([3_950_000, 5_400_000])
+            .domain([4_000_000, 5_400_000])
             .range([
                 Math.max(margin.top, height - marginBottom - AXIS_GAP),
                 margin.top,
@@ -446,6 +454,8 @@
                         {@const cx = leftEdge + b.x * span}
                         {@const w = b.w * span}
                         {@const h = w / SKY_ASPECT[b.file]}
+                        {@const skyScale =
+                            hoveredFile === b.file ? SKY_HOVER_SCALE : 1}
                         {@const baseY = lineYAtX(cx) - b.lift * span}
                         <image
                             href={asset(`/images/timeline/${b.file}.webp`)}
@@ -456,14 +466,14 @@
                             preserveAspectRatio="none"
                             role="img"
                             aria-label={BUILDING_INFO[b.file]?.name}
-                            onmouseenter={() => (hoveredFile = b.file)}
+                            onmouseenter={(e) => enterSkyline(b.file, e)}
                             onmousemove={moveSkyTip}
                             onmouseleave={() => (hoveredFile = null)}
                             style="cursor: pointer; opacity: {cardsVisible
                                 ? 1
                                 : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {cardsVisible
                                 ? i * 40
-                                : 0}ms;"
+                                : 0}ms, transform 180ms ease-out; transform-box: fill-box; transform-origin: center bottom; transform: scale({skyScale});"
                         />
                     {/each}
                 </g>
@@ -659,13 +669,13 @@
         <!-- Building hover tooltip: name + caption, follows the cursor. -->
         {#if hoveredFile !== null && BUILDING_INFO[hoveredFile]}
             <div
-                class="absolute z-30 pointer-events-none select-none -translate-x-1/2 -translate-y-full whitespace-nowrap rounded bg-gray-900/95 px-2.5 py-1.5 shadow-lg"
+                class="absolute z-30 pointer-events-none select-none -translate-x-1/2 -translate-y-full whitespace-nowrap border border-gray-300 bg-white px-2.5 py-1.5"
                 style="left: {skyTipX}px; top: {skyTipY - 14}px;"
             >
-                <div class="text-xs font-semibold leading-tight text-white">
+                <div class="text-xs font-semibold leading-tight text-gray-900">
                     {BUILDING_INFO[hoveredFile].name}
                 </div>
-                <div class="text-[10px] leading-tight text-white/70">
+                <div class="text-[10px] leading-tight text-gray-600">
                     {BUILDING_INFO[hoveredFile].detail}
                 </div>
             </div>

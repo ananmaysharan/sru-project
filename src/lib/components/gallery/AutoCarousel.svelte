@@ -9,18 +9,19 @@
 	let {
 		images,
 		interval = 4000,
-		aspect = 'aspect-[4/3]'
-	}: { images: Image[]; interval?: number; aspect?: string } = $props();
+		aspect = 'aspect-[4/3]',
+		overlayTitle
+	}: { images: Image[]; interval?: number; aspect?: string; overlayTitle?: string } = $props();
 
 	let index = $state(0);
 	let paused = $state(false);
 	let landscape = $state<boolean[]>([]);
+	const hasCaptions = $derived(images.some((img) => img.caption));
+	const portraitActive = $derived(landscape[index] === false);
 
 	function onImageLoad(event: Event, i: number) {
 		const img = event.currentTarget as HTMLImageElement;
-		if (img.naturalWidth > img.naturalHeight) {
-			landscape[i] = true;
-		}
+		landscape[i] = img.naturalWidth > img.naturalHeight;
 	}
 
 	onMount(() => {
@@ -33,9 +34,9 @@
 	});
 </script>
 
-<div class="w-full">
+<div class="relative w-full">
 	<div
-		class="relative w-full {aspect} overflow-hidden bg-gray-100 border border-gray-200"
+		class="relative block w-full {aspect} overflow-hidden {portraitActive ? 'bg-black' : 'bg-gray-100'}"
 		role="group"
 		aria-roledescription="carousel"
 	>
@@ -50,37 +51,49 @@
 			/>
 		{/each}
 
-		{#if images.length > 1}
-			<div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/40 to-transparent p-3">
-				<div class="flex gap-1.5">
-					{#each images as _, i}
-						<button
-							type="button"
-							aria-label="Go to slide {i + 1}"
-							class="w-2 h-2 rounded-full transition-colors {i === index ? 'bg-white' : 'bg-white/50'}"
-							onclick={() => (index = i)}
-						></button>
+		{#if overlayTitle}
+			<div class="absolute left-0 top-0 z-10 px-4 py-4 text-white">
+				<h1 class="text-4xl font-bold leading-tight">
+					{#each overlayTitle.split('\n') as line, i (i)}
+						{#if i > 0}<br />{/if}{line}
 					{/each}
-				</div>
-				<button
-					type="button"
-					aria-label={paused ? 'Play' : 'Pause'}
-					class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30"
-					onclick={() => (paused = !paused)}
-				>
-					{#if paused}
-						<PlayIcon class="h-4 w-4" />
-					{:else}
-						<PauseIcon class="h-4 w-4" />
-					{/if}
-				</button>
+				</h1>
 			</div>
 		{/if}
-	</div>
 
-	{#if images.some((img) => img.caption)}
-		<p class="mt-3 min-h-[3rem] text-sm leading-relaxed text-gray-600">
-			{images[index]?.caption ?? ''}
-		</p>
-	{/if}
+		{#if hasCaptions && images[index]?.caption}
+			<div class="pointer-events-none absolute bottom-0 left-0 z-10 p-4">
+				<p
+					class="max-w-xs text-sm leading-relaxed text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)] sm:max-w-sm sm:text-base"
+				>
+					{images[index]?.caption}
+				</p>
+			</div>
+		{/if}
+
+		{#if images.length > 1}
+			<div class="absolute right-0 top-0 z-10 flex gap-1.5 p-3">
+				{#each images as _, i (i)}
+					<button
+						type="button"
+						aria-label="Go to slide {i + 1}"
+						class="w-2 h-2 rounded-full transition-colors {i === index ? 'bg-white' : 'bg-white/50'}"
+						onclick={() => (index = i)}
+					></button>
+				{/each}
+			</div>
+			<button
+				type="button"
+				aria-label={paused ? 'Play' : 'Pause'}
+				class="absolute right-0 bottom-0 z-10 m-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30"
+				onclick={() => (paused = !paused)}
+			>
+				{#if paused}
+					<PlayIcon class="h-4 w-4" />
+				{:else}
+					<PauseIcon class="h-4 w-4" />
+				{/if}
+			</button>
+		{/if}
+	</div>
 </div>
