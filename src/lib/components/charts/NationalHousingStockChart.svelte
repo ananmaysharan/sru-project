@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { INTRO_LINE_BLUE } from '$lib/data/charts/chart-colors';
 	import { nationalHousingStock } from '$lib/data/charts/national-housing-stock';
 
 	let chartEl: HTMLDivElement;
@@ -55,7 +56,7 @@
 						type: 'bar',
 						data: values,
 						barWidth: '60%',
-						itemStyle: { color: '#9CAEAE' },
+						itemStyle: { color: INTRO_LINE_BLUE },
 						emphasis: { disabled: true }
 					}
 				]

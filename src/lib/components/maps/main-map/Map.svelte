@@ -30,6 +30,7 @@
 	let regionsSourceLayer = '';
 	let departementsSourceLayer = '';
 	let usePmtiles = false;
+	const timelineAccent = '#06738b';
 
 	function flyTo(center: [number, number], zoom: number) {
 		mapInstance?.flyTo({ center, zoom, duration: 1500 });
@@ -391,7 +392,7 @@
 				>
 					<ArrowLeftIcon class="size-4" />
 				</Button>
-				{#each OVERSEAS_REGIONS as region}
+				{#each OVERSEAS_REGIONS as region (region.name)}
 					<Button
 						variant="outline"
 						size="sm"
@@ -436,19 +437,26 @@
 			>
 				{#snippet children({ thumbs })}
 					<span class="bg-gray-200 relative h-1.5 w-full grow overflow-hidden rounded-full">
-						<Slider.Range class="bg-[#8fa6aa] absolute h-full" />
+						<Slider.Range class="absolute h-full" style={`background-color: ${timelineAccent};`} />
 					</span>
 					{#each thumbs as thumb (thumb)}
 						<Slider.Thumb
 							index={thumb}
-							class="border-[#8fa6aa] ring-[#8fa6aa]/30 block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden"
+							class="block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden"
+							style={`border-color: ${timelineAccent}; --tw-ring-color: ${timelineAccent}4d;`}
 						/>
 					{/each}
 				{/snippet}
 			</Slider.Root>
 			<div class="flex justify-between mt-0.5">
-				{#each YEARS as year}
-					<span class="text-[10px] text-gray-400" class:font-semibold={year === mapState.activeYear} class:text-gray-700={year === mapState.activeYear}>{year}</span>
+				{#each YEARS as year (year)}
+					<span
+						class="text-[10px] text-gray-400"
+						class:font-semibold={year === mapState.activeYear}
+						style:color={year === mapState.activeYear ? timelineAccent : undefined}
+					>
+						{year}
+					</span>
 				{/each}
 			</div>
 		</div>

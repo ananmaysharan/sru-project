@@ -163,7 +163,7 @@
     style="height: 400vh;"
 >
     <div
-        class="sticky overflow-hidden flex flex-col"
+        class="sticky flex flex-col"
         style="top: {navHeight}px; height: calc(100vh - {navHeight}px);"
     >
         <!-- Crossfading caption — the heading swaps from the data story to the

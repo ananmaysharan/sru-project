@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { asset } from "$app/paths";
     import Map from "$lib/components/maps/main-map/Map.svelte";
     import EuropeanMap from "$lib/components/maps/european-map/EuropeanMap.svelte";
     import SupplyLineChart from "$lib/components/charts/SupplyLineChart.svelte";
     import ResidencesStackedChart from "$lib/components/charts/ResidencesStackedChart.svelte";
     import SupplyPieChart from "$lib/components/charts/SupplyPieChart.svelte";
     import SupplyRegionalChart from "$lib/components/charts/SupplyRegionalChart.svelte";
+    import CommuneHealthIndexScatter from "$lib/components/charts/CommuneHealthIndexScatter.svelte";
     import DromComCard from "$lib/components/charts/DromComCard.svelte";
     import NationalHousingStockChart from "$lib/components/charts/NationalHousingStockChart.svelte";
+    import NonComplianceChart from "$lib/components/charts/NonComplianceChart.svelte";
 </script>
 
 <section id="supply" class="py-12">
@@ -94,6 +95,10 @@
         </div>
     </div>
 
+    <div class="mx-4 mt-8 md:mx-12">
+        <CommuneHealthIndexScatter />
+    </div>
+
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
         <h3 class="mt-12 text-2xl font-semibold">Supply Map</h3>
         <p class="mt-4 text-gray-700">
@@ -131,18 +136,19 @@
             mechanisms.
         </p>
     </div>
-    <div class="mx-4 mt-4 flex flex-col gap-4 md:mx-12 md:flex-row">
+    <!-- <div class="mx-4 mt-4 flex flex-col gap-4 md:mx-12 md:flex-row">
         <img
-            src={asset("/noncompliance-1.png")}
+            src="/noncompliance-1.png"
             alt="Noncompliant communes page 1 (2005–2022)"
             class="w-full min-w-0 object-contain md:flex-1"
         />
         <img
-            src={asset("/noncompliance-2.png")}
+            src="/noncompliance-2.png"
             alt="Noncompliant communes page 2 (2005–2022)"
             class="w-full min-w-0 object-contain md:flex-1"
         />
-    </div>
+    </div> -->
+    <NonComplianceChart />
 
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
         <h3 class="mt-12 text-2xl font-semibold">Overseas Terrories</h3>

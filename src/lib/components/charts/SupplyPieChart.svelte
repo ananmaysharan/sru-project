@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRIGHT_CHART_PALETTE, colorForRegionName } from '$lib/data/charts/chart-colors';
 	import { socialHousingByRegion2022 } from '$lib/data/charts/region-supply-summary';
 	import { departmentSupply2022 } from '$lib/data/charts/department-supply-summary';
 
@@ -26,13 +27,15 @@
 			name: d.region,
 			value: d.social,
 			rate: d.rate,
-			regionCode: d.regionCode
+			regionCode: d.regionCode,
+			itemStyle: { color: colorForRegionName(d.region) }
 		}));
 		data.push({
 			name: 'Outre-mer',
 			value: outreMerTotal,
 			rate: outreMerRate,
-			regionCode: 'outre-mer'
+			regionCode: 'outre-mer',
+			itemStyle: { color: colorForRegionName('outre-mer') }
 		});
 		return data;
 	}
@@ -41,7 +44,8 @@
 		return outreMer.map((d) => ({
 			name: d.region,
 			value: d.social,
-			rate: d.rate
+			rate: d.rate,
+			itemStyle: { color: colorForRegionName(d.region) }
 		}));
 	}
 
@@ -56,27 +60,9 @@
 			}));
 	}
 
-	const PALETTE = [
-		'#4a596b', // deep slate
-		'#c9a96e', // honey gold
-		'#6b8e7a', // muted teal-green
-		'#b8675f', // dusty terracotta
-		'#8f9bb3', // powder blue
-		'#d8c891', // warm beige
-		'#4d7c70', // forest sage
-		'#d4a988', // peach tan
-		'#5e7a8a', // steel blue
-		'#a87655', // clay
-		'#9da283', // sage
-		'#7d6e8c', // dusty mauve
-		'#b5b08e', // khaki
-		'#3e5a5a', // deep teal
-		'#8a8074'  // warm gray
-	];
-
 	function buildOption(data: { name: string; value: number; rate: number }[]) {
 		return {
-			color: PALETTE,
+			color: BRIGHT_CHART_PALETTE,
 			tooltip: {
 				trigger: 'item',
 				formatter: (params: any) => {

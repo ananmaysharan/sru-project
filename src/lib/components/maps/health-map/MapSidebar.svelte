@@ -89,7 +89,7 @@
 				{#if mapState.filteredRegions.length > 0}
 					<Combobox.Group>
 						<Combobox.GroupHeading class="px-2 py-1.5 text-xs font-medium text-muted-foreground">Regions</Combobox.GroupHeading>
-						{#each mapState.filteredRegions as region}
+							{#each mapState.filteredRegions as region (region.name)}
 							<Combobox.Item
 								value="region:{region.name}"
 								label={region.name}
@@ -106,7 +106,7 @@
 				{#if mapState.filteredCommunes.length > 0}
 					<Combobox.Group>
 						<Combobox.GroupHeading class="px-2 py-1.5 text-xs font-medium text-muted-foreground">Communes</Combobox.GroupHeading>
-						{#each mapState.filteredCommunes as commune}
+							{#each mapState.filteredCommunes as commune (commune.code)}
 							<Combobox.Item
 								value="commune:{commune.code}"
 								label={commune.name}
@@ -204,12 +204,10 @@
 				{#each (['A1', 'A3', 'C1', 'C3'] as const) as cell (cell)}
 					{@const insight = mapState.currentConfig.insights[cell]}
 					<div class="flex gap-2">
-						<span
-							class="shrink-0 inline-flex h-4 w-5 items-center justify-center text-[9px] font-mono font-semibold text-gray-900 border border-gray-300"
-							style="background-color: {BIVARIATE_COLORS[cell]};"
-						>
-							{cell}
-						</span>
+							<span
+								class="shrink-0 h-4 w-5 border border-gray-300"
+								style="background-color: {BIVARIATE_COLORS[cell]};"
+							></span>
 						<div class="text-[11px] leading-tight">
 							<p class="font-medium text-gray-900">{insight.title}</p>
 							<p class="text-gray-600">{insight.body}</p>

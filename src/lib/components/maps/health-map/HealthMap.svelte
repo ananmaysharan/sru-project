@@ -180,10 +180,22 @@
 				const id = feat.id;
 				if (id === undefined) return;
 
+				const code = feat.properties.code;
+				const info = mapState.getCommuneTooltip(code);
+				const nextTooltip = info
+					? {
+							x: e.point.x,
+							y: e.point.y,
+							name: feat.properties.nom,
+							metricLabel: info.metricLabel,
+							metricValue: info.metricValue,
+							socialHousingLabel: info.socialHousingLabel,
+							socialHousingValue: info.socialHousingValue
+						}
+					: null;
+
 				if (id === hoveredCommuneId) {
-					if (mapState.tooltip) {
-						mapState.tooltip = { ...mapState.tooltip, x: e.point.x, y: e.point.y };
-					}
+					mapState.tooltip = nextTooltip;
 					return;
 				}
 
@@ -199,19 +211,7 @@
 					{ hover: true }
 				);
 
-				const code = feat.properties.code;
-				const info = mapState.getCommuneTooltip(code);
-				if (info) {
-					mapState.tooltip = {
-						x: e.point.x,
-						y: e.point.y,
-						name: feat.properties.nom,
-						value: '',
-						label: ''
-					};
-				} else {
-					mapState.tooltip = null;
-				}
+				mapState.tooltip = nextTooltip;
 			});
 		});
 
@@ -235,7 +235,7 @@
 				>
 					<ArrowLeftIcon class="size-4" />
 				</Button>
-				{#each OVERSEAS_REGIONS as region}
+				{#each OVERSEAS_REGIONS as region (region.name)}
 					<Button
 						variant="outline"
 						size="sm"
@@ -272,6 +272,16 @@
 				style="left:{mapState.tooltip.x + 12}px;top:{mapState.tooltip.y - 10}px"
 			>
 				<p class="font-semibold">{mapState.tooltip.name}</p>
+				{#if mapState.tooltip.metricValue}
+					<p class="mt-1 text-gray-200">
+						{mapState.tooltip.metricLabel}: {mapState.tooltip.metricValue}
+					</p>
+				{/if}
+				{#if mapState.tooltip.socialHousingValue}
+					<p class="text-gray-200">
+						{mapState.tooltip.socialHousingLabel}: {mapState.tooltip.socialHousingValue}
+					</p>
+				{/if}
 			</div>
 		{/if}
 	</div>

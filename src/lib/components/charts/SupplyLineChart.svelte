@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRIGHT_CHART_PALETTE } from '$lib/data/charts/chart-colors';
 	import { supplyByYear } from '$lib/data/charts/supply-summary';
 
 	let chartEl: HTMLDivElement;
@@ -36,8 +37,8 @@
 						type: 'line',
 						data: supplyByYear.map((d) => d.total),
 						smooth: true,
-						lineStyle: { color: '#3b82f6', width: 2 },
-						itemStyle: { color: '#3b82f6' }
+						lineStyle: { color: BRIGHT_CHART_PALETTE[0], width: 2 },
+						itemStyle: { color: BRIGHT_CHART_PALETTE[0] }
 					}
 				],
 				grid: { left: 60, right: 16, top: 16, bottom: 48 }

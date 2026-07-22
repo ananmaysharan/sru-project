@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { colorForRegionName } from '$lib/data/charts/chart-colors';
 	import { regionalHousing } from '$lib/data/charts/regional-housing-summary';
 
 	let chartEl: HTMLDivElement;
 
-	const OUTRE_MER = ['Guadeloupe', 'Martinique', 'Guyane', 'La Réunion', 'Mayotte'];
 	const data = [...regionalHousing].reverse();
 
 	onMount(() => {
@@ -25,11 +25,6 @@
 						return `<strong>${item.region}</strong><br/>${item.per10k.toLocaleString()} per 10,000 people<br/>Avg rent: ${item.rentPerSqm.toFixed(2)} €/m²`;
 					}
 				},
-				legend: {
-					data: ['Mainland', 'Overseas'],
-					top: 0,
-					right: 24
-				},
 				xAxis: {
 					type: 'value',
 					name: 'Units per 10,000 inhabitants',
@@ -44,21 +39,15 @@
 				},
 				series: [
 					{
-						name: 'Mainland',
+						name: 'Regions',
 						type: 'bar',
-						stack: 'total',
-						itemStyle: { color: '#8fa6aa' },
-						data: data.map((d) => (OUTRE_MER.includes(d.region) ? null : d.per10k))
-					},
-					{
-						name: 'Overseas',
-						type: 'bar',
-						stack: 'total',
-						itemStyle: { color: '#d8c891' },
-						data: data.map((d) => (OUTRE_MER.includes(d.region) ? d.per10k : null))
+						data: data.map((d) => ({
+							value: d.per10k,
+							itemStyle: { color: colorForRegionName(d.region) }
+						}))
 					}
 				],
-				grid: { left: 160, right: 24, top: 32, bottom: 48 }
+				grid: { left: 160, right: 24, top: 16, bottom: 48 }
 			});
 
 			ro = new ResizeObserver(() => chart.resize());

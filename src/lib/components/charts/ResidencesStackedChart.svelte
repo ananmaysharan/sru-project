@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRIGHT_CHART_PALETTE, INTRO_LINE_BLUE } from '$lib/data/charts/chart-colors';
 	import { residencesByYear } from '$lib/data/charts/residences-summary';
 
 	let chartEl: HTMLDivElement;
 
 	const series = [
-		{ name: 'Social Rental Tenants', key: 'socialRental', color: '#4a596b' },
-		{ name: 'Private Rental Tenants', key: 'privateRental', color: '#b1b9bc' },
-		{ name: 'Owner-Occupied (Mortgaged)', key: 'ownerMortgaged', color: '#9da283' },
-		{ name: 'Owner-Occupied (Mortgage-Free)', key: 'ownerMortgageFree', color: '#d8c891' }
+		{ name: 'Social Rental Tenants', key: 'socialRental', color: INTRO_LINE_BLUE },
+		{ name: 'Private Rental Tenants', key: 'privateRental', color: BRIGHT_CHART_PALETTE[1] },
+		{ name: 'Owner-Occupied (Mortgaged)', key: 'ownerMortgaged', color: BRIGHT_CHART_PALETTE[2] },
+		{ name: 'Owner-Occupied (Mortgage-Free)', key: 'ownerMortgageFree', color: BRIGHT_CHART_PALETTE[3] }
 	] as const;
 
 	onMount(() => {

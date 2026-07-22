@@ -11,6 +11,8 @@ type CellValue = {
 	y_bin: number | null;
 	x_label: 'A' | 'B' | 'C' | null;
 	y_label: '1' | '2' | '3' | null;
+	x_value: number | null;
+	y_value: number | null;
 };
 
 type HealthData = Record<string, { years: Partial<Record<Year, Partial<Record<MetricType, CellValue>>>> }>;
@@ -225,6 +227,20 @@ export const METRIC_CONFIG: Record<
 	}
 };
 
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+	style: 'currency',
+	currency: 'EUR',
+	maximumFractionDigits: 0
+});
+
+const numberFormatter = new Intl.NumberFormat('en-US', {
+	maximumFractionDigits: 2
+});
+
+const percentFormatter = new Intl.NumberFormat('en-US', {
+	maximumFractionDigits: 1
+});
+
 function getNearestAvailableYear(metric: MetricType, year: Year): Year {
 	const availableYears = METRIC_CONFIG[metric].availableYears;
 	if (availableYears.includes(year)) return year;
@@ -236,6 +252,21 @@ function getNearestAvailableYear(metric: MetricType, year: Year): Year {
 
 function getYearIndex(year: Year): number {
 	return YEARS.findIndex((value) => value === year);
+}
+
+function formatSignedNumber(value: number): string {
+	const formatted = numberFormatter.format(value);
+	return value > 0 ? `+${formatted}` : formatted;
+}
+
+function formatMetricValue(metric: MetricType, value: number): string {
+	if (metric === 'income') return currencyFormatter.format(value);
+	if (metric === 'health') return `${numberFormatter.format(value)} per 10k`;
+	if (metric === 'elders' || metric === 'left') {
+		const percent = Math.abs(value) <= 1 ? value * 100 : value;
+		return `${percentFormatter.format(percent)}%`;
+	}
+	return `${percentFormatter.format(value)}%`;
 }
 
 export class MapState {
@@ -252,8 +283,15 @@ export class MapState {
 	searchValue = $state<string | undefined>(undefined);
 	activeTerritory: 'mainland' | 'overseas' | null = $state(null);
 	activeRegion: string | null = $state(null);
-	tooltip: { x: number; y: number; name: string; value: string; label: string } | null =
-		$state(null);
+	tooltip: {
+		x: number;
+		y: number;
+		name: string;
+		metricLabel: string;
+		metricValue: string;
+		socialHousingLabel: string;
+		socialHousingValue: string;
+	} | null = $state(null);
 
 	currentConfig = $derived(METRIC_CONFIG[this.activeMetric]);
 	availableYears = $derived(this.currentConfig.availableYears);
@@ -321,15 +359,18 @@ export class MapState {
 		return expr;
 	}
 
-	getCommuneTooltip(code: string): { name: string; value: string; label: string } | null {
+	getCommuneTooltip(
+		code: string
+	): { metricLabel: string; metricValue: string; socialHousingLabel: string; socialHousingValue: string } | null {
 		const data = (bivariateData as HealthData)[code];
 		const cell = data?.years?.[this.activeYear]?.[this.activeMetric];
 		if (!cell?.cell) return null;
 
 		return {
-			name: '',
-			value: '',
-			label: ''
+			metricLabel: this.currentConfig.label,
+			metricValue: cell.x_value === null ? '' : formatMetricValue(this.activeMetric, cell.x_value),
+			socialHousingLabel: 'Social housing change',
+			socialHousingValue: cell.y_value === null ? '' : `${formatSignedNumber(cell.y_value)} pp`
 		};
 	}
 }

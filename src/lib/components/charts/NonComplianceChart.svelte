@@ -1,0 +1,384 @@
+<script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+	import { colorForRegionName } from '$lib/data/charts/chart-colors';
+	import rawCommuneData from '$lib/data/charts/commune-health-index-scatter.json';
+
+	type Period = '2005' | '2008' | '2014' | '2017' | '2020';
+
+	type Row = {
+		name: string;
+		periods: Period[];
+	};
+
+	type RegionRow = Row & {
+		region: string;
+	};
+
+	type CommuneRegion = {
+		name: string;
+		region: string;
+	};
+
+	const columnX: Record<Period, number> = {
+		'2005': 915,
+		'2008': 1182,
+		'2014': 1440,
+		'2017': 1715,
+		'2020': 1985
+	};
+
+	const periodLabels: { key: Period; label: string }[] = [
+		{ key: '2005', label: '2005-2007' },
+		{ key: '2008', label: '2008-2010' },
+		{ key: '2014', label: '2014-2016' },
+		{ key: '2017', label: '2017-2019' },
+		{ key: '2020', label: '2020-2022' }
+	];
+
+	const pageOneRows: Row[] = [
+		{ name: "Chazay-d'Azergues", periods: ['2005', '2008', '2014', '2017'] },
+		{ name: 'Nice', periods: ['2005', '2008', '2014', '2020'] },
+		{ name: 'Neuilly sur Seine', periods: ['2005', '2008', '2014'] },
+		{ name: 'Saint Jeannet', periods: ['2005', '2008', '2014'] },
+		{ name: 'Saint Maur des Fossés', periods: ['2005', '2008', '2014'] },
+		{ name: 'Toulon', periods: ['2005', '2008', '2020'] },
+		{ name: 'Hyères', periods: ['2005', '2008'] },
+		{ name: 'Saint Clément de Rivière', periods: ['2005', '2008'] },
+		{ name: 'Villeneuve lès Avignon', periods: ['2005', '2008'] },
+		{ name: 'La Bouilladisse', periods: ['2005', '2014', '2017'] },
+		{ name: 'Marignane', periods: ['2005', '2014'] },
+		{ name: 'Sanary sur Mer', periods: ['2005', '2017'] },
+		{ name: 'Allauch', periods: ['2005'] },
+		{ name: 'Barbentane', periods: ['2005'] },
+		{ name: 'Challes les Eaux', periods: ['2005'] },
+		{ name: 'Corbas', periods: ['2005'] },
+		{ name: 'Habsheim', periods: ['2005'] },
+		{ name: 'Le Perreux sur Marne', periods: ['2005'] },
+		{ name: 'Le Pian Médoc', periods: ['2005'] },
+		{ name: 'Le Plessis Bouchard', periods: ['2005'] },
+		{ name: "L'Étang-la-Ville", periods: ['2005'] },
+		{ name: 'Longeville lès Metz', periods: ['2005'] },
+		{ name: 'Olivet', periods: ['2005'] },
+		{ name: 'Saclay', periods: ['2005'] },
+		{ name: 'Solliès Pont', periods: ['2005'] },
+		{ name: 'Le Castellet', periods: ['2008', '2014', '2017'] },
+		{ name: 'Tourrette Levens', periods: ['2008', '2014', '2017'] },
+		{ name: 'Gignac la Nerthe', periods: ['2008', '2014'] },
+		{ name: 'Auriol', periods: ['2008'] },
+		{ name: 'Biarritz', periods: ['2008'] },
+		{ name: 'Bièvres', periods: ['2008'] },
+		{ name: 'Drap', periods: ['2008'] },
+		{ name: 'Hallennes-lez-Haubourdin', periods: ['2008'] },
+		{ name: 'Le Vésinet', periods: ['2008'] },
+		{ name: 'Pernes les Fontaines', periods: ['2008'] },
+		{ name: 'Plan de Cuques', periods: ['2008'] },
+		{ name: 'Pornichet', periods: ['2008'] },
+		{ name: 'Quéven', periods: ['2008'] },
+		{ name: 'Saint Cyr sur Mer', periods: ['2008'] },
+		{ name: 'Santeny', periods: ['2008'] },
+		{ name: 'Varangéville', periods: ['2008'] },
+		{ name: 'Tourrettes sur Loup', periods: ['2014', '2017', '2020'] },
+		{ name: 'Cannes', periods: ['2014', '2017'] },
+		{ name: 'Ceyreste', periods: ['2014', '2017'] },
+		{ name: 'La Frette sur Seine', periods: ['2014', '2017'] },
+		{ name: 'La Gaude', periods: ['2014', '2017'] },
+		{ name: 'Meyreuil', periods: ['2014', '2017'] },
+		{ name: 'Ormesson sur Marne', periods: ['2014', '2017'] },
+		{ name: 'Boulogne-Billancourt', periods: ['2014', '2020'] },
+		{ name: 'Beausoleil', periods: ['2014'] },
+		{ name: 'Bois Colombes', periods: ['2014'] },
+		{ name: 'Bures sur Yvette', periods: ['2014'] },
+		{ name: 'Cabriès', periods: ['2014'] },
+		{ name: 'Chaponnay', periods: ['2014'] },
+		{ name: 'Châteaurenard', periods: ['2014'] },
+		{ name: 'Fuveau', periods: ['2014'] },
+		{ name: 'La Garenne Colombes', periods: ['2014'] },
+		{ name: 'La Roquette sur Siagne', periods: ['2014'] },
+		{ name: 'Le Cannet', periods: ['2014'] },
+		{ name: 'Levens', periods: ['2014'] },
+		{ name: 'Pechbonnieu', periods: ['2014'] }
+	];
+
+	const pageTwoRows: Row[] = [
+		{ name: 'Peyrolles en Provence', periods: ['2014'] },
+		{ name: 'Saint Pierre en Faucigny', periods: ['2014'] },
+		{ name: 'Saint-Raphaël', periods: ['2014'] },
+		{ name: 'Solliès Toucas', periods: ['2014'] },
+		{ name: 'Thoiry', periods: ['2014'] },
+		{ name: 'Vauhallan', periods: ['2014'] },
+		{ name: 'Vincennes', periods: ['2014'] },
+		{ name: 'Auvers sur Oise', periods: ['2017', '2020'] },
+		{ name: 'Gattières', periods: ['2017', '2020'] },
+		{ name: 'Mimet', periods: ['2017', '2020'] },
+		{ name: 'Pégomas', periods: ['2017', '2020'] },
+		{ name: 'Peypin', periods: ['2017', '2020'] },
+		{ name: 'Aix en Provence', periods: ['2017'] },
+		{ name: 'Antony', periods: ['2017'] },
+		{ name: 'Bandol', periods: ['2017'] },
+		{ name: 'Beaulieu sur Mer', periods: ['2017'] },
+		{ name: 'Biguglia', periods: ['2017'] },
+		{ name: 'Canohès', periods: ['2017'] },
+		{ name: 'Charly', periods: ['2017'] },
+		{ name: 'Contes', periods: ['2017'] },
+		{ name: 'Éguilles', periods: ['2017'] },
+		{ name: 'Frontignan', periods: ['2017'] },
+		{ name: 'La Colle sur Loup', periods: ['2017'] },
+		{ name: 'La Crau', periods: ['2017'] },
+		{ name: 'La Seyne sur Mer', periods: ['2017'] },
+		{ name: 'Le Beausset', periods: ['2017'] },
+		{ name: 'Le Pradet', periods: ['2017'] },
+		{ name: 'Levallois Perret', periods: ['2017'] },
+		{ name: 'Mandres les Roses', periods: ['2017'] },
+		{ name: 'Marolles en Brie', periods: ['2017'] },
+		{ name: 'Montmorency', periods: ['2017'] },
+		{ name: 'Pélissanne', periods: ['2017'] },
+		{ name: 'Saint-Jeannet', periods: ['2017'] },
+		{ name: 'Saint-Mandé', periods: ['2017'] },
+		{ name: 'Soisy sur Seine', periods: ['2017'] },
+		{ name: 'Solliès-Toucas', periods: ['2017'] },
+		{ name: 'Villecresnes', periods: ['2017'] },
+		{ name: 'Villefranche sur Mer', periods: ['2017'] },
+		{ name: 'Yerres', periods: ['2017'] },
+		{ name: 'Bordeaux', periods: ['2020'] },
+		{ name: 'Carqueiranne', periods: ['2020'] },
+		{ name: 'Carry Le Rouet', periods: ['2020'] },
+		{ name: 'Coubron', periods: ['2020'] },
+		{ name: 'Cuges Les Pins', periods: ['2020'] },
+		{ name: 'Générac', periods: ['2020'] },
+		{ name: 'Jouques', periods: ['2020'] },
+		{ name: 'La Seyne-sur-Mer', periods: ['2020'] },
+		{ name: 'Lésigny', periods: ['2020'] },
+		{ name: 'Lyon', periods: ['2020'] },
+		{ name: 'Marseille', periods: ['2020'] },
+		{ name: 'Montpellier', periods: ['2020'] },
+		{ name: 'Nesles-la-Vallée', periods: ['2020'] },
+		{ name: 'Paris', periods: ['2020'] },
+		{ name: 'Périgny', periods: ['2020'] },
+		{ name: 'Perpignan', periods: ['2020'] },
+		{ name: 'Prades-le-Lez', periods: ['2020'] },
+		{ name: 'Roquefort-la-Bédoule', periods: ['2020'] },
+		{ name: 'Saint Mitre Les Remparts', periods: ['2020'] },
+		{ name: 'Saint Paul', periods: ['2020'] },
+		{ name: 'Saint-Rémy-lès-Chevreuse', periods: ['2020'] },
+		{ name: 'Vaucresson', periods: ['2020'] },
+		{ name: 'Villeneuve De La Raho', periods: ['2020'] }
+	];
+
+	const regionOverrides = new Map<string, string>(
+		[
+			['Chaponnay', 'Auvergne-Rhone-Alpes'],
+			['Levens', "Provence-Alpes-Cote d'Azur"],
+			['Peyrolles en Provence', "Provence-Alpes-Cote d'Azur"],
+			['Vauhallan', 'Ile-de-France'],
+			['Carry Le Rouet', "Provence-Alpes-Cote d'Azur"],
+			['Cuges Les Pins', "Provence-Alpes-Cote d'Azur"],
+			['Générac', 'Occitanie'],
+			['Jouques', "Provence-Alpes-Cote d'Azur"],
+			['Nesles-la-Vallée', 'Ile-de-France'],
+			['Prades-le-Lez', 'Occitanie'],
+			['Roquefort-la-Bédoule', "Provence-Alpes-Cote d'Azur"],
+			['Saint Mitre Les Remparts', "Provence-Alpes-Cote d'Azur"],
+			['Saint Paul', 'La Reunion'],
+			['Villeneuve De La Raho', 'Occitanie']
+		].map(([name, region]) => [normalizeName(name), region])
+	);
+	const regionDisplayNames: Record<string, string> = {
+		'Auvergne-Rhone-Alpes': 'Auvergne-Rhône-Alpes',
+		'Ile-de-France': 'Île-de-France',
+		'La Reunion': 'La Réunion',
+		"Provence-Alpes-Cote d'Azur": "Provence-Alpes-Côte d'Azur"
+	};
+	const collator = new Intl.Collator('fr', { sensitivity: 'base' });
+	const communeRegionByName = new Map(
+		(rawCommuneData as CommuneRegion[]).map((commune) => [normalizeName(commune.name), commune])
+	);
+	const communeRows: RegionRow[] = [...pageOneRows, ...pageTwoRows]
+		.map((row) => {
+			const key = normalizeName(row.name);
+			return {
+				...row,
+				region: regionOverrides.get(key) ?? communeRegionByName.get(key)?.region ?? 'Other'
+			};
+		})
+		.sort(
+			(a, b) =>
+				collator.compare(displayRegion(a.region), displayRegion(b.region)) ||
+				collator.compare(a.name, b.name)
+		);
+	const regions = Array.from(new Set(communeRows.map((row) => row.region))).sort((a, b) =>
+		collator.compare(displayRegion(a), displayRegion(b))
+	);
+	const pageWidth = 2200;
+	const firstRowY = 154;
+	const rowGap = 50;
+	const lineStartX = 755;
+	const lineEndX = 2135;
+	let viewportWidth = $state(1280);
+	let selectedRegions = $state<string[]>([]);
+	let visibleRows = $derived.by(() => {
+		const selected = new Set(selectedRegions);
+		return communeRows.filter((row) => selected.size === 0 || selected.has(row.region));
+	});
+	let rowColumns = $derived.by(() => {
+		const responsiveColumnCount = viewportWidth >= 1024 ? 3 : viewportWidth >= 640 ? 2 : 1;
+		const columnCount = Math.min(responsiveColumnCount, Math.max(1, visibleRows.length));
+		const columnSize = Math.ceil(visibleRows.length / columnCount);
+
+		return Array.from({ length: columnCount }, (_, index) =>
+			visibleRows.slice(index * columnSize, (index + 1) * columnSize)
+		).filter((column) => column.length > 0);
+	});
+	const rowY = (index: number) => firstRowY + index * rowGap;
+	const heightForRows = (rowCount: number) => Math.max(220, firstRowY + rowCount * rowGap + 45);
+
+	function normalizeName(value: string) {
+		return value
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.toLowerCase()
+			.replace(/[^a-z0-9]/g, '');
+	}
+
+	function displayRegion(region: string) {
+		return regionDisplayNames[region] ?? region;
+	}
+
+	function toggleRegion(region: string) {
+		selectedRegions = selectedRegions.includes(region)
+			? selectedRegions.filter((selected) => selected !== region)
+			: [...selectedRegions, region];
+	}
+</script>
+
+<svelte:window bind:innerWidth={viewportWidth} />
+
+<div class="mx-4 mt-4 md:mx-12">
+	<div class="filter-pills" aria-label="Region filters">
+		<Button
+			variant={selectedRegions.length === 0 ? 'default' : 'outline'}
+			size="sm"
+			class="rounded-full"
+			aria-pressed={selectedRegions.length === 0}
+			aria-controls="noncompliance-list"
+			onclick={() => (selectedRegions = [])}
+		>
+			All regions
+		</Button>
+		{#each regions as region (region)}
+			<Button
+				variant={selectedRegions.includes(region) ? 'default' : 'outline'}
+				size="sm"
+				class="rounded-full"
+				aria-pressed={selectedRegions.includes(region)}
+				aria-controls="noncompliance-list"
+				onclick={() => toggleRegion(region)}
+			>
+				<span class="region-swatch" style={`background:${colorForRegionName(region)}`}></span>
+				{displayRegion(region)}
+			</Button>
+		{/each}
+	</div>
+
+	<div class="list-columns-wrap">
+		<div
+			id="noncompliance-list"
+			class="list-columns"
+			style={`--column-count:${rowColumns.length}`}
+		>
+			{#each rowColumns as column, columnIndex (columnIndex)}
+				{@const columnHeight = heightForRows(column.length)}
+				<svg
+					class="list-column"
+					viewBox={`0 0 ${pageWidth} ${columnHeight}`}
+					role="img"
+					aria-label={`Noncompliant communes, column ${columnIndex + 1} of ${rowColumns.length}`}
+				>
+					<title>Noncompliant communes (2005-2022), column {columnIndex + 1}</title>
+					<rect width={pageWidth} height={columnHeight} fill="#ffffff" />
+
+					<g class="noncompliance-text">
+						<text x="106" y="65" class="header-label">Commune</text>
+						{#each periodLabels as period (period.key)}
+							<text x={columnX[period.key]} y="65" class="header-label" text-anchor="middle">
+								{period.label}
+							</text>
+						{/each}
+
+						{#each column as row, index (`${row.name}-${row.periods.join('-')}`)}
+							{@const y = rowY(index)}
+							<line x1={lineStartX} x2={lineEndX} y1={y} y2={y} class="row-rule" />
+							<text x="106" y={y} class="commune-label">{row.name}</text>
+
+							{#each row.periods as period (period)}
+								<circle cx={columnX[period]} cy={y} r="18.5" class="marker" />
+							{/each}
+						{/each}
+					</g>
+				</svg>
+			{/each}
+		</div>
+	</div>
+</div>
+
+<style>
+	.filter-pills {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+
+	.list-columns-wrap {
+		padding-bottom: 8px;
+	}
+
+	.list-columns {
+		display: grid;
+		grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
+		align-items: start;
+		gap: 16px;
+	}
+
+	.list-column {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	.region-swatch {
+		display: inline-block;
+		width: 8px;
+		height: 8px;
+		border-radius: 999px;
+		box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08);
+	}
+
+	.noncompliance-text {
+		font-family: 'Open Sans', Arial, ui-sans-serif, system-ui, sans-serif;
+		font-stretch: normal;
+		fill: #111111;
+	}
+
+	.header-label {
+		font-size: 43px;
+		font-weight: 700;
+		dominant-baseline: middle;
+	}
+
+	.commune-label {
+		font-size: 42px;
+		font-weight: 400;
+		dominant-baseline: middle;
+	}
+
+	.row-rule {
+		stroke: #cbd7db;
+		stroke-width: 1.6;
+	}
+
+	.marker {
+		fill: #06738b;
+	}
+
+</style>

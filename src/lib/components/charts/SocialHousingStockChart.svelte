@@ -9,6 +9,7 @@
     import { headlines } from "$lib/data/charts/news-headlines";
     import { asset } from "$app/paths";
     import { STORY_PHASES, phaseProgress } from "$lib/data/charts/scroll-story";
+    import { INTRO_LINE_BLUE } from "$lib/data/charts/chart-colors";
 
     interface Props {
         /** Normalized scroll progress through the story section, 0 → 1. */
@@ -34,7 +35,7 @@
     // Newspaper backdrop (NYT scrollytelling): a washed-out texture that eases
     // in at the top through the news beat. Smoothstep on newsProgress so the
     // fade is gentle; capped low so the data line stays legible on top.
-    const NEWSPAPER_MAX_OPACITY = 0.24;
+    const NEWSPAPER_MAX_OPACITY = 0.18;
     const newspaperOpacity = $derived.by(() => {
         const p = newsProgress;
         return p * p * (3 - 2 * p) * NEWSPAPER_MAX_OPACITY;
@@ -48,7 +49,7 @@
     );
     const skylineOpacity = $derived(1 - skylineFade);
 
-    const BLUE = "#06738b";
+    const BLUE = INTRO_LINE_BLUE;
 
     const BOX_OFFSET = 50;
     const CARD_GAP = 16;
@@ -404,6 +405,12 @@
         updateTipFromProgress(lineProgress);
     });
 
+    $effect(() => {
+        if (!cardsVisible || skylineFade >= 0.99 || skylineOpacity <= 0.001) {
+            hoveredFile = null;
+        }
+    });
+
     const formatValue = (v: number) => `${(v / 1_000_000).toFixed(2)}M`;
 
     // Y of the data line at an arbitrary x pixel (line is piecewise-linear).
@@ -432,17 +439,15 @@
     class="relative isolate m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] bg-white"
 >
     <!-- Newspaper texture backdrop: washed-out, covering the full chart (graph
-         + headline grid) during the news beat. Gradient-masked so it eases in
-         at the top and out at the bottom — no hard edges. Sits behind the SVG
-         (-z-10, contained by `isolate` above) so the line and labels read on
-         top of it. -->
+         + headline grid) during the news beat. It extends below the chart box
+         so the lower fade happens off-container instead of ending at the edge. -->
     {#if newspaperOpacity > 0.001}
         <div
-            class="pointer-events-none absolute -inset-x-4 inset-y-0 -z-10 bg-cover bg-center"
+            class="pointer-events-none absolute -inset-x-4 -bottom-40 top-0 -z-10 bg-cover bg-center"
             style="opacity: {newspaperOpacity};
                 background-image: url({asset('/images/newspaper-bg.webp')});
-                -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.5) 97%, rgba(0,0,0,0) 100%);
-                mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.5) 97%, rgba(0,0,0,0) 100%);"
+                -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 96%, rgba(0,0,0,0.7) 99%, rgba(0,0,0,0.25) 100%);
+                mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 96%, rgba(0,0,0,0.7) 99%, rgba(0,0,0,0.25) 100%);"
         ></div>
     {/if}
 
@@ -661,7 +666,7 @@
             {#if tipX >= mx - 0.5 && m.year >= domainLeft - 0.001}
                 <div
                     class="absolute pointer-events-none select-none -translate-x-1/2 whitespace-nowrap text-center px-1.5 py-1 {i <
-                    2
+                    2 || m.year === 2015 || m.year === 2020
                         ? ''
                         : 'bg-white'}"
                     style="left: {mx}px; top: {my + 12}px; color: {BLUE};"
