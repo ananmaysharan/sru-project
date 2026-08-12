@@ -208,3 +208,38 @@
         </div>
     </div>
 </section>
+
+<section class="pt-20 pb-12 md:pt-28">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+        <h2 class="text-3xl font-bold text-gray-900">Acknowledgements</h2>
+        <div class="mt-6 space-y-6 text-gray-700">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">
+                    Data Access and Policy Context
+                </h3>
+                <p class="mt-1">
+                    Julie Bergeot, Clément Petitimbert from the Mission SRU at
+                    the Ministry of Housing; Dr. Julie Vallée (CNRS Research
+                    Director &amp; Head of Mobiliscope), Dr. Rolf Pendall, AICP
+                    (University of New Mexico)
+                </p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Photography</h3>
+                <p class="mt-1">
+                    All images developed in partnership with docar films (Rocío
+                    Calzado Lopez + Jasper Meurer).
+                </p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">
+                    Research Assistantship Team
+                </h3>
+                <p class="mt-1">
+                    Ananmay Sharan, Sebastian Rodriguez, Matt Thibodeau, Yihan
+                    Zhang, Anishta Khan
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

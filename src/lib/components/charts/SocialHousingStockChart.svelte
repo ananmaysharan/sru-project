@@ -439,15 +439,15 @@
     class="relative isolate m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] bg-white"
 >
     <!-- Newspaper texture backdrop: washed-out, covering the full chart (graph
-         + headline grid) during the news beat. It extends below the chart box
-         so the lower fade happens off-container instead of ending at the edge. -->
+         + headline grid) during the news beat. The mask fades symmetrically at
+         the top and bottom so the texture dissolves into the page. -->
     {#if newspaperOpacity > 0.001}
         <div
-            class="pointer-events-none absolute -inset-x-4 -bottom-40 top-0 -z-10 bg-cover bg-center"
+            class="pointer-events-none absolute -inset-x-4 inset-y-0 -z-10 bg-cover bg-center"
             style="opacity: {newspaperOpacity};
                 background-image: url({asset('/images/newspaper-bg.webp')});
-                -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 96%, rgba(0,0,0,0.7) 99%, rgba(0,0,0,0.25) 100%);
-                mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 96%, rgba(0,0,0,0.7) 99%, rgba(0,0,0,0.25) 100%);"
+                -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 88%, rgba(0,0,0,0.85) 93%, rgba(0,0,0,0.45) 97%, rgba(0,0,0,0) 100%);
+                mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 5%, rgba(0,0,0,0.85) 11%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 88%, rgba(0,0,0,0.85) 93%, rgba(0,0,0,0.45) 97%, rgba(0,0,0,0) 100%);"
         ></div>
     {/if}
 

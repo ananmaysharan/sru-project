@@ -7,7 +7,12 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { colorForRegionName } from '$lib/data/charts/chart-colors';
 	import { Button } from '$lib/components/ui/button';
+	import * as Select from '$lib/components/ui/select';
 	import rawData from '$lib/data/charts/commune-health-index-scatter.json';
+
+	type IndicatorKey = 'income' | 'poverty' | 'ageing' | 'heat' | 'energy' | 'green' | 'health';
+	type MetricKey = 'weighted' | IndicatorKey;
+	type IndicatorScores = Record<IndicatorKey, number | null>;
 
 	type CommuneScatterPoint = {
 		code: string;
@@ -21,6 +26,7 @@
 		socialHousingShare2022: number;
 		socialUnits2022: number;
 		totalUnits2022: number;
+		indicatorScores: IndicatorScores;
 	};
 
 	type RankingFilter = 'Top 20' | 'Bottom 20';
@@ -48,6 +54,60 @@
 		top: number;
 		bottom: number;
 	};
+	const metricConfig: Record<
+		MetricKey,
+		{ label: string; shortLabel: string; axisLabel: string; domain: [number, number] }
+	> = {
+		weighted: {
+			label: 'Weighted average of all indicators',
+			shortLabel: 'Weighted average',
+			axisLabel: 'Weighted average of indicators for well-being and access to amenities',
+			domain: [0, 100]
+		},
+		income: {
+			label: 'Median household income',
+			shortLabel: 'Income',
+			axisLabel: 'Income score (0–10; higher is better)',
+			domain: [0, 10]
+		},
+		poverty: {
+			label: 'Share of residents in poverty',
+			shortLabel: 'Poverty',
+			axisLabel: 'Poverty score (0–10; higher is better)',
+			domain: [0, 10]
+		},
+		ageing: {
+			label: 'Older adult share (65+)',
+			shortLabel: 'Older adults',
+			axisLabel: 'Older adult share score (0–10; higher is better)',
+			domain: [0, 10]
+		},
+		heat: {
+			label: 'Urban heat island exposure',
+			shortLabel: 'Heat exposure',
+			axisLabel: 'Heat exposure score (0–10; higher is better)',
+			domain: [0, 10]
+		},
+		energy: {
+			label: 'DPE energy-efficient building share (A-C)',
+			shortLabel: 'Energy efficiency',
+			axisLabel: 'Energy efficiency score (0–10; higher is better)',
+			domain: [0, 10]
+		},
+		green: {
+			label: 'Proximity to green spaces',
+			shortLabel: 'Green spaces',
+			axisLabel: 'Green space proximity score (0–10; higher is better)',
+			domain: [0, 10]
+		},
+		health: {
+			label: 'Proximity to healthcare and hospital infrastructure',
+			shortLabel: 'Healthcare',
+			axisLabel: 'Healthcare proximity score (0–10; higher is better)',
+			domain: [0, 10]
+		}
+	};
+	const metrics = Object.keys(metricConfig) as MetricKey[];
 
 	const curatedLabelPositions: Record<string, LabelPosition> = {
 		'Top 20:13005': { x: 253.9, y: 173.4 },
@@ -94,12 +154,10 @@
 	const xLabelMin = 0;
 	const xLabelMax = 1;
 	const xDomainMin = 0;
-	const yDomainMin = 0;
-	const yDomainMax = 100;
 
 	const xDomainMax = 1;
 	const xScale = d3.scaleLinear().domain([xDomainMin, xDomainMax]).range([margin.left, width - margin.right]);
-	const yScale = d3.scaleLinear().domain([yDomainMin, yDomainMax]).range([height - margin.bottom, margin.top]);
+	const yScale = d3.scaleLinear().domain(metricConfig.weighted.domain).range([height - margin.bottom, margin.top]);
 	const populationValues = points.map((point) => point.population).sort((a, b) => a - b);
 	const populationRadiusMax = d3.quantileSorted(populationValues, 0.98) ?? d3.max(populationValues) ?? 1;
 	const populationRadiusScale = d3
@@ -109,6 +167,7 @@
 		.clamp(true);
 	const formatPercent = d3.format('.0%');
 	const formatNumber = d3.format(',');
+	const formatMetric = d3.format('.1f');
 	const regions = Array.from(new Set(points.map((point) => point.region))).sort();
 
 	let brushElement: SVGGElement;
@@ -122,21 +181,26 @@
 	let searchOpen = $state(false);
 	let searchValue = $state<string | undefined>(undefined);
 	let searchQuery = $state('');
+	let activeMetric = $state<MetricKey>('weighted');
 	let activeRanking = $state<RankingFilter | null>(null);
 	let tooltipX = $state(0);
 	let tooltipY = $state(0);
 	let xDomain = $state<[number, number]>([xDomainMin, xDomainMax]);
-	let yDomain = $state<[number, number]>([yDomainMin, yDomainMax]);
+	let yDomain = $state<[number, number]>(metricConfig.weighted.domain);
 	let brushZoomed = $state(false);
+	let yBounds = $derived(metricConfig[activeMetric].domain);
 	let transformedXScale = $derived(xScale.copy().domain(xDomain));
 	let transformedYScale = $derived(yScale.copy().domain(yDomain));
 	let xTicks = $derived(transformedXScale.ticks(10).filter((tick) => tick >= xLabelMin && tick <= xLabelMax));
-	let rankedPoints = $derived(activeRanking ? points.filter((point) => point.rankGroup === activeRanking) : points);
+	let metricPoints = $derived(points.filter((point) => metricValueOrNull(point) !== null));
+	let rankedPoints = $derived(
+		activeRanking ? metricPoints.filter((point) => point.rankGroup === activeRanking) : metricPoints
+	);
 	let representedRegions = $derived(
 		activeRanking ? new Set(rankedPoints.map((point) => point.region)) : new Set(regions)
 	);
 	let yTicks = $derived(
-		transformedYScale.ticks(10).filter((tick) => tick >= yDomainMin && tick <= yDomainMax)
+		transformedYScale.ticks(10).filter((tick) => tick >= yBounds[0] && tick <= yBounds[1])
 	);
 	let activePoint = $derived.by(() => {
 		const point = hovered ?? selectedPoint;
@@ -147,7 +211,9 @@
 			: null;
 	});
 	let visiblePoints = $derived(rankedPoints.filter((point) => !hiddenRegions.has(point.region)));
-	let labelPlacements = $derived(activeRanking ? buildLabelPlacements(visiblePoints) : []);
+	let labelPlacements = $derived(
+		activeMetric === 'weighted' && activeRanking ? buildLabelPlacements(visiblePoints) : []
+	);
 	let clippedToPlot = $derived(brushZoomed);
 	let searchMatches = $derived.by(() => {
 		const query = normalizeSearch(searchQuery);
@@ -191,8 +257,8 @@
 					clamp(transformedXScale.invert(x0), xDomainMin, xDomainMax),
 					clamp(transformedXScale.invert(x1), xDomainMin, xDomainMax)
 				], [
-					clamp(transformedYScale.invert(y1), yDomainMin, yDomainMax),
-					clamp(transformedYScale.invert(y0), yDomainMin, yDomainMax)
+					clamp(transformedYScale.invert(y1), yBounds[0], yBounds[1]),
+					clamp(transformedYScale.invert(y0), yBounds[0], yBounds[1])
 				]);
 				hovered = null;
 				d3.select(brushElement).call(brush.move, null);
@@ -208,7 +274,7 @@
 
 	function resetZoom() {
 		brushZoomed = false;
-		animateDomains([xDomainMin, xDomainMax], [yDomainMin, yDomainMax]);
+		animateDomains([xDomainMin, xDomainMax], yBounds);
 		hovered = null;
 		selectedPoint = null;
 	}
@@ -226,7 +292,32 @@
 	}
 
 	function yPosition(point: CommuneScatterPoint) {
-		return transformedYScale(point.weightedIndex);
+		return transformedYScale(metricValue(point));
+	}
+
+	function metricValueOrNull(point: CommuneScatterPoint) {
+		return activeMetric === 'weighted' ? point.weightedIndex : point.indicatorScores[activeMetric];
+	}
+
+	function metricValue(point: CommuneScatterPoint) {
+		return metricValueOrNull(point) ?? 0;
+	}
+
+	function formatMetricValue(point: CommuneScatterPoint) {
+		return formatMetric(metricValue(point));
+	}
+
+	function handleMetricChange(value: string | undefined) {
+		if (!value || !metrics.includes(value as MetricKey)) {
+			return;
+		}
+
+		activeMetric = value as MetricKey;
+		activeRanking = null;
+		hovered = null;
+		brushZoomed = false;
+		clearSearch();
+		animateDomains([xDomainMin, xDomainMax], metricConfig[activeMetric].domain);
 	}
 
 	function colorForRegion(region: string) {
@@ -272,7 +363,12 @@
 		searchOpen = false;
 		animateDomains(
 			centeredDomain(point.socialHousingShare2022, 0.06, xDomainMin, xDomainMax),
-			centeredDomain(point.weightedIndex, 15, yDomainMin, yDomainMax)
+			centeredDomain(
+				metricValue(point),
+				activeMetric === 'weighted' ? 15 : 1.5,
+				yBounds[0],
+				yBounds[1]
+			)
 		);
 	}
 
@@ -327,6 +423,7 @@
 	}
 
 	function setRankingFilter(nextRanking: RankingFilter) {
+		activeMetric = 'weighted';
 		activeRanking = nextRanking;
 		hovered = null;
 		selectedPoint = null;
@@ -335,7 +432,7 @@
 		const targetPoints = points.filter((point) => point.rankGroup === nextRanking);
 		animateDomains(
 			extentDomain(targetPoints.map((point) => point.socialHousingShare2022), 0.04, xDomainMin, xDomainMax),
-			extentDomain(targetPoints.map((point) => point.weightedIndex), 8, yDomainMin, yDomainMax)
+			extentDomain(targetPoints.map((point) => point.weightedIndex), 8, 0, 100)
 		);
 	}
 
@@ -345,7 +442,7 @@
 		hovered = null;
 		brushZoomed = false;
 		clearSearch();
-		animateDomains([xDomainMin, xDomainMax], [yDomainMin, yDomainMax]);
+		animateDomains([xDomainMin, xDomainMax], yBounds);
 	}
 
 	function buildLabelPlacements(labelPoints: CommuneScatterPoint[]) {
@@ -687,6 +784,20 @@
 <div class="chart-shell">
 	<aside class="chart-sidebar">
 		<div>
+			<p class="control-label">Outcome measure</p>
+			<Select.Root type="single" value={activeMetric} onValueChange={handleMetricChange}>
+				<Select.Trigger class="w-full">
+					{metricConfig[activeMetric].shortLabel}
+				</Select.Trigger>
+				<Select.Content>
+					{#each metrics as metric (metric)}
+						<Select.Item value={metric} label={metricConfig[metric].label} />
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</div>
+
+		<div>
 			<p class="control-label">Search</p>
 			<Combobox.Root
 				type="single"
@@ -737,27 +848,29 @@
 			</Combobox.Root>
 		</div>
 
-		<div>
-			<p class="control-label">Rank</p>
-			<div class="rank-buttons">
-				<Button
-					variant={activeRanking === 'Top 20' ? 'default' : 'outline'}
-					size="sm"
-					class="flex-1"
-					onclick={() => setRankingFilter('Top 20')}
-				>
-					Top 20
-				</Button>
-				<Button
-					variant={activeRanking === 'Bottom 20' ? 'default' : 'outline'}
-					size="sm"
-					class="flex-1"
-					onclick={() => setRankingFilter('Bottom 20')}
-				>
-					Worst 20
-				</Button>
+		{#if activeMetric === 'weighted'}
+			<div>
+				<p class="control-label">Rank</p>
+				<div class="rank-buttons">
+					<Button
+						variant={activeRanking === 'Top 20' ? 'default' : 'outline'}
+						size="sm"
+						class="flex-1"
+						onclick={() => setRankingFilter('Top 20')}
+					>
+						Top 20
+					</Button>
+					<Button
+						variant={activeRanking === 'Bottom 20' ? 'default' : 'outline'}
+						size="sm"
+						class="flex-1"
+						onclick={() => setRankingFilter('Bottom 20')}
+					>
+						Worst 20
+					</Button>
+				</div>
 			</div>
-		</div>
+		{/if}
 
 		<div class="region-legend" aria-label="Region legend">
 			<p class="control-label">Regions</p>
@@ -781,10 +894,11 @@
 	</aside>
 
 	<div class="chart-panel" bind:this={chartPanelEl}>
+		<p class="quota-label-above">mandatory 25% municipal social housing quota</p>
 		<svg
 			viewBox={`0 0 ${width} ${height}`}
 			role="img"
-			aria-label="Commune social housing share by weighted index"
+			aria-label={`Commune cumulative social housing share evolution by ${metricConfig[activeMetric].label}`}
 			class="chart"
 			ondblclick={resetZoom}
 		>
@@ -832,7 +946,6 @@
 		stroke-width="1"
 		clip-path="url(#commune-scatter-plot-area)"
 	/>
-
 	<line
 		x1={margin.left}
 		x2={width - margin.right}
@@ -850,7 +963,9 @@
 		stroke-width="0.75"
 	/>
 
-	<text x={width / 2} y={height - 14} text-anchor="middle" class="axis-title">Social housing share, 2022</text>
+	<text x={width / 2} y={height - 14} text-anchor="middle" class="axis-title">
+		Cumulative evolution of the social housing share, 2005–2022
+	</text>
 	<text
 		x={-height / 2}
 		y={18}
@@ -858,7 +973,7 @@
 		transform="rotate(-90)"
 		class="axis-title"
 	>
-		Weighted average
+		{metricConfig[activeMetric].axisLabel}
 	</text>
 
 	<g bind:this={brushElement} class="brush-layer"></g>
@@ -882,7 +997,7 @@
 				onpointerleave={() => (hovered = null)}
 			>
 				<title>
-					{point.name}: population {formatNumber(point.population)}
+					{point.name}: {metricConfig[activeMetric].shortLabel} {formatMetricValue(point)}; population {formatNumber(point.population)}
 				</title>
 			</circle>
 		{/each}
@@ -918,9 +1033,9 @@
 			>
 				<p class="font-semibold">{activePoint.name}</p>
 				<p class="mt-1 text-gray-200">
-					Weighted average: {formatNumber(activePoint.weightedIndex)}
+					{metricConfig[activeMetric].shortLabel}: {formatMetricValue(activePoint)}
 				</p>
-				{#if activePoint.rank}
+				{#if activeMetric === 'weighted' && activePoint.rank}
 					<p class="text-gray-200">
 						{activePoint.rankGroup === 'Top 20' ? 'Top' : 'Worst'} rank: {activePoint.rank}
 					</p>
@@ -988,6 +1103,14 @@
 	.axis-title {
 		fill: #000000;
 		font-size: 11px;
+	}
+
+	.quota-label-above {
+		margin: 0 0 4px;
+		color: #4b5563;
+		font-size: 10px;
+		font-weight: 500;
+		text-align: center;
 	}
 
 	.point-label {

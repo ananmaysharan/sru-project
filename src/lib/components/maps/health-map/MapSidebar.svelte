@@ -169,12 +169,9 @@
 						style="background-color: {CORNER_COLORS.A3};"
 					></span>
 					<p class="text-[11px] leading-tight text-gray-700">
-						<span class="font-medium text-gray-900">High social-housing growth in lower-amenity areas</span>
+						<span class="font-medium text-gray-900">High social-housing growth in amenity-poor areas</span>
 					</p>
 				</div>
-				<p class="text-[10px] text-gray-400">
-					All other communes shown neutral; only the two contrasting corners are highlighted.
-				</p>
 			</div>
 		{:else}
 			<div class="flex items-stretch gap-2 w-fit">

@@ -1,5 +1,6 @@
 <script lang="ts">
     import HealthMap from "$lib/components/maps/health-map/HealthMap.svelte";
+    import CommuneHealthIndexScatter from "$lib/components/charts/CommuneHealthIndexScatter.svelte";
     import {
         METRIC_CONFIG,
         MapState,
@@ -7,7 +8,7 @@
 
     // Second map: same indicators, but only the two contrasting corner cells are
     // shown — C3 (high social-housing growth + amenity-rich) in dark blue and
-    // A3 (high social-housing growth + lower-amenity) in red.
+    // A3 (high social-housing growth + amenity-poor) in red.
     const cornerMapState = new MapState({ cornerMode: true });
 </script>
 
@@ -37,12 +38,26 @@
 
     <div class="max-w-3xl mx-auto mt-16 px-4 sm:px-6">
         <h3 class="text-2xl font-bold">
-            Where did social housing grow — amenity-rich vs. lower-amenity
-            areas?
+            Where did social housing grow since the early 2000s--amenity-rich
+            vs. amenity-poor areas?
         </h3>
     </div>
     <div class="max-w-7xl mx-auto h-[70vh] min-h-96 md:h-175 mt-8 px-4 sm:px-6">
         <HealthMap mapState={cornerMapState} />
+    </div>
+
+    <div class="max-w-3xl mx-auto mt-16 px-4 sm:px-6">
+        <h3 class="text-2xl font-bold">
+            Social housing growth and health outcomes
+        </h3>
+        <p class="mt-4 text-gray-700">
+            Use the selector to compare the weighted average or one outcome
+            with the cumulative social housing share from 2005 to 2022. You can
+            search for a commune or filter the chart by region.
+        </p>
+    </div>
+    <div class="max-w-7xl mx-auto mt-8 px-4 sm:px-6">
+        <CommuneHealthIndexScatter />
     </div>
 
     <div class="max-w-3xl mx-auto mt-10 px-4 sm:px-6 space-y-4 text-gray-700">
@@ -81,6 +96,14 @@
         <p>
             <strong>{METRIC_CONFIG.heat.label}</strong>
             {METRIC_CONFIG.heat.description}
+        </p>
+        <p>
+            <strong>{METRIC_CONFIG.green.label}</strong>
+            {METRIC_CONFIG.green.description}
+        </p>
+        <p>
+            <strong>{METRIC_CONFIG.health.label}</strong>
+            {METRIC_CONFIG.health.description}
         </p>
     </div>
 </section>

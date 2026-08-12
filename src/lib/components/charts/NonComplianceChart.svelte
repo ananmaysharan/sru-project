@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { colorForRegionName } from '$lib/data/charts/chart-colors';
 	import rawCommuneData from '$lib/data/charts/commune-health-index-scatter.json';
 
 	type Period = '2005' | '2008' | '2014' | '2017' | '2020';
@@ -34,7 +33,12 @@
 		{ key: '2017', label: '2017-2019' },
 		{ key: '2020', label: '2020-2022' }
 	];
-
+	const frequencyColors = {
+		4: '#7f0000',
+		3: '#fca5a5',
+		2: '#fd8d3c',
+		1: '#fed976'
+	} as const;
 	const pageOneRows: Row[] = [
 		{ name: "Chazay-d'Azergues", periods: ['2005', '2008', '2014', '2017'] },
 		{ name: 'Nice', periods: ['2005', '2008', '2014', '2020'] },
@@ -192,6 +196,11 @@
 	const communeRegionByName = new Map(
 		(rawCommuneData as CommuneRegion[]).map((commune) => [normalizeName(commune.name), commune])
 	);
+	const occurrenceCountByName = new Map<string, number>();
+	for (const row of [...pageOneRows, ...pageTwoRows]) {
+		const key = normalizeName(row.name);
+		occurrenceCountByName.set(key, (occurrenceCountByName.get(key) ?? 0) + row.periods.length);
+	}
 	const communeRows: RegionRow[] = [...pageOneRows, ...pageTwoRows]
 		.map((row) => {
 			const key = normalizeName(row.name);
@@ -215,16 +224,15 @@
 	const lineEndX = 2135;
 	let viewportWidth = $state(1280);
 	let selectedRegions = $state<string[]>([]);
+	let layoutColumnCount = $derived(viewportWidth >= 1024 ? 3 : viewportWidth >= 640 ? 2 : 1);
 	let visibleRows = $derived.by(() => {
 		const selected = new Set(selectedRegions);
 		return communeRows.filter((row) => selected.size === 0 || selected.has(row.region));
 	});
 	let rowColumns = $derived.by(() => {
-		const responsiveColumnCount = viewportWidth >= 1024 ? 3 : viewportWidth >= 640 ? 2 : 1;
-		const columnCount = Math.min(responsiveColumnCount, Math.max(1, visibleRows.length));
-		const columnSize = Math.ceil(visibleRows.length / columnCount);
+		const columnSize = Math.ceil(visibleRows.length / layoutColumnCount);
 
-		return Array.from({ length: columnCount }, (_, index) =>
+		return Array.from({ length: layoutColumnCount }, (_, index) =>
 			visibleRows.slice(index * columnSize, (index + 1) * columnSize)
 		).filter((column) => column.length > 0);
 	});
@@ -243,6 +251,14 @@
 		return regionDisplayNames[region] ?? region;
 	}
 
+	function markerColor(row: Row) {
+		const count = occurrenceCountByName.get(normalizeName(row.name)) ?? row.periods.length;
+		if (count >= 4) return frequencyColors[4];
+		if (count === 3) return frequencyColors[3];
+		if (count === 2) return frequencyColors[2];
+		return frequencyColors[1];
+	}
+
 	function toggleRegion(region: string) {
 		selectedRegions = selectedRegions.includes(region)
 			? selectedRegions.filter((selected) => selected !== region)
@@ -252,38 +268,39 @@
 
 <svelte:window bind:innerWidth={viewportWidth} />
 
-<div class="mx-4 mt-4 md:mx-12">
-	<div class="filter-pills" aria-label="Region filters">
-		<Button
-			variant={selectedRegions.length === 0 ? 'default' : 'outline'}
-			size="sm"
-			class="rounded-full"
-			aria-pressed={selectedRegions.length === 0}
-			aria-controls="noncompliance-list"
-			onclick={() => (selectedRegions = [])}
-		>
-			All regions
-		</Button>
-		{#each regions as region (region)}
+<div class="mt-4">
+	<div class="mx-auto max-w-3xl px-4 sm:px-6">
+		<div class="filter-pills" aria-label="Region filters">
 			<Button
-				variant={selectedRegions.includes(region) ? 'default' : 'outline'}
+				variant={selectedRegions.length === 0 ? 'default' : 'outline'}
 				size="sm"
 				class="rounded-full"
-				aria-pressed={selectedRegions.includes(region)}
+				aria-pressed={selectedRegions.length === 0}
 				aria-controls="noncompliance-list"
-				onclick={() => toggleRegion(region)}
+				onclick={() => (selectedRegions = [])}
 			>
-				<span class="region-swatch" style={`background:${colorForRegionName(region)}`}></span>
-				{displayRegion(region)}
+				All regions
 			</Button>
-		{/each}
+			{#each regions as region (region)}
+				<Button
+					variant={selectedRegions.includes(region) ? 'default' : 'outline'}
+					size="sm"
+					class="rounded-full"
+					aria-pressed={selectedRegions.includes(region)}
+					aria-controls="noncompliance-list"
+					onclick={() => toggleRegion(region)}
+				>
+					{displayRegion(region)}
+				</Button>
+			{/each}
+		</div>
 	</div>
-
-	<div class="list-columns-wrap">
+	<div class="list-columns-wrap mx-4 md:mx-12">
 		<div
 			id="noncompliance-list"
 			class="list-columns"
-			style={`--column-count:${rowColumns.length}`}
+			class:single-column={rowColumns.length === 1}
+			style={`--column-count:${layoutColumnCount};--single-column-width:calc((100% - ${(layoutColumnCount - 1) * 16}px) / ${layoutColumnCount})`}
 		>
 			{#each rowColumns as column, columnIndex (columnIndex)}
 				{@const columnHeight = heightForRows(column.length)}
@@ -310,7 +327,13 @@
 							<text x="106" y={y} class="commune-label">{row.name}</text>
 
 							{#each row.periods as period (period)}
-								<circle cx={columnX[period]} cy={y} r="18.5" class="marker" />
+								<circle
+									cx={columnX[period]}
+									cy={y}
+									r="18.5"
+									class="marker"
+									style={`fill:${markerColor(row)}`}
+								/>
 							{/each}
 						{/each}
 					</g>
@@ -340,18 +363,16 @@
 		gap: 16px;
 	}
 
+	.list-columns.single-column .list-column {
+		grid-column: 1 / -1;
+		width: var(--single-column-width);
+		justify-self: center;
+	}
+
 	.list-column {
 		display: block;
 		width: 100%;
 		height: auto;
-	}
-
-	.region-swatch {
-		display: inline-block;
-		width: 8px;
-		height: 8px;
-		border-radius: 999px;
-		box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08);
 	}
 
 	.noncompliance-text {
@@ -375,10 +396,6 @@
 	.row-rule {
 		stroke: #cbd7db;
 		stroke-width: 1.6;
-	}
-
-	.marker {
-		fill: #06738b;
 	}
 
 </style>

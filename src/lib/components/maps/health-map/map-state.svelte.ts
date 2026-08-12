@@ -192,10 +192,10 @@ export const METRIC_CONFIG: Record<
 		}
 	},
 	health: {
-		label: 'Health facility access',
-		shortName: 'Health facilities per 10k',
+		label: 'Proximity to healthcare and hospital infrastructure',
+		shortName: 'Healthcare proximity',
 		description:
-			'Number of health facilities per 10,000 residents in each commune, defined as HLT_PER_10K = (HLT_CNT / population) × 10,000. Facility counts (HLT_CNT) are derived from OpenStreetMap using the broad “Ampliada” definition (institutional, primary, and paramedical care), then normalized by population to avoid bias toward large, low-density communes. Higher values indicate better local access to health services.',
+			'Measures the average distance or travel time from social housing to nearby healthcare services, including clinics, hospitals, and emergency care facilities.',
 		xAxisLabel: 'Fewer facilities → More facilities',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Low access',
@@ -209,10 +209,10 @@ export const METRIC_CONFIG: Record<
 		}
 	},
 	green: {
-		label: 'Green Spaces',
-		shortName: 'Green-space coverage',
+		label: 'Proximity to green spaces',
+		shortName: 'Green space proximity',
 		description:
-			'Share of commune area covered by green space (GRN_PCT) — vegetated patches as a percentage of total commune area.',
+			'Measures the average distance or travel time from social housing to nearby public green areas (parks, gardens, forests, and other green spaces).',
 		xAxisLabel: 'Less green → More green',
 		yAxisLabel: 'Lower social-housing growth → Higher social-housing growth',
 		xLow: 'Less green',

@@ -5,7 +5,6 @@
     import ResidencesStackedChart from "$lib/components/charts/ResidencesStackedChart.svelte";
     import SupplyPieChart from "$lib/components/charts/SupplyPieChart.svelte";
     import SupplyRegionalChart from "$lib/components/charts/SupplyRegionalChart.svelte";
-    import CommuneHealthIndexScatter from "$lib/components/charts/CommuneHealthIndexScatter.svelte";
     import DromComCard from "$lib/components/charts/DromComCard.svelte";
     import NationalHousingStockChart from "$lib/components/charts/NationalHousingStockChart.svelte";
     import NonComplianceChart from "$lib/components/charts/NonComplianceChart.svelte";
@@ -93,10 +92,6 @@
                 <SupplyRegionalChart />
             </div>
         </div>
-    </div>
-
-    <div class="mx-4 mt-8 md:mx-12">
-        <CommuneHealthIndexScatter />
     </div>
 
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
