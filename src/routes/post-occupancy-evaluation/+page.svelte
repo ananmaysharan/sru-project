@@ -380,6 +380,7 @@
                         role="group"
                         aria-label="Projects"
                     >
+                        <span class="story-region-inline">Paris</span>
                         <span
                             class="story-project-indicator"
                             style:left="{indicatorLeft}px"
@@ -473,11 +474,12 @@
 
     .story-project-nav {
         position: sticky;
-        top: calc(4.0625rem + 0.75rem);
+        top: 4.0625rem;
         z-index: 100;
         height: 0;
         width: min(58rem, calc(100% - 2rem));
         margin-inline: auto;
+        transform: translateY(1.25rem);
         text-align: center;
         pointer-events: auto;
     }
@@ -494,6 +496,20 @@
 
     .story-project-tabs::-webkit-scrollbar {
         display: none;
+    }
+
+    .story-region-inline {
+        position: relative;
+        z-index: 1;
+        flex: 0 0 auto;
+        padding: 0.52rem 0.9rem;
+        color: #fff;
+        font: inherit;
+        font-size: clamp(0.68rem, 1.25vw, 0.875rem);
+        font-weight: 700;
+        line-height: 1;
+        text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
+        white-space: nowrap;
     }
 
     .story-project-indicator {
@@ -549,6 +565,13 @@
         position: relative;
     }
 
+    .story-cards::after {
+        display: block;
+        height: calc(100svh - 4.0625rem);
+        background: #000;
+        content: "";
+    }
+
     .story-card {
         position: sticky;
         top: 4.0625rem;
@@ -591,8 +614,9 @@
 
     @media (max-width: 640px) {
         .story-project-nav {
-            top: calc(4.0625rem + 0.55rem);
+            top: 4.0625rem;
             width: calc(100% - 1rem);
+            transform: translateY(1rem);
         }
 
         .story-project-tabs {
@@ -600,6 +624,10 @@
         }
 
         .story-project-button {
+            padding-inline: 0.72rem;
+        }
+
+        .story-region-inline {
             padding-inline: 0.72rem;
         }
 
