@@ -408,6 +408,7 @@
                             data-frame={frameIndex}
                             data-project={frame.projectLabel}
                             class:story-card--landscape={frame.image.landscape}
+                            class:story-card--retired={frameIndex < activeFrame - 2}
                             class="story-card"
                             style:z-index={frameIndex + 1}
                             aria-label="{frame.projectLabel}, photograph {frame.imageIndex + 1} of {parisProjects[frame.projectIndex].images.length}"
@@ -582,6 +583,13 @@
         justify-content: center;
         overflow: hidden;
         background: #000;
+    }
+
+    /* Once a card is fully covered, remove it from the browser's paint stack.
+       Keeping every full-screen sticky image composited caused the final cards
+       to paint stale/cropped layers before snapping to the correct image. */
+    .story-card--retired {
+        visibility: hidden;
     }
 
     .story-image {
