@@ -5,7 +5,7 @@
 	import XIcon from '@lucide/svelte/icons/x';
 	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
-	import { colorForRegionName } from '$lib/data/charts/chart-colors';
+	import { colorForRegionName, GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { Button } from '$lib/components/ui/button';
 	import * as Select from '$lib/components/ui/select';
 	import rawData from '$lib/data/charts/commune-health-index-scatter.json';
@@ -320,16 +320,12 @@
 		animateDomains([xDomainMin, xDomainMax], metricConfig[activeMetric].domain);
 	}
 
-	function colorForRegion(region: string) {
-		return colorForRegionName(region);
-	}
-
 	function fillForPoint(point: CommuneScatterPoint) {
-		if (selectedPoint && selectedPoint.code !== point.code) {
-			return '#d1d5db';
+		if (hovered?.code === point.code) {
+			return GRAPHICS_COLORS.focus;
 		}
 
-		return colorForRegion(point.region);
+		return colorForRegionName(point.region);
 	}
 
 	function opacityForPoint(point: CommuneScatterPoint) {
@@ -337,7 +333,7 @@
 			return 0.36;
 		}
 
-		return activePoint?.code === point.code ? 1 : 0.62;
+		return activePoint?.code === point.code ? 1 : 0.72;
 	}
 
 	function radiusForPoint(point: CommuneScatterPoint) {
@@ -883,7 +879,7 @@
 					aria-pressed={!hiddenRegions.has(region)}
 					onclick={() => toggleRegion(region)}
 				>
-					<span class="legend-swatch" style={`background: ${colorForRegion(region)}`}></span>
+					<span class="legend-swatch" style={`background:${colorForRegionName(region)}`}></span>
 					<span>{region}</span>
 				</button>
 			{/each}
@@ -914,7 +910,7 @@
 			x2={transformedXScale(tick)}
 			y1={margin.top}
 			y2={height - margin.bottom}
-			stroke="#B6B3B3"
+			stroke={GRAPHICS_COLORS.grid}
 			stroke-dasharray="2 2"
 			stroke-width="0.5"
 		/>
@@ -929,7 +925,7 @@
 			x2={width - margin.right}
 			y1={transformedYScale(tick)}
 			y2={transformedYScale(tick)}
-			stroke="#B6B3B3"
+			stroke={GRAPHICS_COLORS.grid}
 			stroke-dasharray="2 2"
 			stroke-width="0.5"
 		/>
@@ -941,7 +937,7 @@
 		x2={transformedXScale(targetShare)}
 		y1={margin.top}
 		y2={height - margin.bottom}
-		stroke="#6b7280"
+		stroke={GRAPHICS_COLORS.secondaryText}
 		stroke-dasharray="6 6"
 		stroke-width="1"
 		clip-path="url(#commune-scatter-plot-area)"
@@ -951,7 +947,7 @@
 		x2={width - margin.right}
 		y1={height - margin.bottom}
 		y2={height - margin.bottom}
-		stroke="#111111"
+		stroke={GRAPHICS_COLORS.ink}
 		stroke-width="0.75"
 	/>
 	<line
@@ -959,7 +955,7 @@
 		x2={margin.left}
 		y1={margin.top}
 		y2={height - margin.bottom}
-		stroke="#111111"
+		stroke={GRAPHICS_COLORS.ink}
 		stroke-width="0.75"
 	/>
 
@@ -986,7 +982,7 @@
 				r={radiusForPoint(point)}
 				fill={fillForPoint(point)}
 				fill-opacity={opacityForPoint(point)}
-				stroke={activePoint?.code === point.code ? 'white' : 'none'}
+				stroke={activePoint?.code === point.code ? GRAPHICS_COLORS.canvas : 'none'}
 				role="img"
 				aria-label={`${point.name}: population ${formatNumber(point.population)}`}
 				onpointerenter={(event) => {
@@ -1054,7 +1050,7 @@
 		display: block;
 		width: 100%;
 		height: auto;
-		color: #111111;
+		color: #121212;
 		font-size: 11px;
 		user-select: none;
 	}
@@ -1062,7 +1058,7 @@
 	.chart-shell {
 		display: flex;
 		flex-direction: column;
-		border: 1px solid #e5e7eb;
+		border: 1px solid #dadad7;
 		background: white;
 	}
 
@@ -1071,7 +1067,7 @@
 		width: 100%;
 		flex-direction: column;
 		gap: 16px;
-		border-bottom: 1px solid #e5e7eb;
+		border-bottom: 1px solid #dadad7;
 		background: white;
 		padding: 16px;
 	}
@@ -1085,7 +1081,7 @@
 
 	.control-label {
 		margin-bottom: 6px;
-		color: #6b7280;
+		color: #5f5f5f;
 		font-size: 12px;
 		font-weight: 500;
 	}
@@ -1101,20 +1097,20 @@
 
 	.axis-label,
 	.axis-title {
-		fill: #000000;
+		fill: #121212;
 		font-size: 11px;
 	}
 
 	.quota-label-above {
 		margin: 0 0 4px;
-		color: #4b5563;
+		color: #5f5f5f;
 		font-size: 10px;
 		font-weight: 500;
 		text-align: center;
 	}
 
 	.point-label {
-		fill: #111827;
+		fill: #121212;
 		font-size: 10px;
 		font-weight: 500;
 		paint-order: stroke;
@@ -1125,7 +1121,7 @@
 	}
 
 	.leader-line {
-		stroke: #6b7280;
+		stroke: #5f5f5f;
 		stroke-width: 0.75;
 		stroke-opacity: 0.65;
 		pointer-events: none;
@@ -1143,14 +1139,14 @@
 		gap: 6px;
 		border: 0;
 		background: transparent;
-		color: #374151;
+		color: #5f5f5f;
 		padding: 2px 0;
 		font-size: 12px;
 		text-align: left;
 	}
 
 	.legend-item:hover {
-		color: #111827;
+		color: #121212;
 	}
 
 	.legend-off {
@@ -1166,7 +1162,7 @@
 		flex: 0 0 auto;
 		width: 10px;
 		height: 10px;
-		border: 1px solid #d1d5db;
+		border: 1px solid #dadad7;
 	}
 
 	.brush-layer {
@@ -1178,9 +1174,9 @@
 	}
 
 	:global(.brush-layer .selection) {
-		fill: white;
-		fill-opacity: 0.4;
-		stroke: currentColor;
+		fill: #bfd2d5;
+		fill-opacity: 0.45;
+		stroke: #497380;
 	}
 
 	@media (min-width: 768px) {
@@ -1189,7 +1185,7 @@
 		}
 
 		.chart-sidebar {
-			border-right: 1px solid #e5e7eb;
+			border-right: 1px solid #dadad7;
 			border-bottom: 0;
 			width: 240px;
 			flex: 0 0 240px;

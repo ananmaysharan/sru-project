@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { socialRentalByCountry } from '$lib/data/charts/european-social-rental-summary';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 
 	let { countryCode = '' }: { countryCode?: string } = $props();
 
@@ -38,10 +39,10 @@
 						<span>{startYear}</span>
 						<span class="font-semibold text-gray-800">{startPct.toFixed(1)}%</span>
 					</div>
-					<div class="h-5 w-full rounded bg-gray-100 overflow-hidden">
+					<div class="h-5 w-full rounded overflow-hidden" style="background: {GRAPHICS_COLORS.surface};">
 						<div
-							class="h-full rounded bg-gray-400 bar-fill"
-							style="width: {(startPct / MAX_PCT) * 100}%"
+							class="h-full rounded bar-fill"
+							style="width: {(startPct / MAX_PCT) * 100}%; background: {GRAPHICS_COLORS.contextStrong};"
 						></div>
 					</div>
 				</div>
@@ -53,10 +54,10 @@
 						<span>{endYear}</span>
 						<span class="font-semibold text-gray-800">{endPct.toFixed(1)}%</span>
 					</div>
-					<div class="h-5 w-full rounded bg-gray-100 overflow-hidden">
+					<div class="h-5 w-full rounded overflow-hidden" style="background: {GRAPHICS_COLORS.surface};">
 						<div
-							class="h-full rounded bg-gray-800 bar-fill"
-							style="width: {(endPct / MAX_PCT) * 100}%"
+							class="h-full rounded bar-fill"
+							style="width: {(endPct / MAX_PCT) * 100}%; background: {GRAPHICS_COLORS.primaryDark};"
 						></div>
 					</div>
 				</div>
@@ -67,6 +68,12 @@
 
 <style>
 	.bar-fill {
-		transition: width 500ms cubic-bezier(0.4, 0, 0.2, 1);
+		transition: width 220ms cubic-bezier(0.23, 1, 0.32, 1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bar-fill {
+			transition: none;
+		}
 	}
 </style>

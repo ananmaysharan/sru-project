@@ -1,6 +1,11 @@
 <script lang="ts">
     import { asset } from "$app/paths";
+    import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
+    import editorialContent from "$lib/data/editorial-content.md?raw";
+    import { onMount } from "svelte";
     import AutoCarousel from "$lib/components/gallery/AutoCarousel.svelte";
+    import * as Carousel from "$lib/components/ui/carousel/index.js";
+    import type { CarouselAPI } from "$lib/components/ui/carousel/context.js";
 
     // Keep the previous carousel presentation available while the new
     // scrollytelling direction is being evaluated.
@@ -19,6 +24,16 @@
     let indicatorLeft = $state(4);
     let indicatorWidth = $state(0);
     let scrollFrame = 0;
+
+    let residentTopicIndex = $state(0);
+    let residentQuoteIndex = $state(0);
+    let residentQuotesInView = $state(false);
+    let residentQuotesEl = $state<HTMLElement | null>(null);
+    let residentTabsEl = $state<HTMLDivElement | null>(null);
+    let residentButtonEls = $state<HTMLButtonElement[]>([]);
+    let residentIndicatorLeft = $state(0);
+    let residentIndicatorWidth = $state(0);
+    let residentCarouselApi = $state<CarouselAPI>();
 
     function slug(s: string) {
         return s
@@ -158,6 +173,58 @@
         },
     ];
 
+    const residentTopics = [
+        {
+            label: "Residential pride and the symbolic value of place",
+            quotes: [
+                "We all felt like we’d won the lottery when we were allocated housing in this neighborhood.",
+                "I cried the day I saw how beautiful the apartment was and the view from my balcony. It opened up the field of possibilities.",
+                "I have a large studio, with an incredible view and a small balcony. I can see the Eiffel Tower, the Louvre, the Sacré Cœur, the Montparnasse Tower, and a bit of the Seine.",
+                "It nourishes the soul. I’m very proud to live here.",
+                "My daughter was even able to find a job at La Samaritaine, and it made her very proud. It’s also a source of pride for my daughters to live at La Samaritaine.",
+            ],
+        },
+        {
+            label: "Everyday retail and food access",
+            quotes: [
+                "For my budget, it’s a bit of a food desert. There should be more supermarkets. Everything costs a fortune. I do my grocery shopping when I go to my parents’ place. My neighbors all have to take the metro to get to the nearest Lidl, which is still five metro stops away.",
+                "Sometimes the crowds are a bit much, but being in the heart of the city is priceless. We’re close to everything—except large supermarkets.",
+                "I’ve always done my shopping at the Aligre market. That suits me perfectly. It’s still a bit far and I have to take the metro, so we have to be two people if I’m heavily loaded with the shopping cart.",
+                "There’s a market on Sunday mornings on Rue de Montmartre, but the prices are prohibitive.",
+                "It’s a showcase neighborhood. So, there are a huge number of tourists. It’s really geared toward a tourist clientele.",
+            ],
+        },
+        {
+            label: "Healthcare access and affordability",
+            quotes: [
+                "Around here, the problem is that there are a lot of health centers that charge extra fees, and depending on our complementary insurance, we’re not covered 100%, even when we have civil-servant insurance.",
+                "I’m in favor of local medicine, but it’s impossible to find a new primary care doctor in the neighborhood. So I see my doctor where I used to live before. Here, doctors all refuse to take new patients.",
+                "On the other hand, for all other care, I go nearby. I found a great dentist. Same for the ophthalmologist. Same for the imaging center. There are a huge number of care centers that are not necessarily cheap, that I find very luxurious, but for now they help me out.",
+            ],
+        },
+        {
+            label: "Thermal comfort and housing design in use",
+            quotes: [
+                "Our homes are not energy sieves, but we die of heat in the summer. They’re real thermal kettles. I have a small AC unit, but even with that, I can barely survive. So if I can, I escape to my parents’ place outside Paris.",
+                "At the Tour Bois-le-Prêtre, when the balconies were added by the architects, for a long time the neighbors were afraid to go out there to cool off and enjoy the view; it made them dizzy.",
+                "They installed these nice thermal curtains for us, which require a minimum of know-how for everyday maintenance. Many of my neighbors forget to open them and air out the whole apartment for at least ten minutes a day.",
+                "Here, this must have been the storage floor. So our apartment is attic-style, with a sloping ceiling. We’re right under the zinc roof. So, yes, in the summer, the whole envelope is hot, sometimes burning.",
+            ],
+        },
+        {
+            label: "Cultural capital and proximity to amenities",
+            quotes: [
+                "I was able to take art history classes at the Louvre museum because it’s right next door. I wouldn’t have done it if I didn’t live in the neighborhood. The Louvre is what symbolizes my experience of this home. I spent wonderful hours studying there.",
+            ],
+        },
+        {
+            label: "Governance, coordination and the “after” of flagship projects",
+            quotes: [
+                "These are all the questions about the post-inauguration phase that Paris Habitat and every social housing provider managing these more recent projects should be asking themselves. They honored their part of the deal. With a bit more coordination of resources at the neighborhood scale, we wouldn’t be having these problems in terms of access to services and well-being.",
+            ],
+        },
+    ];
+
     const brittanyImages = ["brittany-01", "brittany-02", "brittany-04"].map(
         (id) => ({
             src: `/images/optimized/brittany/${id}-full.webp`,
@@ -217,6 +284,7 @@
 
     function handleResize() {
         syncProjectIndicator();
+        syncResidentIndicator();
         syncActiveFrame();
     }
 
@@ -249,9 +317,74 @@
         });
     }
 
+    function syncResidentIndicator() {
+        const button = residentButtonEls[residentTopicIndex];
+        if (!button) return;
+        residentIndicatorLeft = button.offsetLeft;
+        residentIndicatorWidth = button.offsetWidth;
+        residentTabsEl?.scrollTo({
+            left:
+                button.offsetLeft +
+                button.offsetWidth / 2 -
+                residentTabsEl.clientWidth / 2,
+            behavior: "smooth",
+        });
+    }
+
+    function selectResidentTopic(topicIndex: number) {
+        residentCarouselApi = undefined;
+        residentTopicIndex = topicIndex;
+        residentQuoteIndex = 0;
+    }
+
+    onMount(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                residentQuotesInView = entry.isIntersecting;
+            },
+            { threshold: 0.35 },
+        );
+        if (residentQuotesEl) observer.observe(residentQuotesEl);
+        return () => observer.disconnect();
+    });
+
     $effect(() => {
         activeProjectIndex;
         requestAnimationFrame(syncProjectIndicator);
+    });
+
+    $effect(() => {
+        residentTopicIndex;
+        requestAnimationFrame(syncResidentIndicator);
+    });
+
+    $effect(() => {
+        const api = residentCarouselApi;
+        if (!api) return;
+        const syncResidentQuote = () => {
+            residentQuoteIndex = api.selectedScrollSnap();
+        };
+        syncResidentQuote();
+        api.on("select", syncResidentQuote);
+        return () => api.off("select", syncResidentQuote);
+    });
+
+    $effect(() => {
+        residentTopicIndex;
+        residentQuoteIndex;
+        const api = residentCarouselApi;
+        if (!api || !residentQuotesInView) return;
+        const timeout = window.setTimeout(() => {
+            const quotes = residentTopics[residentTopicIndex].quotes;
+            if (residentQuoteIndex < quotes.length - 1) {
+                api.scrollNext();
+            } else {
+                selectResidentTopic(
+                    (residentTopicIndex + 1) % residentTopics.length,
+                );
+            }
+        }, 6500);
+        return () => window.clearTimeout(timeout);
     });
 
     $effect(() => {
@@ -461,7 +594,78 @@
         ></div>
         -->
     </div>
+
+    <section
+        bind:this={residentQuotesEl}
+        class="resident-voices"
+        aria-labelledby="resident-voices-title"
+    >
+        <div class="resident-voices-inner">
+            <h2 id="resident-voices-title" class="text-3xl font-bold">
+                What residents told us
+            </h2>
+
+            <div
+                bind:this={residentTabsEl}
+                class="resident-topic-tabs"
+                role="tablist"
+                aria-label="Resident quote themes"
+            >
+                <span
+                    class="resident-topic-indicator"
+                    style:left="{residentIndicatorLeft}px"
+                    style:width="{residentIndicatorWidth}px"
+                ></span>
+                {#each residentTopics as topic, topicIndex (topic.label)}
+                    <button
+                        bind:this={residentButtonEls[topicIndex]}
+                        type="button"
+                        role="tab"
+                        aria-selected={topicIndex === residentTopicIndex}
+                        aria-controls="resident-quote-panel"
+                        tabindex={topicIndex === residentTopicIndex ? 0 : -1}
+                        class:resident-topic-button--active={topicIndex === residentTopicIndex}
+                        class="resident-topic-button"
+                        onclick={() => selectResidentTopic(topicIndex)}
+                    >
+                        {topic.label}
+                    </button>
+                {/each}
+            </div>
+
+            {#key residentTopicIndex}
+                <Carousel.Root
+                    opts={{ loop: false }}
+                    setApi={(api) => (residentCarouselApi = api)}
+                    class="resident-carousel"
+                    aria-label={residentTopics[residentTopicIndex].label}
+                >
+                    <Carousel.Content>
+                        {#each residentTopics[residentTopicIndex].quotes as quote (quote)}
+                            <Carousel.Item>
+                                <div class="resident-quote-slide">
+                                    <blockquote class="resident-quote">
+                                        “{quote}”
+                                    </blockquote>
+                                </div>
+                            </Carousel.Item>
+                        {/each}
+                    </Carousel.Content>
+                    {#if residentTopics[residentTopicIndex].quotes.length > 1}
+                        <Carousel.Previous class="resident-carousel-previous" />
+                        <Carousel.Next class="resident-carousel-next" />
+                    {/if}
+                </Carousel.Root>
+            {/key}
+
+            <p class="resident-quote-count" aria-live="polite">
+                {residentQuoteIndex + 1} / {residentTopics[residentTopicIndex].quotes.length}
+            </p>
+        </div>
+    </section>
 </section>
+
+<EditorialMarkdown source={editorialContent} section="post-occupancy" />
 
 <style>
     :global(html) {
@@ -470,6 +674,7 @@
 
     .story {
         position: relative;
+        overflow: clip;
         background: #111;
     }
 
@@ -620,6 +825,112 @@
         line-height: 1.4;
     }
 
+    .resident-voices {
+        background: #fff;
+        color: #111;
+    }
+
+    .resident-voices-inner {
+        width: min(48rem, calc(100% - 2rem));
+        margin-inline: auto;
+        padding: clamp(4.5rem, 9vw, 8rem) 0;
+    }
+
+    .resident-voices-inner > h2 {
+        margin-bottom: 2rem;
+    }
+
+    .resident-topic-tabs {
+        position: relative;
+        display: flex;
+        width: 100%;
+        gap: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .resident-topic-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .resident-topic-indicator {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        z-index: 0;
+        border: 1px solid #111827;
+        border-radius: 9999px;
+        transition:
+            left 420ms cubic-bezier(0.22, 1, 0.36, 1),
+            width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .resident-topic-button {
+        position: relative;
+        z-index: 1;
+        flex: 0 0 auto;
+        border: 0;
+        border-radius: 9999px;
+        padding: 0.62rem 0.9rem;
+        background: transparent;
+        color: #384152;
+        font: inherit;
+        font-size: clamp(0.72rem, 1vw, 0.875rem);
+        line-height: 1.15;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: color 200ms ease;
+    }
+
+    .resident-topic-button:hover,
+    .resident-topic-button--active {
+        color: #111;
+    }
+
+    .resident-topic-button:focus-visible {
+        outline: 2px solid #111827;
+        outline-offset: 3px;
+    }
+
+    :global(.resident-carousel) {
+        width: calc(100% - 5rem);
+        margin: 0 auto;
+    }
+
+    .resident-quote-slide {
+        display: grid;
+        min-height: clamp(19rem, 36vw, 28rem);
+        place-items: center;
+        padding: clamp(3rem, 7vw, 6rem) 0 clamp(2rem, 4vw, 3rem);
+    }
+
+    .resident-quote {
+        max-width: 54rem;
+        margin: 0 auto;
+        font-size: clamp(1.55rem, 3.2vw, 3rem);
+        font-weight: 400;
+        letter-spacing: -0.035em;
+        line-height: 1.18;
+        text-align: center;
+        text-wrap: balance;
+    }
+
+    :global(.resident-carousel-previous) {
+        left: -2.5rem;
+    }
+
+    :global(.resident-carousel-next) {
+        right: -2.5rem;
+    }
+
+    .resident-quote-count {
+        margin: 0;
+        color: #697181;
+        font-size: 0.75rem;
+        font-variant-numeric: tabular-nums;
+        text-align: center;
+    }
+
     @media (max-width: 640px) {
         .story-project-nav {
             top: 4.0625rem;
@@ -642,6 +953,27 @@
         .story-caption {
             width: calc(100% - 1.5rem);
         }
+
+        .resident-voices-inner {
+            width: calc(100% - 1.5rem);
+        }
+
+        :global(.resident-carousel) {
+            width: calc(100% - 3.5rem);
+        }
+
+        :global(.resident-carousel-previous) {
+            left: -1.75rem;
+        }
+
+        :global(.resident-carousel-next) {
+            right: -1.75rem;
+        }
+
+        .resident-quote {
+            font-size: clamp(1.35rem, 7vw, 2rem);
+            text-wrap: pretty;
+        }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -650,6 +982,7 @@
         }
 
         .story-project-indicator,
+        .resident-topic-indicator,
         .story-card {
             transition-duration: 1ms;
         }

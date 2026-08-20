@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { BRIGHT_CHART_PALETTE, colorForRegionName } from '$lib/data/charts/chart-colors';
+	import {
+		colorForRegionName,
+		GRAPHICS_COLORS,
+		PIE_TONAL_PALETTE
+	} from '$lib/data/charts/chart-colors';
 	import { socialHousingByRegion2022 } from '$lib/data/charts/region-supply-summary';
 	import { departmentSupply2022 } from '$lib/data/charts/department-supply-summary';
 
@@ -35,7 +39,7 @@
 			value: outreMerTotal,
 			rate: outreMerRate,
 			regionCode: 'outre-mer',
-			itemStyle: { color: colorForRegionName('outre-mer') }
+			itemStyle: { color: colorForRegionName('Outre-mer') }
 		});
 		return data;
 	}
@@ -53,16 +57,17 @@
 		return departmentSupply2022
 			.filter((d) => d.regionCode === regionCode && d.social > 0)
 			.sort((a, b) => b.social - a.social)
-			.map((d) => ({
+			.map((d, index) => ({
 				name: d.department,
 				value: d.social,
-				rate: d.rate
+				rate: d.rate,
+				itemStyle: { color: PIE_TONAL_PALETTE[index % PIE_TONAL_PALETTE.length] }
 			}));
 	}
 
 	function buildOption(data: { name: string; value: number; rate: number }[]) {
 		return {
-			color: BRIGHT_CHART_PALETTE,
+			color: [...PIE_TONAL_PALETTE],
 			tooltip: {
 				trigger: 'item',
 				formatter: (params: any) => {
@@ -78,19 +83,26 @@
 					avoidLabelOverlap: true,
 					itemStyle: {
 						borderRadius: 0,
-						borderColor: '#fff',
+						borderColor: GRAPHICS_COLORS.canvas,
 						borderWidth: 2
 					},
 					label: {
 						show: true,
 						formatter: '{b}',
-						fontSize: 10
+						fontSize: 10,
+						color: GRAPHICS_COLORS.ink
 					},
 					labelLine: {
 						length: 10,
-						length2: 8
+						length2: 8,
+						lineStyle: { color: GRAPHICS_COLORS.grid }
 					},
 					emphasis: {
+						itemStyle: {
+							color: GRAPHICS_COLORS.focus,
+							borderColor: GRAPHICS_COLORS.canvas,
+							borderWidth: 2
+						},
 						label: {
 							show: true,
 							fontSize: 12,

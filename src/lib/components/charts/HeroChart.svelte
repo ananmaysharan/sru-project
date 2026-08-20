@@ -2,6 +2,7 @@
 	import { asset } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { timelineYears, legislations } from '$lib/data/charts/hero-timeline';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 
 	let containerEl: HTMLDivElement;
 	let containerWidth = $state(0);
@@ -34,15 +35,15 @@
 	</div>
 
 	<svg class="w-full h-auto" viewBox="0 0 {totalWidth} 60">
-		<line x1={pad} y1={25} x2={pad + innerWidth} y2={25} stroke="#4b5563" stroke-width="1" />
+		<line x1={pad} y1={25} x2={pad + innerWidth} y2={25} stroke={GRAPHICS_COLORS.secondaryText} stroke-width="1" />
 
 		{#each timelineYears as { year, highlighted }}
 			{@const cx = yearToX(year)}
 			<g>
 				{#if highlighted}
-					<circle {cx} cy={25} r={15} fill="#C4A882" opacity={0.2} />
+					<circle {cx} cy={25} r={15} fill={GRAPHICS_COLORS.focus} opacity={0.14} />
 				{/if}
-				<circle {cx} cy={25} r={3} fill={highlighted ? '#4b5563' : '#6b7280'} />
+				<circle {cx} cy={25} r={3} fill={highlighted ? GRAPHICS_COLORS.primary : GRAPHICS_COLORS.contextStrong} />
 				{#if highlighted || showAllLabels}
 					<text
 						x={cx}
@@ -50,7 +51,7 @@
 						text-anchor="middle"
 						font-size="10"
 						font-weight={highlighted ? 'medium' : 'normal'}
-						fill={highlighted ? '#374151' : '#6b7280'}
+						fill={highlighted ? GRAPHICS_COLORS.ink : GRAPHICS_COLORS.secondaryText}
 					>
 						{year}
 					</text>
@@ -70,7 +71,7 @@
 			<div></div>
 			{#each legislations as law}
 				<div>
-					<h3 class="text-xs sm:text-sm font-bold text-red-800">{law.name}</h3>
+					<h3 class="text-xs sm:text-sm font-bold" style="color: {GRAPHICS_COLORS.plum};">{law.name}</h3>
 					<p class="text-[8px] sm:text-[10px] italic text-gray-600 leading-tight mt-0.5">{law.fullName}</p>
 					<p class="text-[7px] sm:text-[9px] text-gray-400 mt-1">{law.date}</p>
 				</div>

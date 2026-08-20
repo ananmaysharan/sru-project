@@ -79,7 +79,13 @@
 			</div>
 		</div>
 
-			<div bind:this={mapContainer} class="w-full h-96"></div>
+			<div bind:this={mapContainer} class="locator-map w-full h-96"></div>
 
 	</div>
 </div>
+
+<style>
+	.locator-map :global(canvas.maplibregl-canvas) {
+		filter: grayscale(1) saturate(0) contrast(0.92);
+	}
+</style>

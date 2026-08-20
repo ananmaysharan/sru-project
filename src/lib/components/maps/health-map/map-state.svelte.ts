@@ -1,5 +1,6 @@
 import bivariateData from '$lib/data/map/health-communes-bivariate.json';
 import communeLookup from '$lib/data/map/commune-lookup.json';
+import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 
 type MetricType = 'income' | 'poverty' | 'elders' | 'left' | 'dpe' | 'heat' | 'green' | 'health';
 type Year = 2012 | 2014 | 2017 | 2018 | 2020 | 2021;
@@ -53,27 +54,26 @@ export const REGIONS_PMTILES_URL =
 export const YEARS = [2012, 2014, 2017, 2018, 2020, 2021] as const;
 
 export const BIVARIATE_COLORS: Record<CellCode, string> = {
-	A1: '#e8e8e8',
-	B1: '#b8d6be',
-	C1: '#73ae80',
-	A2: '#dfb0d6',
-	B2: '#a5add3',
-	C2: '#5698b9',
-	A3: '#be64ac',
-	B3: '#8c62aa',
-	C3: '#3b4994'
+	A1: '#e2eceb',
+	B1: '#f7ddbb',
+	C1: GRAPHICS_COLORS.focus,
+	A2: '#bfd3d6',
+	B2: '#c7b7ad',
+	C2: '#b77968',
+	A3: GRAPHICS_COLORS.primary,
+	B3: '#7b7885',
+	C3: GRAPHICS_COLORS.plum
 };
 
 type CornerCells = 'A1' | 'A3' | 'C1' | 'C3';
 
-// Colors for the "corner-only" map (second map): top-right (C3, high amenity +
-// high social-housing growth) in dark blue, top-left (A3, low amenity + high
-// social-housing growth) in red. Every other cell renders neutral.
+// The corner-only view reuses the same semantic colors as the full matrix so
+// readers do not need to relearn the encoding between the paired maps.
 export const CORNER_COLORS: Partial<Record<CellCode, string>> = {
-	C3: '#1e3a8a',
-	A3: '#b91c1c'
+	C3: BIVARIATE_COLORS.C3,
+	A3: BIVARIATE_COLORS.A3
 };
-export const CORNER_NEUTRAL = '#eef0f2';
+export const CORNER_NEUTRAL = GRAPHICS_COLORS.noData;
 
 export const METRIC_CONFIG: Record<
 	MetricType,
@@ -354,8 +354,8 @@ export class MapState {
 
 		// Guarantee at least one match/output pair so the `match` expression
 		// stays valid even if no commune falls in a corner cell this year.
-		expr.push(' __none__', this.cornerMode ? CORNER_NEUTRAL : '#f3f4f6');
-		expr.push(this.cornerMode ? CORNER_NEUTRAL : '#f3f4f6');
+		expr.push('__none__', GRAPHICS_COLORS.noData);
+		expr.push(GRAPHICS_COLORS.noData);
 		return expr;
 	}
 

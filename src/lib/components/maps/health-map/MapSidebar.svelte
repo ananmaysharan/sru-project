@@ -3,6 +3,7 @@
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as Select from '$lib/components/ui/select';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import {
 		mapState as DEFAULT_MAP_STATE,
 		MapState,
@@ -213,5 +214,13 @@
 				{/each}
 			</div>
 		{/if}
+
+		<div class="mt-3 flex items-center gap-2 text-[10px] text-gray-500">
+			<span
+				class="h-3.5 w-5 shrink-0 border"
+				style="background-color: {GRAPHICS_COLORS.noData}; border-color: {GRAPHICS_COLORS.grid};"
+			></span>
+			<span>Not available</span>
+		</div>
 	</div>
 </div>

@@ -3,6 +3,7 @@
 	import maplibregl from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import MapSidebar from './MapSidebar.svelte';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 
 	const COUNTRIES_SOURCE_ID = 'europe-countries';
 	const COUNTRIES_FILL_LAYER_ID = 'europe-countries-fill';
@@ -54,14 +55,6 @@
 	let selectedCountryName = $state('');
 	let tooltip: { x: number; y: number; name: string } | null = $state(null);
 
-	$effect(() => {
-		if (!selectedCountryCode) return;
-		console.log('[EuropeanMap] selection state', {
-			selectedCountryCode,
-			selectedCountryName
-		});
-	});
-
 	onMount(() => {
 		mapInstance = new maplibregl.Map({
 			container: mapContainer,
@@ -82,7 +75,7 @@
 				promoteId: 'ISO_A3'
 			});
 
-			const countriesFilter = ['in', ['get', 'ISO_A3'], ['literal', EUROPE_COUNTRY_CODES]] as any;
+			const countriesFilter = ['in', ['get', 'ISO_A3_EH'], ['literal', EUROPE_COUNTRY_CODES]] as any;
 
 			// Insert all data layers below the first basemap symbol layer so
 			// toponyms render on top — the canonical MapLibre pattern.
@@ -98,18 +91,18 @@
 						'fill-color': [
 							'case',
 							['boolean', ['feature-state', 'selected'], false],
-							'#111827',
+							GRAPHICS_COLORS.primaryDark,
 							['boolean', ['feature-state', 'hover'], false],
-							'#374151',
-							'#6b7280'
+							GRAPHICS_COLORS.focus,
+							GRAPHICS_COLORS.primary
 						],
 						'fill-opacity': [
 							'case',
 							['boolean', ['feature-state', 'selected'], false],
-							0.75,
+							0.95,
 							['boolean', ['feature-state', 'hover'], false],
-							0.55,
-							0.35
+							0.9,
+							0.78
 						]
 					}
 				},
@@ -123,8 +116,8 @@
 					source: COUNTRIES_SOURCE_ID,
 					filter: countriesFilter,
 					paint: {
-						'line-color': '#f9fafb',
-						'line-width': 0.6,
+						'line-color': GRAPHICS_COLORS.canvas,
+						'line-width': 0.75,
 						'line-opacity': 0.75
 					}
 				},
@@ -167,12 +160,6 @@
 				if (!e.features?.length) return;
 				const feature = e.features[0];
 				if (feature.id === undefined) return;
-				console.log('[EuropeanMap] country click', {
-					id: feature.id,
-					iso3: feature.properties?.ISO_A3,
-					name: feature.properties?.NAME_EN || feature.properties?.NAME || feature.properties?.ADMIN
-				});
-
 				if (selectedCountryId !== null) {
 					map.setFeatureState(
 						{ source: COUNTRIES_SOURCE_ID, id: selectedCountryId },
@@ -181,7 +168,8 @@
 				}
 
 				selectedCountryId = feature.id;
-				selectedCountryCode = feature.properties?.ISO_A3 || String(feature.id);
+				selectedCountryCode =
+					feature.properties?.ISO_A3_EH || feature.properties?.ADM0_A3 || String(feature.id);
 				selectedCountryName =
 					feature.properties?.NAME_EN || feature.properties?.NAME || feature.properties?.ADMIN || '';
 				map.setFeatureState({ source: COUNTRIES_SOURCE_ID, id: selectedCountryId }, { selected: true });

@@ -1,11 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { colorForRegionName } from '$lib/data/charts/chart-colors';
+	import { GRAPHICS_COLORS, normalizeRegionName } from '$lib/data/charts/chart-colors';
 	import { regionalHousing } from '$lib/data/charts/regional-housing-summary';
 
 	let chartEl: HTMLDivElement;
 
 	const data = [...regionalHousing].reverse();
+	const overseasRegions = new Set([
+		'guadeloupe',
+		'guyane',
+		'la reunion',
+		'martinique',
+		'mayotte'
+	]);
+	const isOverseas = (region: string) => overseasRegions.has(normalizeRegionName(region));
 
 	onMount(() => {
 		let chart: ReturnType<typeof import('echarts')['init']>;
@@ -15,9 +23,20 @@
 			chart = echarts.init(chartEl);
 
 			chart.setOption({
+				legend: {
+					top: 0,
+					left: 'center',
+					icon: 'rect',
+					itemWidth: 10,
+					itemHeight: 10,
+					textStyle: { fontSize: 10, color: GRAPHICS_COLORS.secondaryText }
+				},
 				tooltip: {
 					trigger: 'axis',
-					axisPointer: { type: 'line' },
+					axisPointer: {
+						type: 'line',
+						lineStyle: { color: GRAPHICS_COLORS.secondaryText, width: 1 }
+					},
 					formatter: (params: any) => {
 						const d = params.find((p: any) => p.value != null);
 						if (!d) return '';
@@ -30,24 +49,39 @@
 					name: 'Units per 10,000 inhabitants',
 					nameLocation: 'middle',
 					nameGap: 30,
-					axisLabel: { fontSize: 11 }
+					nameTextStyle: { color: GRAPHICS_COLORS.secondaryText },
+					axisLine: { lineStyle: { color: GRAPHICS_COLORS.grid } },
+					axisTick: { show: false },
+					splitLine: { lineStyle: { color: GRAPHICS_COLORS.grid, width: 0.5 } },
+					axisLabel: { fontSize: 11, color: GRAPHICS_COLORS.secondaryText }
 				},
 				yAxis: {
 					type: 'category',
 					data: data.map((d) => d.region),
-					axisLabel: { fontSize: 10 }
+					axisLine: { show: false },
+					axisTick: { show: false },
+					axisLabel: { fontSize: 10, color: GRAPHICS_COLORS.secondaryText }
 				},
 				series: [
 					{
-						name: 'Regions',
+						name: 'Metropolitan France',
 						type: 'bar',
-						data: data.map((d) => ({
-							value: d.per10k,
-							itemStyle: { color: colorForRegionName(d.region) }
-						}))
+						barWidth: '60%',
+						data: data.map((d) => (isOverseas(d.region) ? null : d.per10k)),
+						itemStyle: { color: GRAPHICS_COLORS.primary },
+						emphasis: { itemStyle: { color: GRAPHICS_COLORS.primary } }
+					},
+					{
+						name: 'Overseas territories',
+						type: 'bar',
+						barWidth: '60%',
+						barGap: '-100%',
+						data: data.map((d) => (isOverseas(d.region) ? d.per10k : null)),
+						itemStyle: { color: GRAPHICS_COLORS.plum },
+						emphasis: { itemStyle: { color: GRAPHICS_COLORS.plum } }
 					}
 				],
-				grid: { left: 160, right: 24, top: 16, bottom: 48 }
+				grid: { left: 160, right: 24, top: 36, bottom: 48 }
 			});
 
 			ro = new ResizeObserver(() => chart.resize());

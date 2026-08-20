@@ -2,8 +2,10 @@
     import { onMount } from "svelte";
     import { asset } from "$app/paths";
     import SocialHousingStockChart from "$lib/components/charts/SocialHousingStockChart.svelte";
+    import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
     import Logos from "$lib/components/elements/Logos.svelte";
     import { STORY_PHASES, phaseProgress } from "$lib/data/charts/scroll-story";
+    import editorialContent from "$lib/data/editorial-content.md?raw";
 
     let storyEl = $state<HTMLElement>();
     let navHeight = $state(56);
@@ -209,7 +211,9 @@
     </div>
 </section>
 
-<section class="pt-20 pb-12 md:pt-28">
+<EditorialMarkdown source={editorialContent} section="introduction" />
+
+<section class="pt-8 pb-12 md:pt-12">
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
         <h2 class="text-3xl font-bold text-gray-900">Acknowledgements</h2>
         <div class="mt-6 space-y-6 text-gray-700">

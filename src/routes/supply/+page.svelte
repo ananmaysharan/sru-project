@@ -8,6 +8,8 @@
     import DromComCard from "$lib/components/charts/DromComCard.svelte";
     import NationalHousingStockChart from "$lib/components/charts/NationalHousingStockChart.svelte";
     import NonComplianceChart from "$lib/components/charts/NonComplianceChart.svelte";
+    import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
+    import editorialContent from "$lib/data/editorial-content.md?raw";
 </script>
 
 <section id="supply" class="py-12">
@@ -41,7 +43,7 @@
                 France: Main Type of Residences Occupied (1984–2023)
             </h4>
             <p class="text-xs text-gray-400 mb-2">
-                Millions of housing units (lodgements) per household
+				Millions of occupied residences, by tenure
             </p>
             <div class="h-96">
                 <ResidencesStackedChart />
@@ -146,7 +148,7 @@
     <NonComplianceChart />
 
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h3 class="mt-12 text-2xl font-semibold">Overseas Terrories</h3>
+		<h3 class="mt-12 text-2xl font-semibold">Overseas Territories</h3>
         <p class="mt-4 text-gray-700">
             In France’s overseas territories, the dynamics of social housing are
             shaped by rapid demographic growth, colonial legacies, and high
@@ -179,4 +181,6 @@
             <EuropeanMap />
         </div>
     </div>
+
+    <EditorialMarkdown source={editorialContent} section="supply" />
 </section>

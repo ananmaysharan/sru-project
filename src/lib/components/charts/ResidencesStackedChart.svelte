@@ -1,15 +1,35 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { BRIGHT_CHART_PALETTE, INTRO_LINE_BLUE } from '$lib/data/charts/chart-colors';
+	import { COMPARISON_PALETTE, GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { residencesByYear } from '$lib/data/charts/residences-summary';
 
 	let chartEl: HTMLDivElement;
 
 	const series = [
-		{ name: 'Social Rental Tenants', key: 'socialRental', color: INTRO_LINE_BLUE },
-		{ name: 'Private Rental Tenants', key: 'privateRental', color: BRIGHT_CHART_PALETTE[1] },
-		{ name: 'Owner-Occupied (Mortgaged)', key: 'ownerMortgaged', color: BRIGHT_CHART_PALETTE[2] },
-		{ name: 'Owner-Occupied (Mortgage-Free)', key: 'ownerMortgageFree', color: BRIGHT_CHART_PALETTE[3] }
+		{
+			name: 'Social Rental Tenants',
+			key: 'socialRental',
+			color: COMPARISON_PALETTE[0],
+			labelColor: GRAPHICS_COLORS.canvas
+		},
+		{
+			name: 'Private Rental Tenants',
+			key: 'privateRental',
+			color: COMPARISON_PALETTE[1],
+			labelColor: GRAPHICS_COLORS.ink
+		},
+		{
+			name: 'Owner-Occupied (Mortgaged)',
+			key: 'ownerMortgaged',
+			color: COMPARISON_PALETTE[2],
+			labelColor: GRAPHICS_COLORS.canvas
+		},
+		{
+			name: 'Owner-Occupied (Mortgage-Free)',
+			key: 'ownerMortgageFree',
+			color: COMPARISON_PALETTE[3],
+			labelColor: GRAPHICS_COLORS.canvas
+		}
 	] as const;
 
 	onMount(() => {
@@ -22,7 +42,10 @@
 			chart.setOption({
 				tooltip: {
 					trigger: 'axis',
-					axisPointer: { type: 'line' },
+					axisPointer: {
+						type: 'line',
+						lineStyle: { color: GRAPHICS_COLORS.secondaryText, width: 1 }
+					},
 					valueFormatter: (v: number) => `${v.toFixed(1)}M`
 				},
 				legend: {
@@ -32,32 +55,48 @@
 					itemWidth: 10,
 					itemHeight: 10,
 					itemGap: 8,
-					textStyle: { fontSize: 10 },
+					textStyle: { fontSize: 10, color: GRAPHICS_COLORS.secondaryText },
 					type: 'plain',
 					width: '100%'
 				},
 				xAxis: {
 					type: 'category',
 					data: residencesByYear.map((d) => d.year),
-					axisLabel: { fontSize: 11 }
+					axisLine: { lineStyle: { color: GRAPHICS_COLORS.grid } },
+					axisTick: { show: false },
+					axisLabel: { fontSize: 11, color: GRAPHICS_COLORS.secondaryText }
 				},
 				yAxis: {
 					type: 'value',
 					max: 35,
-					axisLabel: { formatter: (v: number) => `${v}` }
+					axisLine: { show: false },
+					axisTick: { show: false },
+					splitLine: { lineStyle: { color: GRAPHICS_COLORS.grid, width: 0.5 } },
+					axisLabel: {
+						formatter: (v: number) => `${v}`,
+						color: GRAPHICS_COLORS.secondaryText
+					}
 				},
 				series: series.map((s) => ({
 					name: s.name,
 					type: 'bar',
 					stack: 'total',
-					itemStyle: { color: s.color },
+					itemStyle: {
+						color: s.color,
+						borderColor: GRAPHICS_COLORS.canvas,
+						borderWidth: 0.5
+					},
+					emphasis: {
+						itemStyle: { borderColor: GRAPHICS_COLORS.canvas, borderWidth: 0.5 }
+					},
 					data: residencesByYear.map((d) => d[s.key]),
 					barWidth: '55%',
 					label: {
 						show: true,
 						position: 'inside',
 						formatter: (p: any) => p.value.toFixed(1),
-						fontSize: 11
+						fontSize: 11,
+						color: s.labelColor
 					}
 				})),
 				grid: { left: 40, right: 16, top: 16, bottom: 80 }

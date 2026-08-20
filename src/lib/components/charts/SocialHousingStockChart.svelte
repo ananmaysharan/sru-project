@@ -9,7 +9,7 @@
     import { headlines } from "$lib/data/charts/news-headlines";
     import { asset } from "$app/paths";
     import { STORY_PHASES, phaseProgress } from "$lib/data/charts/scroll-story";
-    import { INTRO_LINE_BLUE } from "$lib/data/charts/chart-colors";
+    import { GRAPHICS_COLORS, INTRO_LINE_BLUE } from "$lib/data/charts/chart-colors";
 
     interface Props {
         /** Normalized scroll progress through the story section, 0 → 1. */
@@ -517,7 +517,7 @@
                             y1={margin.top}
                             x2={x}
                             y2={axisY}
-                            stroke="#d1d5db"
+                            stroke={GRAPHICS_COLORS.grid}
                             stroke-width="1"
                             stroke-dasharray="3 4"
                         />
@@ -552,14 +552,14 @@
                                 y1={cardTopY}
                                 x2={dateX}
                                 y2={dataLineY}
-                                stroke="#9ca3af"
+                                stroke={GRAPHICS_COLORS.contextStrong}
                                 stroke-width="1"
                             />
                         {:else}
                             <polyline
                                 points="{cardX},{cardTopY} {cardX},{railY} {dateX},{railY} {dateX},{dataLineY}"
                                 fill="none"
-                                stroke="#9ca3af"
+                                stroke={GRAPHICS_COLORS.contextStrong}
                                 stroke-width="1"
                             />
                         {/if}
@@ -619,7 +619,7 @@
                             y={axisY + 18}
                             text-anchor="middle"
                             font-size="10"
-                            fill="#6b7280"
+                            fill={GRAPHICS_COLORS.secondaryText}
                         >
                             {d.year}
                         </text>
@@ -643,7 +643,7 @@
                                 y1={startY}
                                 x2={pos.x}
                                 y2={pos.y}
-                                stroke="#9ca3af"
+                                stroke={GRAPHICS_COLORS.contextStrong}
                                 stroke-width="1"
                             />
                         {:else}
@@ -651,7 +651,7 @@
                             <polyline
                                 points="{lineX},{startY} {lineX},{midY} {pos.x},{midY} {pos.x},{pos.y}"
                                 fill="none"
-                                stroke="#9ca3af"
+                                stroke={GRAPHICS_COLORS.contextStrong}
                                 stroke-width="1"
                             />
                         {/if}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import rawCommuneData from '$lib/data/charts/commune-health-index-scatter.json';
+	import { GRAPHICS_COLORS, RISK_SEQUENTIAL_SCALE } from '$lib/data/charts/chart-colors';
 
 	type Period = '2005' | '2008' | '2014' | '2017' | '2020';
 
@@ -34,11 +35,17 @@
 		{ key: '2020', label: '2020-2022' }
 	];
 	const frequencyColors = {
-		4: '#7f0000',
-		3: '#fca5a5',
-		2: '#fd8d3c',
-		1: '#fed976'
+		4: RISK_SEQUENTIAL_SCALE[4],
+		3: RISK_SEQUENTIAL_SCALE[3],
+		2: RISK_SEQUENTIAL_SCALE[2],
+		1: RISK_SEQUENTIAL_SCALE[1]
 	} as const;
+	const frequencyLegend = [
+		{ count: 1, label: '1 period', color: frequencyColors[1] },
+		{ count: 2, label: '2 periods', color: frequencyColors[2] },
+		{ count: 3, label: '3 periods', color: frequencyColors[3] },
+		{ count: 4, label: '4+ periods', color: frequencyColors[4] }
+	] as const;
 	const pageOneRows: Row[] = [
 		{ name: "Chazay-d'Azergues", periods: ['2005', '2008', '2014', '2017'] },
 		{ name: 'Nice', periods: ['2005', '2008', '2014', '2020'] },
@@ -294,6 +301,15 @@
 				</Button>
 			{/each}
 		</div>
+		<div class="frequency-legend" aria-label="Marker colors show repeated noncompliance">
+			<span class="frequency-legend-title">Repeated noncompliance</span>
+			{#each frequencyLegend as item (item.count)}
+				<span class="frequency-legend-item">
+					<span class="frequency-swatch" style={`background:${item.color}`}></span>
+					{item.label}
+				</span>
+			{/each}
+		</div>
 	</div>
 	<div class="list-columns-wrap mx-4 md:mx-12">
 		<div
@@ -311,7 +327,7 @@
 					aria-label={`Noncompliant communes, column ${columnIndex + 1} of ${rowColumns.length}`}
 				>
 					<title>Noncompliant communes (2005-2022), column {columnIndex + 1}</title>
-					<rect width={pageWidth} height={columnHeight} fill="#ffffff" />
+					<rect width={pageWidth} height={columnHeight} fill={GRAPHICS_COLORS.canvas} />
 
 					<g class="noncompliance-text">
 						<text x="106" y="65" class="header-label">Commune</text>
@@ -352,6 +368,36 @@
 		margin-bottom: 16px;
 	}
 
+	.frequency-legend {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 6px 14px;
+		margin: -2px 0 18px;
+		color: #5f5f5f;
+		font-family: 'Open Sans', Arial, ui-sans-serif, system-ui, sans-serif;
+		font-size: 12px;
+	}
+
+	.frequency-legend-title {
+		font-weight: 600;
+		color: #121212;
+	}
+
+	.frequency-legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.frequency-swatch {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: 999px;
+	}
+
 	.list-columns-wrap {
 		padding-bottom: 8px;
 	}
@@ -378,7 +424,7 @@
 	.noncompliance-text {
 		font-family: 'Open Sans', Arial, ui-sans-serif, system-ui, sans-serif;
 		font-stretch: normal;
-		fill: #111111;
+		fill: #121212;
 	}
 
 	.header-label {
@@ -394,7 +440,7 @@
 	}
 
 	.row-rule {
-		stroke: #cbd7db;
+		stroke: #dadad7;
 		stroke-width: 1.6;
 	}
 

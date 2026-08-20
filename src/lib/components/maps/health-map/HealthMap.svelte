@@ -5,6 +5,7 @@
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { Protocol, PMTiles } from 'pmtiles';
 	import { Button } from '$lib/components/ui/button';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import MapSidebar from './MapSidebar.svelte';
 	import {
@@ -125,8 +126,8 @@
 						'fill-opacity': [
 							'case',
 							['boolean', ['feature-state', 'hover'], false],
-							0.9,
-							0.7
+							0.95,
+							0.78
 						]
 					}
 				},
@@ -140,9 +141,24 @@
 					source: 'communes',
 					...sl(communesSourceLayer),
 					paint: {
-						'line-color': '#d1d5db',
-						'line-width': 0.2,
-						'line-opacity': 0.3
+						'line-color': [
+							'case',
+							['boolean', ['feature-state', 'hover'], false],
+							GRAPHICS_COLORS.ink,
+							GRAPHICS_COLORS.grid
+						],
+						'line-width': [
+							'case',
+							['boolean', ['feature-state', 'hover'], false],
+							1.1,
+							0.2
+						],
+						'line-opacity': [
+							'case',
+							['boolean', ['feature-state', 'hover'], false],
+							0.9,
+							0.3
+						]
 					}
 				},
 				firstSymbolId
@@ -155,7 +171,7 @@
 					source: 'regions',
 					...sl(regionsSourceLayer),
 					paint: {
-						'line-color': '#ddd',
+						'line-color': GRAPHICS_COLORS.grid,
 						'line-width': 1
 					}
 				},

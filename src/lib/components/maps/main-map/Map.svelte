@@ -7,6 +7,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Slider } from 'bits-ui';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import MapSidebar from './MapSidebar.svelte';
 	import {
 		mapState,
@@ -30,7 +31,16 @@
 	let regionsSourceLayer = '';
 	let departementsSourceLayer = '';
 	let usePmtiles = false;
-	const timelineAccent = '#06738b';
+	const timelineAccent = GRAPHICS_COLORS.primary;
+
+	function choroplethWithHover() {
+		return [
+			'case',
+			['boolean', ['feature-state', 'hover'], false],
+			GRAPHICS_COLORS.focus,
+			mapState.buildChoroplethExpression()
+		] as unknown as maplibregl.ExpressionSpecification;
+	}
 
 	function flyTo(center: [number, number], zoom: number) {
 		mapInstance?.flyTo({ center, zoom, duration: 1500 });
@@ -45,7 +55,7 @@
 	function applyChoropleth() {
 		const map = mapInstance;
 		if (!map) return;
-		const expr = mapState.buildChoroplethExpression() as maplibregl.ExpressionSpecification;
+		const expr = choroplethWithHover();
 
 		if (mapState.activeTab === 'communes') {
 			if (map.getLayer('communes-fill')) {
@@ -184,7 +194,7 @@
 					source: 'communes',
 					...sl(communesSourceLayer),
 					paint: {
-						'fill-color': mapState.buildChoroplethExpression() as maplibregl.ExpressionSpecification,
+						'fill-color': choroplethWithHover(),
 						'fill-opacity': [
 							'case',
 							['boolean', ['feature-state', 'hover'], false],
@@ -203,7 +213,7 @@
 					source: 'communes',
 					...sl(communesSourceLayer),
 					paint: {
-						'line-color': '#d1d5db',
+						'line-color': GRAPHICS_COLORS.grid,
 						'line-width': 0.2,
 						'line-opacity': 0.3
 					}
@@ -240,7 +250,7 @@
 					...sl(departementsSourceLayer),
 					layout: { visibility: 'none' },
 					paint: {
-						'line-color': '#9ca3af',
+						'line-color': GRAPHICS_COLORS.contextStrong,
 						'line-width': 0.5,
 						'line-opacity': 0.6
 					}
@@ -256,7 +266,7 @@
 					source: 'regions',
 					...sl(regionsSourceLayer),
 					paint: {
-						'line-color': '#ddd',
+						'line-color': GRAPHICS_COLORS.grid,
 						'line-width': 1
 					}
 				},

@@ -4,6 +4,7 @@
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as Select from '$lib/components/ui/select';
 	import * as Tabs from '$lib/components/ui/tabs';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import {
 		mapState,
 		communeLookup,
@@ -186,6 +187,13 @@
 					</span>
 				</div>
 			{/each}
+			<div class="mt-1 flex items-center gap-1.5">
+				<span
+					class="inline-block h-3 w-4 rounded-sm border"
+					style={`background:${GRAPHICS_COLORS.noData};border-color:${GRAPHICS_COLORS.grid}`}
+				></span>
+				<span class="text-xs text-gray-600">No data</span>
+			</div>
 		</div>
 	</div>
 </div>

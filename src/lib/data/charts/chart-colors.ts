@@ -1,48 +1,81 @@
-export const INTRO_LINE_BLUE = '#06738b';
+/**
+ * Shared graphics palette.
+ *
+ * Color is assigned by meaning rather than by component: teal carries the SRU
+ * story, orange directs attention, warm colors communicate repeated risk, and
+ * neutrals provide context. Keep categorical comparisons to four colors or
+ * fewer and use direct labels wherever possible. Region-comparison graphics
+ * are the deliberate exception: each region keeps one stable identity color
+ * across the scatterplot, donut, and regional bars.
+ */
+export const GRAPHICS_COLORS = {
+	ink: '#121212',
+	secondaryText: '#5f5f5f',
+	grid: '#dadad7',
+	context: '#e6e6e2',
+	contextStrong: '#a8a8a5',
+	noData: '#efede8',
+	surface: '#f7f6f2',
+	canvas: '#ffffff',
+	primary: '#497380',
+	primaryDark: '#315a67',
+	primaryMid: '#7ea0a8',
+	primaryLight: '#bfd2d5',
+	focus: '#d97f18',
+	plum: '#785171',
+	blue: '#3b64a1',
+	alert: '#bc3939'
+} as const;
 
-export const BRIGHT_CHART_PALETTE = [
-	'#1aa6a8',
-	'#ef3b7d',
-	'#318ce7',
-	'#3f9f4a',
-	'#f5c400',
-	'#00b5d8',
-	'#73bf43',
-	'#ff6f61',
-	'#00a878',
-	'#4f8bd6',
-	'#d84a8a',
-	'#9aa52d',
-	'#0072b2',
-	'#5da5da',
-	'#e15759',
-	'#17becf',
-	'#757575',
-	'#b3a500',
-	'#26a69a',
-	'#8da000'
-];
+/** Low to high values for ordinary SRU quantities. */
+export const SRU_SEQUENTIAL_SCALE = [
+	'#eff4f4',
+	'#d8e5e5',
+	'#bcd3d5',
+	'#93b7bc',
+	'#6a969f',
+	GRAPHICS_COLORS.primary,
+	GRAPHICS_COLORS.primaryDark
+] as const;
 
+/** Low to high recurrence or risk. */
+export const RISK_SEQUENTIAL_SCALE = [
+	'#fff2d8',
+	'#ffcc83',
+	'#ff9750',
+	'#d84a3c',
+	'#992d3c'
+] as const;
+
+/** Maximum four simultaneous comparison series. */
+export const COMPARISON_PALETTE = [
+	GRAPHICS_COLORS.primary,
+	GRAPHICS_COLORS.focus,
+	GRAPHICS_COLORS.plum,
+	GRAPHICS_COLORS.blue
+] as const;
+
+/** Stable regional identities for graphics whose subject is the regions. */
 export const REGION_COLORS: Record<string, string> = {
-	'auvergne-rhone-alpes': '#1aa6a8',
-	'bourgogne-franche-comte': '#f5c400',
-	bretagne: '#3f9f4a',
-	'centre-val de loire': '#ef3b7d',
-	corse: '#9aa52d',
-	'grand est': '#00a878',
-	guadeloupe: '#26a69a',
-	guyane: '#73bf43',
-	'hauts-de-france': '#00b5d8',
-	'ile-de-france': '#318ce7',
-	'la reunion': '#b3a500',
-	martinique: '#d84a8a',
-	mayotte: '#757575',
-	normandie: '#5da5da',
-	'nouvelle-aquitaine': '#e15759',
-	occitanie: '#ff6f61',
-	'pays de la loire': '#4f8bd6',
-	"provence-alpes-cote d'azur": '#0072b2',
-	'outre-mer': '#8da000'
+	'auvergne-rhone-alpes': GRAPHICS_COLORS.primary,
+	'bourgogne-franche-comte': '#b58b28',
+	bretagne: '#4f7c5d',
+	'centre-val de loire': '#a8556f',
+	corse: '#7c7a3c',
+	'grand est': '#2f7d72',
+	guadeloupe: '#3f8f8b',
+	guyane: '#6f8c3d',
+	'hauts-de-france': '#4f88a3',
+	'ile-de-france': GRAPHICS_COLORS.blue,
+	'la reunion': '#a98a2f',
+	martinique: GRAPHICS_COLORS.plum,
+	mayotte: '#6f6f6c',
+	normandie: '#6b8fac',
+	'nouvelle-aquitaine': '#b84b4b',
+	occitanie: GRAPHICS_COLORS.focus,
+	'pays de la loire': '#6766a5',
+	"provence-alpes-cote d'azur": GRAPHICS_COLORS.primaryDark,
+	'outre-mer': '#8b7740'
 };
 
 export function normalizeRegionName(region: string) {
@@ -54,5 +87,19 @@ export function normalizeRegionName(region: string) {
 }
 
 export function colorForRegionName(region: string) {
-	return REGION_COLORS[normalizeRegionName(region)] ?? '#6b7280';
+	return REGION_COLORS[normalizeRegionName(region)] ?? GRAPHICS_COLORS.contextStrong;
 }
+
+/** Tonal rather than categorical: labels and interaction identify pie slices. */
+export const PIE_TONAL_PALETTE = [
+	GRAPHICS_COLORS.primaryDark,
+	GRAPHICS_COLORS.primary,
+	GRAPHICS_COLORS.primaryMid,
+	'#9db7bc',
+	GRAPHICS_COLORS.primaryLight,
+	'#d3e0e2',
+	GRAPHICS_COLORS.contextStrong
+] as const;
+
+// Compatibility name retained for the two long-form stock charts.
+export const INTRO_LINE_BLUE = GRAPHICS_COLORS.primary;

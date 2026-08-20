@@ -2,6 +2,7 @@ import sruData from '$lib/data/map/sru-communes.json';
 import deptData from '$lib/data/map/sru-departements.json';
 import communeLookup from '$lib/data/map/commune-lookup.json';
 import departementLookup from '$lib/data/map/departement-lookup.json';
+import { GRAPHICS_COLORS, SRU_SEQUENTIAL_SCALE } from '$lib/data/charts/chart-colors';
 
 // --- Types ---
 export type MetricType =
@@ -82,42 +83,42 @@ export type MetricConfig = {
 	suffix: string;
 };
 
-const BLUE_SCALE = ['#f7fbff', '#c6dbef', '#6baed6', '#3182bd', '#1d6aaf', '#08519c', '#08306b'];
+const SRU_SCALE = [...SRU_SEQUENTIAL_SCALE];
 
 export const METRIC_CONFIG: Record<MetricType, MetricConfig> = {
 	rate: {
 		breaks: [0, 5, 10, 15, 20, 25, 30],
-		colors: BLUE_SCALE,
+		colors: SRU_SCALE,
 		label: 'SRU Rate (%)',
 		suffix: '%'
 	},
 	units: {
 		breaks: [0, 50, 200, 500, 1000, 3000, 5000],
-		colors: BLUE_SCALE,
+		colors: SRU_SCALE,
 		label: 'Social Units',
 		suffix: ''
 	},
 	social_per_10k: {
 		breaks: [0, 200, 400, 600, 800, 1000, 1400],
-		colors: BLUE_SCALE,
+		colors: SRU_SCALE,
 		label: 'Social housing units by 10,000 residents',
 		suffix: ''
 	},
 	single_family_pct: {
 		breaks: [0, 5, 10, 20, 30, 40, 50],
-		colors: BLUE_SCALE,
+		colors: SRU_SCALE,
 		label: 'Share of single-family social housing (%)',
 		suffix: '%'
 	},
 	multi_family_pct: {
 		breaks: [50, 60, 70, 80, 90, 95, 100],
-		colors: BLUE_SCALE,
+		colors: SRU_SCALE,
 		label: 'Share of multi-family social housing (%)',
 		suffix: '%'
 	},
 	avg_rent_per_sqm: {
 		breaks: [0, 5, 5.5, 6, 6.5, 7, 8],
-		colors: BLUE_SCALE,
+		colors: SRU_SCALE,
 		label: 'Average rent per square meter (\u20AC)',
 		suffix: '\u20AC'
 	}
@@ -226,7 +227,7 @@ export class MapState {
 					: yearData.social;
 			expr.push(code, valueToColor(value, breaks, colors));
 		}
-		expr.push('transparent');
+		expr.push(GRAPHICS_COLORS.noData);
 		return expr;
 	}
 
@@ -250,7 +251,7 @@ export class MapState {
 			}
 			expr.push(code, valueToColor(value, breaks, colors));
 		}
-		expr.push('transparent');
+		expr.push(GRAPHICS_COLORS.noData);
 		return expr;
 	}
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { INTRO_LINE_BLUE } from '$lib/data/charts/chart-colors';
+	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { nationalHousingStock } from '$lib/data/charts/national-housing-stock';
 
 	let chartEl: HTMLDivElement;
@@ -19,17 +19,20 @@
 				tooltip: {
 					trigger: 'axis',
 					showContent: false,
-					axisPointer: { type: 'line' }
+					axisPointer: {
+						type: 'line',
+						lineStyle: { color: GRAPHICS_COLORS.secondaryText, width: 1 }
+					}
 				},
 				grid: { left: 56, right: 16, top: 16, bottom: 80 },
 				xAxis: {
 					type: 'category',
 					data: years,
-					axisLine: { show: true },
+					axisLine: { show: true, lineStyle: { color: GRAPHICS_COLORS.grid } },
 					axisTick: { show: false },
 					axisLabel: {
 						fontSize: 11,
-						color: '#000',
+						color: GRAPHICS_COLORS.secondaryText,
 						interval: 0,
 						rotate: 90
 					}
@@ -43,11 +46,11 @@
 					axisTick: { show: false },
 					splitLine: {
 						show: true,
-						lineStyle: { color: '#B6B3B3', type: 'dashed', width: 0.5 }
+						lineStyle: { color: GRAPHICS_COLORS.grid, type: 'dashed', width: 0.5 }
 					},
 					axisLabel: {
 						fontSize: 11,
-						color: '#000',
+						color: GRAPHICS_COLORS.secondaryText,
 						formatter: (v: number) => v.toLocaleString()
 					}
 				},
@@ -56,8 +59,8 @@
 						type: 'bar',
 						data: values,
 						barWidth: '60%',
-						itemStyle: { color: INTRO_LINE_BLUE },
-						emphasis: { disabled: true }
+						itemStyle: { color: GRAPHICS_COLORS.primary },
+						emphasis: { itemStyle: { color: GRAPHICS_COLORS.focus } }
 					}
 				]
 			});

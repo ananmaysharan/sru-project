@@ -1,6 +1,8 @@
 <script lang="ts">
     import HealthMap from "$lib/components/maps/health-map/HealthMap.svelte";
     import CommuneHealthIndexScatter from "$lib/components/charts/CommuneHealthIndexScatter.svelte";
+    import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
+    import editorialContent from "$lib/data/editorial-content.md?raw";
     import {
         METRIC_CONFIG,
         MapState,
@@ -38,7 +40,7 @@
 
     <div class="max-w-3xl mx-auto mt-16 px-4 sm:px-6">
         <h3 class="text-2xl font-bold">
-            Where did social housing grow since the early 2000s--amenity-rich
+			Where did social housing grow since the early 2000s—amenity-rich
             vs. amenity-poor areas?
         </h3>
     </div>
@@ -50,12 +52,12 @@
         <h3 class="text-2xl font-bold">
             Social housing growth and health outcomes
         </h3>
-        <p class="mt-4 text-gray-700">
-            Use the selector to compare the weighted average or one outcome
-            with the cumulative social housing share from 2005 to 2022. You can
-            search for a commune or filter the chart by region.
-        </p>
     </div>
+    <EditorialMarkdown
+        source={editorialContent}
+        section="health-chart"
+        compact
+    />
     <div class="max-w-7xl mx-auto mt-8 px-4 sm:px-6">
         <CommuneHealthIndexScatter />
     </div>
@@ -106,4 +108,10 @@
             {METRIC_CONFIG.health.description}
         </p>
     </div>
+
+    <EditorialMarkdown
+        source={editorialContent}
+        section="health-method"
+        compact
+    />
 </section>
