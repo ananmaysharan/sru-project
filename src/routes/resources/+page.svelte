@@ -1,16 +1,17 @@
 <script lang="ts">
-	import { resourceDate, resourceSections } from '$lib/data/resources/sru-news-index';
+	import { resourceSections } from '$lib/data/resources/sru-news-index';
 </script>
 
-<section id="resources" class="py-12">
-	<div class="max-w-3xl mx-auto px-4 sm:px-6">
-		<h2 class="text-3xl font-bold">Resources</h2>
+
+<section id="resources" class="page-shell">
+	<div class="prose-column">
+		<h1 class="page-title">Resources</h1>
 		
-		<div class="mt-6 space-y-8 text-base text-gray-700">
+		<div class="index-groups text-gray-700">
 			{#each resourceSections as section (section.title)}
-				<div>
-					<h3 class="text-lg font-semibold text-gray-900">{section.title}</h3>
-					<ul class="mt-2 space-y-3 list-none">
+				<section class="index-group">
+					<h2>{section.title}</h2>
+					<ul>
 						{#each section.items as item}
 							<li>
 								{item.text}
@@ -27,7 +28,7 @@
 							</li>
 						{/each}
 					</ul>
-				</div>
+				</section>
 			{/each}
 		</div>
 	</div>

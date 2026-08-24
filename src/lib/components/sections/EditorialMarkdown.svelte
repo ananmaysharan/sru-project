@@ -8,16 +8,19 @@
         source,
         section,
         compact = false,
+        render = "all",
     }: {
         source: string;
         section: EditorialSectionKey;
         compact?: boolean;
+        render?: "all" | "content" | "notes";
     } = $props();
 
     const story = $derived(parseEditorialStory(source, section));
 
     const sectionLabels: Record<EditorialSectionKey, string> = {
         introduction: "Introduction project essay",
+        "dashboard-guide": "Using the dashboard",
         supply: "Methods and stance project essay",
         "health-chart": "Health chart guidance",
         "health-method": "Health methods note",
@@ -26,35 +29,37 @@
 </script>
 
 <section
-    id={`editorial-${section}`}
+    id={render === "notes" ? `editorial-${section}-notes` : `editorial-${section}`}
     class:compact
     class="editorial-section"
     aria-label={sectionLabels[section]}
 >
     <article class="editorial-article">
-        {#each story.blocks as block}
-            {#if block.type === "heading" && block.level === 2}
-                <h2 id={block.id}>{@html block.html}</h2>
-            {:else if block.type === "heading"}
-                <h3 id={block.id}>{@html block.html}</h3>
-            {:else if block.type === "paragraph"}
-                <p>{@html block.html}</p>
-            {:else if block.ordered}
-                <ol>
-                    {#each block.items as item}
-                        <li>{@html item}</li>
-                    {/each}
-                </ol>
-            {:else}
-                <ul>
-                    {#each block.items as item}
-                        <li>{@html item}</li>
-                    {/each}
-                </ul>
-            {/if}
-        {/each}
+        {#if render !== "notes"}
+            {#each story.blocks as block}
+                {#if block.type === "heading" && block.level === 2}
+                    <h2 id={block.id}>{@html block.html}</h2>
+                {:else if block.type === "heading"}
+                    <h3 id={block.id}>{@html block.html}</h3>
+                {:else if block.type === "paragraph"}
+                    <p>{@html block.html}</p>
+                {:else if block.ordered}
+                    <ol>
+                        {#each block.items as item}
+                            <li>{@html item}</li>
+                        {/each}
+                    </ol>
+                {:else}
+                    <ul>
+                        {#each block.items as item}
+                            <li>{@html item}</li>
+                        {/each}
+                    </ul>
+                {/if}
+            {/each}
+        {/if}
 
-        {#if story.notes.length}
+        {#if render !== "content" && story.notes.length}
             <aside class="editorial-notes" role="doc-endnotes" aria-label="Footnotes">
                 <ol start={story.notes[0].number}>
                     {#each story.notes as note}
@@ -77,17 +82,19 @@
 <style>
     .editorial-section {
         scroll-margin-top: 4.5rem;
-        padding: clamp(3.75rem, 6vw, 5rem) 1.5rem clamp(2rem, 4vw, 3rem);
+        padding: var(--space-xl) var(--page-gutter) var(--space-lg);
         background: #fff;
     }
 
     .editorial-section.compact {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
+        padding-top: var(--space-lg);
+        padding-bottom: var(--space-lg);
     }
 
     .editorial-article {
-        width: min(100%, 46rem);
+        /* Match the readable width of `max-w-3xl px-4 sm:px-6` prose
+           containers used by the surrounding route sections. */
+        width: min(100%, var(--measure));
         margin: 0 auto;
         color: #252525;
         font-family: inherit;
@@ -98,7 +105,7 @@
 
     .editorial-article h2 {
         scroll-margin-top: 6rem;
-        margin: clamp(2.75rem, 4.5vw, 3.5rem) 0 1rem;
+        margin: clamp(3rem, 5vw, 4rem) 0 1rem;
         color: #111;
         font-family: "Open Sans", ui-sans-serif, system-ui, sans-serif;
         font-size: clamp(1.75rem, 1.45rem + 0.9vw, 2.35rem);
@@ -113,16 +120,16 @@
     }
 
     .editorial-article h3 {
-        margin: clamp(1.75rem, 3vw, 2.25rem) 0 0.55rem;
+        margin: clamp(2rem, 3.5vw, 2.75rem) 0 0.65rem;
         color: #181818;
         font-size: 1.15em;
-        font-style: italic;
+        font-style: normal;
         font-weight: 700;
         line-height: 1.35;
     }
 
     .editorial-article p {
-        margin: 0 0 1.2rem;
+        margin: 0 0 1.25rem;
     }
 
     .editorial-article ul,
@@ -201,9 +208,9 @@
         text-decoration: none !important;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 639.98px) {
         .editorial-section {
-            padding: 3rem 1.25rem 2.5rem;
+            padding: var(--space-lg) 1rem;
         }
 
         .editorial-article h2 {

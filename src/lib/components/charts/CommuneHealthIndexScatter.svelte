@@ -147,10 +147,11 @@
 	const points = rawData as CommuneScatterPoint[];
 	const width = 960;
 	const height = 560;
-	const margin = { top: 24, right: 28, bottom: 56, left: 64 };
+	const margin = { top: 28, right: 28, bottom: 56, left: 64 };
 	const plotWidth = width - margin.left - margin.right;
 	const plotHeight = height - margin.top - margin.bottom;
 	const targetShare = 0.25;
+	const quotaLabelWidth = 250;
 	const xLabelMin = 0;
 	const xLabelMax = 1;
 	const xDomainMin = 0;
@@ -192,6 +193,9 @@
 	let transformedXScale = $derived(xScale.copy().domain(xDomain));
 	let transformedYScale = $derived(yScale.copy().domain(yDomain));
 	let xTicks = $derived(transformedXScale.ticks(10).filter((tick) => tick >= xLabelMin && tick <= xLabelMax));
+	let targetLineX = $derived(transformedXScale(targetShare));
+	let targetLineVisible = $derived(targetLineX >= margin.left && targetLineX <= width - margin.right);
+	let quotaLabelX = $derived(targetLineX - quotaLabelWidth / 2);
 	let metricPoints = $derived(points.filter((point) => metricValueOrNull(point) !== null));
 	let rankedPoints = $derived(
 		activeRanking ? metricPoints.filter((point) => point.rankGroup === activeRanking) : metricPoints
@@ -782,7 +786,7 @@
 		<div>
 			<p class="control-label">Outcome measure</p>
 			<Select.Root type="single" value={activeMetric} onValueChange={handleMetricChange}>
-				<Select.Trigger class="w-full">
+				<Select.Trigger class="w-full" aria-label="Health outcome measure">
 					{metricConfig[activeMetric].shortLabel}
 				</Select.Trigger>
 				<Select.Content>
@@ -804,7 +808,8 @@
 				<div class="search-wrap" bind:this={searchInputEl}>
 					<SearchIcon class="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
 					<Combobox.Input
-						placeholder="Search commune"
+						aria-label="Search for a commune"
+						placeholder="Search commune…"
 						class="flex h-9 w-full rounded-md border border-input bg-transparent pl-8 pr-8 py-1 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 						oninput={handleSearchInput}
 						onkeydown={handleSearchKeydown}
@@ -889,9 +894,8 @@
 		</div>
 	</aside>
 
-	<div class="chart-panel" bind:this={chartPanelEl}>
-		<p class="quota-label-above">mandatory 25% municipal social housing quota</p>
-		<svg
+		<div class="chart-panel" bind:this={chartPanelEl}>
+			<svg
 			viewBox={`0 0 ${width} ${height}`}
 			role="img"
 			aria-label={`Commune cumulative social housing share evolution by ${metricConfig[activeMetric].label}`}
@@ -932,16 +936,40 @@
 		<text x={margin.left - 12} y={transformedYScale(tick) + 4} text-anchor="end" class="axis-label">{tick}</text>
 	{/each}
 
-	<line
-		x1={transformedXScale(targetShare)}
-		x2={transformedXScale(targetShare)}
-		y1={margin.top}
-		y2={height - margin.bottom}
-		stroke={GRAPHICS_COLORS.secondaryText}
-		stroke-dasharray="6 6"
-		stroke-width="1"
-		clip-path="url(#commune-scatter-plot-area)"
-	/>
+		<line
+			x1={targetLineX}
+			x2={targetLineX}
+			y1={margin.top}
+			y2={height - margin.bottom}
+			stroke={GRAPHICS_COLORS.secondaryText}
+			stroke-dasharray="5 4"
+			stroke-width="1.6"
+			stroke-opacity="0.9"
+			clip-path="url(#commune-scatter-plot-area)"
+		/>
+		{#if targetLineVisible}
+			<g
+				class="quota-annotation"
+				transform={`translate(${quotaLabelX} ${margin.top - 26})`}
+				aria-hidden="true"
+			>
+				<rect
+					width={quotaLabelWidth}
+					height="20"
+					rx="0"
+					ry="0"
+					class="quota-label-box"
+				/>
+				<text
+					x={quotaLabelWidth / 2}
+					y="13.5"
+					text-anchor="middle"
+					class="quota-label-text"
+				>
+					mandatory 25% municipal social housing quota
+				</text>
+			</g>
+		{/if}
 	<line
 		x1={margin.left}
 		x2={width - margin.right}
@@ -1101,12 +1129,17 @@
 		font-size: 11px;
 	}
 
-	.quota-label-above {
-		margin: 0 0 4px;
-		color: #5f5f5f;
+	.quota-label-box {
+		fill: #fff;
+		stroke: #5f5f5f;
+		stroke-width: 0.9px;
+	}
+
+	.quota-label-text {
+		fill: #121212;
 		font-size: 10px;
-		font-weight: 500;
-		text-align: center;
+		font-weight: 600;
+		pointer-events: none;
 	}
 
 	.point-label {

@@ -7,45 +7,64 @@
 	import { dromComTerritories } from '$lib/data/charts/drom-com-summary';
 
 	let selectedName = $state(dromComTerritories[0].name);
-	let selected = $derived(dromComTerritories.find((t) => t.name === selectedName)!);
-
+	let selected = $derived(dromComTerritories.find((territory) => territory.name === selectedName)!);
 	let mapContainer: HTMLDivElement;
 	let mapInstance: maplibregl.Map | null = null;
+	const territoryPadding = 32;
 
-	function formatNumber(n: number): string {
-		return n.toLocaleString('en-US');
+	function formatNumber(value: number): string {
+		return value.toLocaleString('en-US');
 	}
 
-	function handleSelect(v: string | undefined) {
-		if (!v) return;
-		selectedName = v;
-		const territory = dromComTerritories.find((t) => t.name === v);
-		if (territory && mapInstance) {
-			mapInstance.flyTo({ center: territory.center, zoom: territory.zoom, duration: 1500 });
-		}
+	function fitTerritory(territory: (typeof dromComTerritories)[number], duration = 0) {
+		if (!mapInstance) return;
+		mapInstance.resize();
+		mapInstance.fitBounds(territory.bounds, {
+			padding: territoryPadding,
+			maxZoom: 13,
+			duration
+		});
+	}
+
+	function handleSelect(value: string | undefined) {
+		if (!value) return;
+		selectedName = value;
+		const territory = dromComTerritories.find((item) => item.name === value);
+		if (territory) fitTerritory(territory, 900);
 	}
 
 	onMount(() => {
 		const map = new maplibregl.Map({
 			container: mapContainer,
 			style: 'https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC',
-			center: selected.center,
-			zoom: selected.zoom,
+			bounds: selected.bounds,
+			fitBoundsOptions: {
+				padding: territoryPadding,
+				maxZoom: 13
+			},
 			attributionControl: false
 		});
 		map.addControl(new maplibregl.AttributionControl({ compact: true }));
 		map.addControl(new maplibregl.NavigationControl(), 'top-right');
 		mapInstance = map;
 
-		return () => map.remove();
+		let resizeFrame = 0;
+		const resizeObserver = new ResizeObserver(() => {
+			cancelAnimationFrame(resizeFrame);
+			resizeFrame = requestAnimationFrame(() => fitTerritory(selected));
+		});
+		resizeObserver.observe(mapContainer);
+
+		return () => {
+			resizeObserver.disconnect();
+			cancelAnimationFrame(resizeFrame);
+			map.remove();
+		};
 	});
 </script>
 
 <div class="border border-gray-200 bg-white flex flex-col gap-0">
-	<!-- Map -->
-
 	<div class="p-5 flex flex-col gap-4">
-		<!-- Territory selector -->
 		<Select.Root type="single" value={selectedName} onValueChange={handleSelect}>
 			<Select.Trigger class="w-full">
 				{selectedName}
@@ -57,13 +76,11 @@
 			</Select.Content>
 		</Select.Root>
 
-		<!-- Location & classification pills -->
 		<div class="flex flex-wrap gap-1.5">
 			<Badge variant="secondary">{selected.location}</Badge>
 			<Badge variant="outline">{selected.status}</Badge>
 		</div>
 
-		<!-- Stats boxes -->
 		<div class="flex gap-3">
 			<div class="flex-1 border border-gray-200 rounded-md p-3 text-center">
 				<p class="text-lg font-semibold text-gray-900">{formatNumber(selected.population)}</p>
@@ -79,8 +96,7 @@
 			</div>
 		</div>
 
-			<div bind:this={mapContainer} class="locator-map w-full h-96"></div>
-
+		<div bind:this={mapContainer} class="locator-map w-full h-96"></div>
 	</div>
 </div>
 

@@ -1,5 +1,6 @@
 export type EditorialSectionKey =
     | "introduction"
+    | "dashboard-guide"
     | "supply"
     | "health-method"
     | "health-chart"
@@ -19,6 +20,7 @@ export type EditorialStory = {
 
 const markerToKey = (line: string): EditorialSectionKey | null => {
     if (!line.includes("THIS TEXT PORTION BELOW GOES IN")) return null;
+    if (line.includes("USING THE DASHBOARD")) return "dashboard-guide";
     if (line.includes("INTRODUCTION PAGE")) return "introduction";
     if (line.includes("NYMBERS PAGE")) return "supply";
     if (line.includes("POST-OCCUPANCY EVALUATION PAGE")) return "post-occupancy";

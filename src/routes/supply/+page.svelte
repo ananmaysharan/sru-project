@@ -1,24 +1,26 @@
 <script lang="ts">
     import Map from "$lib/components/maps/main-map/Map.svelte";
     import EuropeanMap from "$lib/components/maps/european-map/EuropeanMap.svelte";
-    import SupplyLineChart from "$lib/components/charts/SupplyLineChart.svelte";
     import ResidencesStackedChart from "$lib/components/charts/ResidencesStackedChart.svelte";
     import SupplyPieChart from "$lib/components/charts/SupplyPieChart.svelte";
     import SupplyRegionalChart from "$lib/components/charts/SupplyRegionalChart.svelte";
-    import DromComCard from "$lib/components/charts/DromComCard.svelte";
+    import DromComAtlas from "$lib/components/charts/DromComAtlas.svelte";
+    import EuropeanAtlas from "$lib/components/charts/EuropeanAtlas.svelte";
     import NationalHousingStockChart from "$lib/components/charts/NationalHousingStockChart.svelte";
     import NonComplianceChart from "$lib/components/charts/NonComplianceChart.svelte";
     import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
     import editorialContent from "$lib/data/editorial-content.md?raw";
+
+    const showOriginalEuropeanMap = false;
 </script>
 
-<section id="supply" class="py-12">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h2 class="text-3xl font-bold">The Numbers</h2>
-        <p class="mt-2 text-lg text-gray-600">
+<section id="supply" class="page-shell">
+    <div class="prose-column">
+        <h1 class="page-title">The Numbers</h1>
+        <p class="page-deck">
             An increase in production, a geographic redistribution
         </p>
-        <p class="mt-4 text-gray-700">
+        <p class="page-intro-body">
             Over the past two decades, France has steadily expanded its stock of
             social housing, but this growth has not been evenly shared across
             the country. New units have been concentrated in certain regions and
@@ -28,27 +30,27 @@
         </p>
     </div>
 
-    <div class="mx-4 mt-8 flex flex-col gap-4 md:mx-12 md:flex-row">
-        <div class="flex-1 min-w-0 border border-gray-200 rounded-none p-4">
-            <h4 class="text-sm font-semibold text-gray-700">
+    <div class="wide-column visual-grid">
+        <article class="visual-card">
+            <h3 class="visual-title">
                 Evolution of national French social housing stock (1920–2022)
-            </h4>
-            <p class="text-xs text-gray-400 mb-2">Source: RPLS 2023</p>
-            <div class="h-96">
+            </h3>
+            <p class="visual-caption">Source: RPLS 2023</p>
+            <div class="chart-frame">
                 <NationalHousingStockChart />
             </div>
-        </div>
-        <div class="flex-1 min-w-0 border border-gray-200 rounded-none p-4">
-            <h4 class="text-sm font-semibold text-gray-700">
+        </article>
+        <article class="visual-card">
+            <h3 class="visual-title">
                 France: Main Type of Residences Occupied (1984–2023)
-            </h4>
-            <p class="text-xs text-gray-400 mb-2">
+            </h3>
+            <p class="visual-caption">
 				Millions of occupied residences, by tenure
             </p>
-            <div class="h-96">
+            <div class="chart-frame">
                 <ResidencesStackedChart />
             </div>
-        </div>
+        </article>
     </div>
 
     <!-- <div class="max-w-3xl mx-auto mt-8 px-4 sm:px-6">
@@ -62,9 +64,9 @@
 		</div>
 	</div> -->
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h3 class="mt-12 text-2xl font-semibold">Regional Breakdown</h3>
-        <p class="mt-4 text-gray-700">
+    <div class="prose-column section-copy">
+        <h2 class="section-title">Regional Breakdown</h2>
+        <p class="section-body">
             Looking at the data by region reveals stark contrasts in
             social‑housing provision. Some regions, often those with
             long‑standing public‑housing traditions or acute affordability
@@ -74,31 +76,32 @@
             households can realistically live.
         </p>
     </div>
-    <div class="mx-4 mt-8 flex flex-col gap-4 md:mx-12 md:flex-row">
-        <div class="flex-1 min-w-0 border border-gray-200 rounded-none p-4">
-            <h4 class="text-sm font-semibold text-gray-700">
+    <div class="wide-column visual-grid">
+        <article class="visual-card">
+            <h3 class="visual-title">
                 Social Housing Unit Distribution (2022)
-            </h4>
-            <p class="text-xs text-gray-400 mb-2">
+            </h3>
+            <p class="visual-caption">
                 Click on a region to see its departments
             </p>
-            <div class="h-100">
+            <div class="chart-frame">
                 <SupplyPieChart />
             </div>
-        </div>
-        <div class="flex-1 min-w-0 border border-gray-200 rounded-none p-4">
-            <h4 class="text-sm font-semibold text-gray-700 mb-2">
+        </article>
+        <article class="visual-card">
+            <h3 class="visual-title">
                 Social Housing Units per 10,000 Inhabitants (2023)
-            </h4>
-            <div class="h-100">
+            </h3>
+            <p class="visual-caption">Regional rate comparison</p>
+            <div class="chart-frame">
                 <SupplyRegionalChart />
             </div>
-        </div>
+        </article>
     </div>
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h3 class="mt-12 text-2xl font-semibold">Supply Map</h3>
-        <p class="mt-4 text-gray-700">
+    <div class="prose-column section-copy">
+        <h2 class="section-title">Supply Map</h2>
+        <p class="section-body">
             This interactive map makes it possible to zoom in from regions to
             departments and communes to see how the SRU objectives translate on
             the ground. By toggling variables such as the SRU rate, users can
@@ -112,18 +115,18 @@
 			<p><span class="font-medium text-gray-800">Total Supply</span> — Absolute number of social housing units (logements sociaux) counted in the commune.</p>
 		</div> -->
     </div>
-    <div class="mt-4">
-        <div class="mx-4 h-[60vh] min-h-80 md:mx-12 md:h-175">
+    <div class="wide-column visual-block">
+        <div class="map-frame">
             <Map />
         </div>
     </div>
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h3 class="mt-12 text-2xl font-semibold">Non-Compliance (2005–2022)</h3>
-        <p class="mt-2 text-lg text-gray-600">
+    <div class="prose-column section-copy">
+        <h2 class="section-title">Non-Compliance (2005–2022)</h2>
+        <p class="section-deck">
             Which communes did not meet their objectives?
         </p>
-        <p class="mt-4 text-gray-700">
+        <p class="section-body">
             Despite the overall increase in social‑housing units, many communes
             repeatedly fail to meet their legally required SRU quotas. This
             section tracks, year by year, which municipalities were officially
@@ -147,9 +150,9 @@
     </div> -->
     <NonComplianceChart />
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-		<h3 class="mt-12 text-2xl font-semibold">Overseas Territories</h3>
-        <p class="mt-4 text-gray-700">
+    <div class="prose-column section-copy">
+		<h2 class="section-title">Overseas Territories</h2>
+        <p class="section-body">
             In France’s overseas territories, the dynamics of social housing are
             shaped by rapid demographic growth, colonial legacies, and high
             levels of poverty. Although some territories display relatively high
@@ -159,14 +162,14 @@
             intersects with broader struggles over land, environment, and basic
             services.
         </p>
-        <div class="mx-auto mt-6">
-            <DromComCard />
-        </div>
     </div>
+	<div class="wide-column atlas-block">
+		<DromComAtlas />
+	</div>
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h3 class="mt-12 text-2xl font-semibold">European Context</h3>
-        <p class="mt-4 text-gray-700">
+    <div class="prose-column section-copy">
+        <h2 class="section-title">European Context</h2>
+        <p class="section-body">
             Placing France alongside its European neighbors underscores that
             social housing systems can be organized in very different ways. Some
             countries treat social housing as a large, universal sector, while
@@ -176,10 +179,15 @@
             regulate inequality and segregation.
         </p>
     </div>
-    <div class="mt-4">
-        <div class="mx-4 h-[60vh] min-h-80 md:mx-12 md:h-175">
-            <EuropeanMap />
+    {#if showOriginalEuropeanMap}
+        <div class="wide-column visual-block">
+            <div class="map-frame">
+                <EuropeanMap />
+            </div>
         </div>
+    {/if}
+    <div class="wide-column atlas-block">
+        <EuropeanAtlas />
     </div>
 
     <EditorialMarkdown source={editorialContent} section="supply" />

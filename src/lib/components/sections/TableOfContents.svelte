@@ -14,6 +14,7 @@
 	let lexiconOpen = $state(false);
 	let lexiconButton = $state<HTMLButtonElement | null>(null);
 	let lexiconPanel = $state<HTMLDivElement | null>(null);
+	let navList = $state<HTMLUListElement | null>(null);
 
 	// The introduction page opens with a full-screen hero image. There the nav
 	// floats transparently over the photo for a more immersive feel and only
@@ -42,6 +43,19 @@
 			closeLexicon();
 		}
 	}
+
+	$effect(() => {
+		routeId;
+		if (!navList || !window.matchMedia('(max-width: 639.98px)').matches) return;
+		requestAnimationFrame(() => {
+			const current = navList?.querySelector<HTMLElement>('[aria-current="page"]');
+			if (!current || !navList) return;
+			navList.scrollLeft = Math.max(
+				0,
+				current.offsetLeft - (navList.clientWidth - current.offsetWidth) / 2
+			);
+		});
+	});
 </script>
 
 <svelte:window bind:scrollY bind:innerHeight onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
@@ -57,9 +71,10 @@
 	]}
 	aria-label="Table of contents"
 >
-	<div class="relative w-full px-4 sm:px-6">
+	<div class="relative flex w-full items-center px-2 sm:block sm:px-6">
 		<ul
-			class="mx-auto flex max-w-5xl items-center gap-2 overflow-x-auto whitespace-nowrap pr-24 [-ms-overflow-style:none] [scrollbar-width:none] sm:justify-center sm:gap-8 sm:overflow-visible sm:whitespace-normal sm:px-6 [&::-webkit-scrollbar]:hidden"
+			bind:this={navList}
+			class="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap pr-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-auto sm:max-w-5xl sm:justify-center sm:gap-8 sm:overflow-visible sm:whitespace-normal sm:px-24 [&::-webkit-scrollbar]:hidden"
 		>
 			{#each siteRoutes as section (section.href)}
 				<li class="shrink-0">
@@ -67,7 +82,7 @@
 						href={resolve(section.href as '/')}
 						aria-current={isActive(section.href) ? 'page' : undefined}
 						class={[
-							'my-4 block rounded-full border px-3 py-1.5 text-sm transition-colors sm:px-4',
+							'my-3 block rounded-full border px-3 py-1.5 text-sm transition-colors sm:my-4 sm:px-4',
 							isActive(section.href)
 								? ['font-medium', transparent ? 'border-white text-white' : 'border-gray-900 text-gray-900']
 								: 'border-transparent hover:underline'
@@ -83,7 +98,7 @@
 			bind:this={lexiconButton}
 			type="button"
 			class={[
-				'absolute right-4 top-1/2 shrink-0 -translate-y-1/2 rounded-full border px-3 py-1.5 text-sm transition-colors sm:right-6 sm:px-4',
+				'relative shrink-0 rounded-full border px-3 py-1.5 text-sm transition-colors sm:absolute sm:right-6 sm:top-1/2 sm:-translate-y-1/2 sm:px-4',
 				transparent
 					? 'border-white/70 text-white hover:border-white'
 					: 'border-gray-300 text-gray-700 hover:border-gray-900 hover:text-gray-900',
@@ -100,7 +115,7 @@
 			<div
 				bind:this={lexiconPanel}
 				id="dashboard-lexicon-panel"
-				class="absolute right-4 top-full z-50 mt-2 max-h-[calc(100vh-5rem)] w-[min(calc(100vw-2rem),44rem)] overflow-y-auto border border-gray-300 bg-white p-5 text-left text-sm shadow-sm sm:right-6"
+				class="absolute right-2 top-full z-50 mt-2 max-h-[calc(100vh-5rem)] w-[min(calc(100vw-1rem),44rem)] overflow-y-auto border border-gray-300 bg-white p-5 text-left text-sm shadow-sm sm:right-6 sm:w-[min(calc(100vw-2rem),44rem)]"
 			>
 				<button
 					type="button"

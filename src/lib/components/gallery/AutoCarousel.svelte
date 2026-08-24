@@ -53,11 +53,11 @@
 
 		{#if overlayTitle}
 			<div class="absolute left-0 top-0 z-10 px-4 py-4 text-white">
-				<h1 class="text-4xl font-bold leading-tight">
+				<h2 class="text-4xl font-bold leading-tight">
 					{#each overlayTitle.split('\n') as line, i (i)}
 						{#if i > 0}<br />{/if}{line}
 					{/each}
-				</h1>
+				</h2>
 			</div>
 		{/if}
 

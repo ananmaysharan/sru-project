@@ -16,7 +16,7 @@
 	);
 </script>
 
-<div class="w-full md:w-84 shrink-0 border border-gray-200 bg-white p-4 flex flex-col gap-4">
+<div class="flex w-full shrink-0 flex-col gap-5 border border-gray-200 bg-white p-5 md:w-84">
 	{#if countryName}
 		<div class="flex flex-col gap-2">
 			<h3 class="text-lg font-semibold text-gray-900">{countryName}</h3>

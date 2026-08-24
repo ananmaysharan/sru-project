@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { socialRentalByCountry } from '$lib/data/charts/european-social-rental-summary';
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 
 	let { countryCode = '' }: { countryCode?: string } = $props();
-
-	const MAX_PCT = 40;
+	let chartEl: HTMLDivElement;
+	let chart: ReturnType<typeof import('echarts')['init']> | null = null;
+	let chartReady = $state(false);
 
 	let countryData = $derived(
 		socialRentalByCountry.find((d) => d.iso3 === countryCode) ?? null
@@ -16,64 +18,169 @@
 				countryData.socialRentalSharePctEnd !== null)
 	);
 
-	let startPct = $derived(countryData?.socialRentalSharePctStart ?? 0);
-	let endPct = $derived(countryData?.socialRentalSharePctEnd ?? 0);
-	let startYear = $derived(countryData?.startYear ?? '—');
-	let endYear = $derived(countryData?.endYear ?? '—');
-</script>
 
-{#if !countryCode}
-	<p class="text-sm text-gray-400 italic">Select a country on the map</p>
-{:else if !hasData}
-	<p class="text-sm text-gray-400 italic">No data available for this country.</p>
-{:else}
-	<div class="flex flex-col gap-3">
-		<p class="text-xs font-medium text-gray-500 uppercase tracking-wide">
-			Social Rental Share (%)
-		</p>
+	function updateChart() {
+		if (!chart) return;
 
-		<div class="flex flex-col gap-2">
-			{#if countryData?.socialRentalSharePctStart !== null && countryData?.socialRentalSharePctStart !== undefined}
-				<div class="flex flex-col gap-1">
-					<div class="flex items-center justify-between text-xs text-gray-600">
-						<span>{startYear}</span>
-						<span class="font-semibold text-gray-800">{startPct.toFixed(1)}%</span>
-					</div>
-					<div class="h-5 w-full rounded overflow-hidden" style="background: {GRAPHICS_COLORS.surface};">
-						<div
-							class="h-full rounded bar-fill"
-							style="width: {(startPct / MAX_PCT) * 100}%; background: {GRAPHICS_COLORS.contextStrong};"
-						></div>
-					</div>
-				</div>
-			{/if}
+		if (!hasData || !countryData) {
+			chart.clear();
+			return;
+		}
 
-			{#if countryData?.socialRentalSharePctEnd !== null && countryData?.socialRentalSharePctEnd !== undefined}
-				<div class="flex flex-col gap-1">
-					<div class="flex items-center justify-between text-xs text-gray-600">
-						<span>{endYear}</span>
-						<span class="font-semibold text-gray-800">{endPct.toFixed(1)}%</span>
-					</div>
-					<div class="h-5 w-full rounded overflow-hidden" style="background: {GRAPHICS_COLORS.surface};">
-						<div
-							class="h-full rounded bar-fill"
-							style="width: {(endPct / MAX_PCT) * 100}%; background: {GRAPHICS_COLORS.primaryDark};"
-						></div>
-					</div>
-				</div>
-			{/if}
-		</div>
-	</div>
-{/if}
+		const rows = [
+			countryData.socialRentalSharePctStart !== null
+				? {
+						year: String(countryData.startYear),
+						value: countryData.socialRentalSharePctStart,
+						color: GRAPHICS_COLORS.contextStrong
+					}
+				: null,
+			countryData.socialRentalSharePctEnd !== null
+				? {
+						year: String(countryData.endYear),
+						value: countryData.socialRentalSharePctEnd,
+						color: GRAPHICS_COLORS.primaryDark
+					}
+				: null
+		].filter((row): row is NonNullable<typeof row> => row !== null);
 
-<style>
-	.bar-fill {
-		transition: width 220ms cubic-bezier(0.23, 1, 0.32, 1);
+		chart.setOption(
+			{
+				title: {
+					text: 'SOCIAL RENTAL SHARE (%)',
+					left: 0,
+					top: 0,
+					textStyle: {
+						fontSize: 10,
+						fontWeight: 500,
+						color: GRAPHICS_COLORS.secondaryText
+					}
+				},
+				tooltip: {
+					trigger: 'item',
+					formatter: (params: any) =>
+						`<strong>${params.name}</strong><br/>${Number(params.value).toFixed(1)}% social rental housing`
+				},
+				grid: { left: 38, right: 42, top: 30, bottom: 22 },
+				xAxis: {
+					type: 'value',
+					min: 0,
+					max: 40,
+					interval: 10,
+					axisLine: { lineStyle: { color: GRAPHICS_COLORS.grid } },
+					axisTick: { show: false },
+					axisLabel: {
+						fontSize: 10,
+						color: GRAPHICS_COLORS.secondaryText,
+						formatter: '{value}%'
+					},
+					splitLine: {
+						lineStyle: { color: GRAPHICS_COLORS.grid, width: 0.5, type: 'dashed' }
+					}
+				},
+				yAxis: {
+					type: 'category',
+					inverse: true,
+					data: rows.map((row) => row.year),
+					axisLine: { show: false },
+					axisTick: { show: false },
+					axisLabel: { fontSize: 10, color: GRAPHICS_COLORS.secondaryText }
+				},
+				series: [
+					{
+						type: 'bar',
+						barWidth: 22,
+						data: rows.map((row) => ({
+							value: row.value,
+							itemStyle: { color: row.color }
+						})),
+						label: {
+							show: true,
+							position: 'right',
+							distance: 6,
+							fontSize: 10,
+							fontWeight: 600,
+							color: GRAPHICS_COLORS.secondaryText,
+							formatter: (params: any) => `${Number(params.value).toFixed(1)}%`
+						},
+						emphasis: { disabled: true }
+					}
+				],
+				animationDurationUpdate: 220,
+				animationEasingUpdate: 'cubicOut'
+			},
+			true
+		);
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.bar-fill {
-			transition: none;
-		}
+	onMount(() => {
+		let observer: ResizeObserver | null = null;
+		let disposed = false;
+
+		import('echarts').then((echarts) => {
+			if (disposed) return;
+			chart = echarts.init(chartEl);
+			chartReady = true;
+			observer = new ResizeObserver(() => chart?.resize());
+			observer.observe(chartEl);
+		});
+
+		return () => {
+			disposed = true;
+			observer?.disconnect();
+			chart?.dispose();
+			chart = null;
+		};
+	});
+
+	$effect(() => {
+		if (!chartReady) return;
+		countryCode;
+		countryData;
+		updateChart();
+	});
+</script>
+
+<div class="country-comparison-chart">
+	<div
+		bind:this={chartEl}
+		class="chart-canvas"
+		class:chart-canvas--hidden={!hasData}
+		aria-hidden={!hasData}
+	></div>
+
+	{#if !countryCode}
+		<p>Select a country on the map</p>
+	{:else if !hasData}
+		<p>No data available for this country.</p>
+	{/if}
+</div>
+
+<style>
+	.country-comparison-chart {
+		position: relative;
+		height: 8.25rem;
+		width: 100%;
+	}
+
+	.chart-canvas {
+		height: 100%;
+		width: 100%;
+	}
+
+	.chart-canvas--hidden {
+		visibility: hidden;
+	}
+
+	p {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		width: 100%;
+		margin: 0;
+		transform: translateY(-50%);
+		color: #9ca3af;
+		font-size: 0.875rem;
+		font-style: italic;
 	}
 </style>

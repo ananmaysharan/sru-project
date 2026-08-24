@@ -166,6 +166,8 @@ Broader socio‑economic indicators reinforce this picture. In 2021, the poverty
 
 Financing arrangements also differ in overseas DROM territories. Social housing there largely depends on a dedicated budget line, or Ligne Budgétaire Unique (LBU), managed by the Ministry for Overseas Territories, complemented by a specific tax credit, Action Logement contributions, and long‑term loans from the Banque des Territoires[20]. While nominal authorizations under the LBU have increased in recent years (with, for example, a roughly 20% rise in commitments in the 2024 finance bill), actual disbursements are often constrained by administrative bottlenecks and the difficulty of assembling viable projects. In practice, this can mean that overseas territories, which face the highest rates of poverty and the strongest exposure to climate risks, are also those where the pipeline of social housing projects is most fragile and where the underutilization of national credits coexists with massive unmet needs.
 
+**<u>THIS TEXT PORTION BELOW GOES IN INTRODUCTION PAGE [USING THE DASHBOARD before acknowledgements]</u>**
+
 **Using the dashboard**
 
 Across these four regimes, and the many variations between them, the dashboard offers a common set of tools. Users can:

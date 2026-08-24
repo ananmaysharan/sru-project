@@ -4,7 +4,6 @@
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as Select from '$lib/components/ui/select';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import {
 		mapState,
 		communeLookup,
@@ -58,7 +57,7 @@
 	}
 </script>
 
-<div class="w-full md:w-84 shrink-0 border border-gray-200 bg-white p-4 flex flex-col gap-4">
+<div class="flex w-full shrink-0 flex-col gap-5 border border-gray-200 bg-white p-5 md:w-84">
 	<!-- <h3 class="text-2xl font-semibold">Supply Map</h3> -->
 	<!-- Tabs -->
 	<Tabs.Root bind:value={mapState.activeTab} onValueChange={handleTabChange}>
@@ -70,7 +69,7 @@
 
 	<!-- Search -->
 	<div>
-		<p class="text-xs font-medium text-gray-500 mb-1.5">Search</p>
+		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">Search</p>
 		<Combobox.Root
 			type="single"
 			bind:open={mapState.searchOpen}
@@ -80,13 +79,15 @@
 			<div class="relative" bind:this={searchInputEl}>
 				<SearchIcon class="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
 				<Combobox.Input
-					placeholder="Search for a place..."
+					aria-label="Search the supply map"
+					placeholder="Search for a place…"
 					class="flex h-9 w-full rounded-md border border-input bg-transparent pl-8 pr-8 py-1 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 					oninput={(e: Event) => { mapState.searchQuery = (e.target as HTMLInputElement).value; mapState.searchOpen = true; }}
 				/>
 				{#if mapState.searchQuery.length > 0 || mapState.searchValue}
 					<button
 						type="button"
+						aria-label="Clear map search"
 						class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
 						onclick={clearSearch}
 					>
@@ -152,9 +153,9 @@
 
 	<!-- Metric select -->
 	<div>
-		<p class="text-xs font-medium text-gray-500 mb-1.5">Select Variable</p>
+		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">Variable</p>
 		<Select.Root type="single" value={mapState.activeMetric} onValueChange={handleMetricChange}>
-			<Select.Trigger class="w-full">
+			<Select.Trigger class="w-full" aria-label="Supply map variable">
 				{mapState.currentConfig.label}
 			</Select.Trigger>
 			<Select.Content>
@@ -167,7 +168,7 @@
 
 	<!-- Legend -->
 	<div class="mt-auto">
-		<p class="text-xs font-medium text-gray-500 mb-1.5">
+		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">
 			{mapState.currentConfig.label}
 		</p>
 		<div class="flex flex-col gap-0.5">
@@ -187,13 +188,6 @@
 					</span>
 				</div>
 			{/each}
-			<div class="mt-1 flex items-center gap-1.5">
-				<span
-					class="inline-block h-3 w-4 rounded-sm border"
-					style={`background:${GRAPHICS_COLORS.noData};border-color:${GRAPHICS_COLORS.grid}`}
-				></span>
-				<span class="text-xs text-gray-600">No data</span>
-			</div>
 		</div>
 	</div>
 </div>

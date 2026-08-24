@@ -2,10 +2,105 @@
     import { asset } from "$app/paths";
     import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
     import editorialContent from "$lib/data/editorial-content.md?raw";
-    import { onMount } from "svelte";
     import AutoCarousel from "$lib/components/gallery/AutoCarousel.svelte";
-    import * as Carousel from "$lib/components/ui/carousel/index.js";
-    import type { CarouselAPI } from "$lib/components/ui/carousel/context.js";
+    import * as Select from "$lib/components/ui/select";
+    import { onMount } from "svelte";
+    import {
+        COMPARISON_PALETTE,
+        GRAPHICS_COLORS,
+    } from "$lib/data/charts/chart-colors";
+
+    type CaptionGridPosition =
+        | "top-left"
+        | "top-center"
+        | "top-right"
+        | "center-left"
+        | "center-center"
+        | "center-right"
+        | "bottom-left"
+        | "bottom-center"
+        | "bottom-right";
+
+    const permanentCaptionPositions: Partial<
+        Record<string, CaptionGridPosition>
+    > = {
+        "/images/optimized/brittany/talgen-01-full.webp": "top-center",
+        "/images/optimized/brittany/talgen-02-full.webp": "top-left",
+        "/images/optimized/brittany/talgen-03-full.webp": "top-left",
+        "/images/optimized/brittany/talgen-04-full.webp": "top-right",
+        "/images/optimized/french-riviera/gignac-la-nerthe-01-full.webp": "top-center",
+        "/images/optimized/french-riviera/gignac-la-nerthe-02-full.webp": "top-right",
+        "/images/optimized/french-riviera/gignac-la-nerthe-03-full.webp": "top-center",
+        "/images/optimized/french-riviera/gignac-la-nerthe-04-full.webp": "top-left",
+        "/images/optimized/overseas-territories/les-jasmins-01-full.webp": "top-right",
+        "/images/optimized/overseas-territories/les-jasmins-02-full.webp": "top-left",
+        "/images/optimized/overseas-territories/les-jasmins-03-full.webp": "top-left",
+        "/images/optimized/overseas-territories/les-jasmins-04-full.webp": "top-left",
+        "/images/optimized/project-1/000016390005-full.webp": "top-right",
+        "/images/optimized/project-1/000016390007-2-full.webp": "top-center",
+        "/images/optimized/project-1/000016390009-full.webp": "top-right",
+        "/images/optimized/project-1/000016390013-full.webp": "top-left",
+        "/images/optimized/project-1/000064690007-full.webp": "top-center",
+        "/images/optimized/project-1/000064690014-full.webp": "top-right",
+        "/images/optimized/project-1/000064700002-full.webp": "top-right",
+        "/images/optimized/project-1/000064700003-full.webp": "top-center",
+        "/images/optimized/project-1/000086750006-full.webp": "top-left",
+        "/images/optimized/project-1/000086750011-full.webp": "top-center",
+        "/images/optimized/project-1/000086760003-full.webp": "top-center",
+        "/images/optimized/project-1/000086760007-full.webp": "top-center",
+        "/images/optimized/project-1/000086760009-full.webp": "top-center",
+        "/images/optimized/project-1/7918512c-eab2-42ea-8d28-5f22f76dc604-full.webp": "top-left",
+        "/images/optimized/project-1/a6a4358f-d0c0-48d5-9c19-bb3ff977df70-full.webp": "top-center",
+        "/images/optimized/project-1/DSC02107-full.webp": "top-center",
+        "/images/optimized/project-2/DSC01776-full.webp": "top-left",
+        "/images/optimized/project-2/DSC01779-full.webp": "top-left",
+        "/images/optimized/project-2/DSC01780-full.webp": "top-right",
+        "/images/optimized/project-2/DSC01794-full.webp": "top-right",
+        "/images/optimized/project-2/DSC01796-full.webp": "top-center",
+        "/images/optimized/project-2/DSC01797-full.webp": "top-right",
+        "/images/optimized/project-2/DSC01798-full.webp": "top-left",
+        "/images/optimized/project-2/DSC01799-full.webp": "top-center",
+        "/images/optimized/project-3/DSC01781-full.webp": "top-center",
+        "/images/optimized/project-3/DSC01783-full.webp": "top-center",
+        "/images/optimized/project-3/paris-01-full.webp": "top-right",
+        "/images/optimized/project-4/7685ce4e-bef7-419c-8d9e-68536a49e292-full.webp": "top-left",
+        "/images/optimized/project-4/cd3ed7fa-1ded-4c80-b2a8-21da3751b6d1-full.webp": "top-left",
+        "/images/optimized/project-4/laguiole-280-full.webp": "top-right",
+        "/images/optimized/project-4/laguiole-291-full.webp": "top-left",
+        "/images/optimized/project-4/laguiole-297-full.webp": "top-center",
+    };
+
+    const captionGrid: CaptionGridPosition[] = [
+        "top-left",
+        "top-center",
+        "top-right",
+        "center-left",
+        "center-center",
+        "center-right",
+        "bottom-left",
+        "bottom-center",
+        "bottom-right",
+    ];
+
+    type StoryImage = {
+        src: string;
+        alt: string;
+        landscape: boolean;
+        caption: string;
+        objectPosition?: string;
+    };
+
+    type StoryProject = {
+        label: string;
+        images: StoryImage[];
+        thumbnailIndex?: number;
+    };
+
+    type CaseStudyName =
+        | "Paris"
+        | "Brittany"
+        | "French Riviera"
+        | "Overseas Territories";
 
     // Keep the previous carousel presentation available while the new
     // scrollytelling direction is being evaluated.
@@ -19,21 +114,30 @@
     let activeFrame = $state(0);
     let storyCardEls = $state<HTMLElement[]>([]);
     let storyCardsEl = $state<HTMLDivElement | null>(null);
-    let projectButtonEls = $state<HTMLButtonElement[]>([]);
-    let projectTabsEl = $state<HTMLDivElement | null>(null);
-    let indicatorLeft = $state(4);
-    let indicatorWidth = $state(0);
+    let storyEl = $state<HTMLDivElement | null>(null);
+    let caseStudyNavCompact = $state(false);
     let scrollFrame = 0;
 
-    let residentTopicIndex = $state(0);
-    let residentQuoteIndex = $state(0);
-    let residentQuotesInView = $state(false);
-    let residentQuotesEl = $state<HTMLElement | null>(null);
-    let residentTabsEl = $state<HTMLDivElement | null>(null);
-    let residentButtonEls = $state<HTMLButtonElement[]>([]);
-    let residentIndicatorLeft = $state(0);
-    let residentIndicatorWidth = $state(0);
-    let residentCarouselApi = $state<CarouselAPI>();
+    let captionDebugMode = $state(false);
+    let captionPositionOverrides = $state<
+        Partial<Record<string, CaptionGridPosition>>
+    >({});
+    let draggingCaption = $state<string | null>(null);
+    let captionCopyState = $state("");
+
+    const adjustedCaptionCount = $derived(
+        Object.keys({
+            ...permanentCaptionPositions,
+            ...captionPositionOverrides,
+        }).length,
+    );
+
+    let activeResidentTopic = $state<number | null>(null);
+    let pinnedResidentTopic = $state<number | null>(null);
+    let activeResidentQuote = $state<number | null>(null);
+    let residentSankeyBody = $state<HTMLDivElement | null>(null);
+    let residentTopicEls = $state<HTMLButtonElement[]>([]);
+    let residentQuoteEls = $state<HTMLButtonElement[]>([]);
 
     function slug(s: string) {
         return s
@@ -42,6 +146,84 @@
             .replace(/[̀-ͯ]/g, "")
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)/g, "");
+    }
+
+    function captionPositionFor(_image: StoryImage): CaptionGridPosition {
+        return "top-right";
+    }
+
+    function setCaptionPosition(
+        imageSrc: string,
+        position: CaptionGridPosition,
+    ) {
+        captionPositionOverrides = {
+            ...captionPositionOverrides,
+            [imageSrc]: position,
+        };
+        captionCopyState = "";
+    }
+
+    function updateCaptionFromPointer(
+        event: PointerEvent | MouseEvent,
+        imageSrc: string,
+    ) {
+        if (!captionDebugMode || draggingCaption !== imageSrc) return;
+        const frameIndex = storyFrames.findIndex(
+            (frame) => frame.image.src === imageSrc,
+        );
+        const card = storyCardEls[frameIndex];
+        if (!card) return;
+
+        const bounds = card.getBoundingClientRect();
+        const column = Math.min(
+            2,
+            Math.max(
+                0,
+                Math.floor(
+                    ((event.clientX - bounds.left) / bounds.width) * 3,
+                ),
+            ),
+        );
+        const row = Math.min(
+            2,
+            Math.max(
+                0,
+                Math.floor(
+                    ((event.clientY - bounds.top) / bounds.height) * 3,
+                ),
+            ),
+        );
+        setCaptionPosition(imageSrc, captionGrid[row * 3 + column]);
+    }
+
+    function startCaptionDrag(
+        event: PointerEvent | MouseEvent,
+        imageSrc: string,
+    ) {
+        if (!captionDebugMode) return;
+        event.preventDefault();
+        draggingCaption = imageSrc;
+    }
+
+    function finishCaptionDrag() {
+        draggingCaption = null;
+    }
+
+    function handleCaptionPointerMove(event: PointerEvent | MouseEvent) {
+        if (draggingCaption) {
+            updateCaptionFromPointer(event, draggingCaption);
+        }
+    }
+
+    async function copyCaptionPositions() {
+        const positions = {
+            ...permanentCaptionPositions,
+            ...captionPositionOverrides,
+        };
+        await navigator.clipboard.writeText(
+            JSON.stringify({ captionPositions: positions }, null, 2),
+        );
+        captionCopyState = "Copied";
     }
 
     const landscapeImageIds = new Set([
@@ -66,7 +248,7 @@
         "laguiole-297",
     ]);
 
-    const parisProjects = [
+    const parisProjects: StoryProject[] = [
         {
             label: "Samaritaine",
             images: [
@@ -139,6 +321,7 @@
         },
         {
             label: "Rue Jean-Bart",
+            thumbnailIndex: 2,
             images: ["paris-01", "DSC01781", "DSC01783"].map((id, i) => ({
                 src: `/images/optimized/project-3/${id}-full.webp`,
                 alt: "Rue Jean-Bart",
@@ -172,6 +355,122 @@
             })),
         },
     ];
+
+    const frenchRivieraProjects: StoryProject[] = [
+        {
+            label: "Gignac-la-Nerthe",
+            images: [
+                {
+                    src: "/images/optimized/french-riviera/gignac-la-nerthe-01-full.webp",
+                    alt: "West façade of the Gignac-la-Nerthe housing project",
+                    landscape: true,
+                    objectPosition: "center bottom",
+                    caption:
+                        "Located in the small suburban middle-income town of Gignac-la-Nerthe, approximately 20 km northwest of Marseille, the project marks the transition between a residential neighborhood and the surrounding open landscape. West façade with a regular rhythm of Douglas-fir balconies set against solid ochre limestone walls, giving each dwelling access to a sheltered private outdoor space while helping buffer traffic noise.",
+                },
+                {
+                    src: "/images/optimized/french-riviera/gignac-la-nerthe-02-full.webp",
+                    alt: "Timber-and-steel access platforms at Gignac-la-Nerthe",
+                    landscape: true,
+                    caption:
+                        "Open timber-and-steel access platforms connect the apartments while providing shared circulation space, private balconies, daylight and views across the surrounding landscape.",
+                },
+                {
+                    src: "/images/optimized/french-riviera/gignac-la-nerthe-03-full.webp",
+                    alt: "Limestone-clad housing ensemble at Gignac-la-Nerthe",
+                    landscape: false,
+                    caption:
+                        "The two-volume housing ensemble clad in 32 cm-thick Vers-Pont-du-Gard limestone, with recessed loggias and landscaped outdoor areas that extend residents’ living environment beyond the apartments.",
+                },
+                {
+                    src: "/images/optimized/french-riviera/gignac-la-nerthe-04-full.webp",
+                    alt: "Ground-floor plan of the Gignac-la-Nerthe housing project",
+                    landscape: true,
+                    caption:
+                        "Ground-floor plan showing the two-building arrangement, shared garden, storage and bicycle rooms, and the circulation spaces that organize access between the homes. Gignac-la-Nerthe is a small, middle-income suburban commune within the Marseille–Aix metropolitan area, predominantly characterized by homeowner-oriented housing.",
+                },
+            ],
+        },
+    ];
+
+    const brittanyProjects: StoryProject[] = [
+        {
+            label: "Talgen",
+            images: [
+                {
+                    src: "/images/optimized/brittany/talgen-01-full.webp",
+                    alt: "The Talgen social-housing project in Cesson-Sévigné",
+                    landscape: true,
+                    caption:
+                        "The Talgen project inserts 24 social-rental homes into ViaSilva, a mixed-use expansion of Cesson-Sévigné, mediating between detached houses and larger collective buildings. The neighborhood connects residents to the metro, the Boudebois park, local services and employment areas.",
+                },
+                {
+                    src: "/images/optimized/brittany/talgen-02-full.webp",
+                    alt: "Apartment plan for the Talgen social-housing project",
+                    landscape: false,
+                    caption:
+                        "The plan brings together a range of apartment types around a compact shared circulation core, while terraces and balconies extend many of the homes into private outdoor space.",
+                },
+                {
+                    src: "/images/optimized/brittany/talgen-03-full.webp",
+                    alt: "Bicycle room at the Talgen social-housing project",
+                    landscape: false,
+                    caption:
+                        "A secure, dedicated bicycle room makes cycle storage convenient and accessible, supporting car-independent connections to nearby public transport, green space and local services.",
+                },
+                {
+                    src: "/images/optimized/brittany/talgen-04-full.webp",
+                    alt: "Communal circulation space at the Talgen social-housing project",
+                    landscape: false,
+                    caption:
+                        "The communal circulation space is treated as an amenity rather than leftover space, combining natural light, timber, tiled surfaces and green metalwork to create a welcoming and legible entrance to the homes.",
+                },
+            ],
+        },
+    ];
+
+    const overseasTerritoriesProjects: StoryProject[] = [
+        {
+            label: "Les Jasmins · La Réunion",
+            images: [
+                {
+                    src: "/images/optimized/overseas-territories/les-jasmins-01-full.webp",
+                    alt: "Les Jasmins residence in La Possession, La Réunion",
+                    landscape: true,
+                    caption:
+                        "The Les Jasmins residence provides 38 homes through a social homeownership scheme within Cœur de Ville, La Possession’s new urban centre. Shaded balconies, deep overhangs and screened openings create comfortable outdoor spaces suited to the tropical climate.",
+                },
+                {
+                    src: "/images/optimized/overseas-territories/les-jasmins-02-full.webp",
+                    alt: "Planted pedestrian paths around Les Jasmins",
+                    landscape: false,
+                    caption:
+                        "Planted paths, palms, shared gardens and porous pedestrian spaces create a shaded setting around the housing. In Cœur de Ville, this “garden-city” approach extends access to cooling, recreation and social interaction beyond the individual dwelling.",
+                },
+                {
+                    src: "/images/optimized/overseas-territories/les-jasmins-03-full.webp",
+                    alt: "Site plan of Cœur de Ville in La Possession",
+                    landscape: true,
+                    caption:
+                        "The site plan situates Les Jasmins within Cœur de Ville, a 34-hectare development combining housing with green spaces, schools, shops, public facilities and pedestrian routes. Conceived in response to La Possession’s rapid demographic growth, the district aims to bring everyday amenities closer to residents.",
+                },
+                {
+                    src: "/images/optimized/overseas-territories/les-jasmins-04-full.webp",
+                    alt: "Axonometric view of Cœur de Ville in La Possession",
+                    landscape: false,
+                    caption:
+                        "The axonometric view presents Cœur de Ville as a socially mixed neighbourhood combining housing, shops, offices, healthcare, schools, gardens and shared public spaces. Its planning links access to affordable housing with access to the facilities of a new town centre.",
+                },
+            ],
+        },
+    ];
+
+    const caseStudyProjects: Record<CaseStudyName, StoryProject[]> = {
+        Paris: parisProjects,
+        Brittany: brittanyProjects,
+        "French Riviera": frenchRivieraProjects,
+        "Overseas Territories": overseasTerritoriesProjects,
+    };
 
     const residentTopics = [
         {
@@ -225,30 +524,86 @@
         },
     ];
 
-    const brittanyImages = ["brittany-01", "brittany-02", "brittany-04"].map(
-        (id) => ({
-            src: `/images/optimized/brittany/${id}-full.webp`,
-            alt: "Brittany",
-        }),
+    const residentTopicColors = [
+        GRAPHICS_COLORS.primary,
+        GRAPHICS_COLORS.focus,
+        GRAPHICS_COLORS.plum,
+        GRAPHICS_COLORS.blue,
+        GRAPHICS_COLORS.primaryMid,
+        GRAPHICS_COLORS.primaryDark,
+    ];
+
+    const residentQuoteList = residentTopics.flatMap((topic, topicIndex) =>
+        topic.quotes.map((quote, quoteIndex) => ({
+            quote,
+            quoteIndex,
+            topicIndex,
+            topicLabel: topic.label,
+            color: residentTopicColors[topicIndex] ?? COMPARISON_PALETTE[0],
+        })),
     );
 
-    const regions = [
+    let residentTopicPositions = $state(residentTopics.map(
+        (_, topicIndex) => ((topicIndex + 0.5) / residentTopics.length) * 100,
+    ));
+
+    let residentQuotePositions = $state(residentQuoteList.map(
+        (_, quoteIndex) =>
+            ((quoteIndex + 0.5) / residentQuoteList.length) * 100,
+    ));
+
+    function residentLinkPath(item: (typeof residentQuoteList)[number], quoteIndex: number) {
+        const topicCenter = residentTopicPositions[item.topicIndex] * 10;
+        const topicQuoteCount = residentTopics[item.topicIndex].quotes.length;
+        const topicNodeHeight = Math.max(28, topicQuoteCount * 13);
+        const sourceY =
+            topicCenter -
+            topicNodeHeight / 2 +
+            ((item.quoteIndex + 0.5) / topicQuoteCount) * topicNodeHeight;
+        const targetY = residentQuotePositions[quoteIndex] * 10;
+        return `M 213 ${sourceY} C 320 ${sourceY}, 404 ${targetY}, 500 ${targetY}`;
+    }
+
+    function residentTopicNodeHeight(topicIndex: number) {
+        return Math.max(28, residentTopics[topicIndex].quotes.length * 13);
+    }
+
+    const regions: CaseStudyName[] = [
         "Paris",
-        // Temporarily hidden:
-        // "Brittany",
-        // "French Riviera",
-        // "Overseas Territories",
+        "Brittany",
+        "French Riviera",
+        "Overseas Territories",
     ];
 
     const galleryAspect = "h-[95vh]";
 
-    const storyFrames = parisProjects.flatMap((project, projectIndex) =>
-        project.images.map((image, imageIndex) => ({
-            image,
-            imageIndex,
-            projectIndex,
-            projectLabel: project.label,
-        })),
+    const caseStudyNavItems = $derived(
+        regions.flatMap((region) =>
+            caseStudyProjects[region].map(
+                (project, projectIndex) => ({
+                    region,
+                    project,
+                    projectIndex,
+                }),
+            ),
+        ),
+    );
+
+    const storyFrames = $derived(
+        caseStudyNavItems.flatMap((item) =>
+            item.project.images.map((image, imageIndex) => ({
+                image,
+                imageIndex,
+                region: item.region,
+                project: item.project,
+                projectIndex: item.projectIndex,
+                projectLabel: item.project.label,
+            })),
+        ),
+    );
+
+    const activeCaseStudy = $derived(
+        storyFrames[activeFrame]?.region ?? "Paris",
     );
 
     const activeProjectIndex = $derived(
@@ -274,117 +629,201 @@
         setActiveFrame(nextFrame);
     }
 
+    function syncCaseStudyNavState() {
+        if (!storyEl) return;
+        const bounds = storyEl.getBoundingClientRect();
+        const headerHeight = 65;
+        caseStudyNavCompact =
+            bounds.top <= headerHeight && bounds.bottom > headerHeight + 80;
+    }
+
     function handleStoryScroll() {
         if (scrollFrame) return;
         scrollFrame = requestAnimationFrame(() => {
             scrollFrame = 0;
             syncActiveFrame();
+            syncCaseStudyNavState();
         });
     }
 
     function handleResize() {
-        syncProjectIndicator();
-        syncResidentIndicator();
         syncActiveFrame();
+        syncCaseStudyNavState();
     }
 
-    function syncProjectIndicator() {
-        const button = projectButtonEls[activeProjectIndex];
-        if (!button) return;
-        indicatorLeft = button.offsetLeft;
-        indicatorWidth = button.offsetWidth;
-        projectTabsEl?.scrollTo({
-            left:
-                button.offsetLeft +
-                button.offsetWidth / 2 -
-                projectTabsEl.clientWidth / 2,
-            behavior: "smooth",
-        });
-    }
-
-    function scrollToProject(projectIndex: number) {
-        const firstFrame = storyFrames.findIndex(
-            (frame) => frame.projectIndex === projectIndex,
+    function projectFrameIndex(
+        region: CaseStudyName,
+        projectIndex: number,
+    ) {
+        return storyFrames.findIndex(
+            (frame) =>
+                frame.region === region &&
+                frame.projectIndex === projectIndex,
         );
+    }
+
+    function alignActiveFrameSmoothly() {
+        const target = storyCardEls[activeFrame];
+        if (!target) return;
+        const correction = target.getBoundingClientRect().top - 65;
+        if (Math.abs(correction) <= 1) return;
+        window.scrollBy({ top: correction, behavior: "smooth" });
+    }
+
+    function jumpToProject(
+        region: CaseStudyName,
+        projectIndex: number,
+    ) {
+        const firstFrame = projectFrameIndex(region, projectIndex);
         const target = storyCardEls[firstFrame];
         if (!target || !storyCardsEl) return;
         setActiveFrame(firstFrame);
         const storyTop =
             storyCardsEl.getBoundingClientRect().top + window.scrollY;
+        const root = document.documentElement;
+        const previousScrollBehavior = root.style.scrollBehavior;
+        root.style.scrollBehavior = "auto";
         window.scrollTo({
             top: storyTop + firstFrame * target.offsetHeight - 65,
-            behavior: "smooth",
+            behavior: "auto",
+        });
+
+        requestAnimationFrame(() => {
+            root.style.scrollBehavior = previousScrollBehavior;
+            requestAnimationFrame(alignActiveFrameSmoothly);
         });
     }
 
-    function syncResidentIndicator() {
-        const button = residentButtonEls[residentTopicIndex];
-        if (!button) return;
-        residentIndicatorLeft = button.offsetLeft;
-        residentIndicatorWidth = button.offsetWidth;
-        residentTabsEl?.scrollTo({
-            left:
-                button.offsetLeft +
-                button.offsetWidth / 2 -
-                residentTabsEl.clientWidth / 2,
-            behavior: "smooth",
-        });
+    function isAvailableCaseStudy(region: string): region is CaseStudyName {
+        return (
+            region === "Paris" ||
+            region === "Brittany" ||
+            region === "French Riviera" ||
+            region === "Overseas Territories"
+        );
     }
 
-    function selectResidentTopic(topicIndex: number) {
-        residentCarouselApi = undefined;
-        residentTopicIndex = topicIndex;
-        residentQuoteIndex = 0;
+    function selectCaseStudy(region: string, projectIndex = 0) {
+        if (!isAvailableCaseStudy(region)) return;
+
+        if (
+            activeCaseStudy === region &&
+            activeProjectIndex === projectIndex
+        ) {
+            alignActiveFrameSmoothly();
+            return;
+        }
+
+        jumpToProject(region, projectIndex);
+    }
+
+    function caseStudyValue(region: CaseStudyName, projectIndex: number) {
+        return `${region}::${projectIndex}`;
+    }
+
+    const activeCaseStudyValue = $derived(
+        caseStudyValue(activeCaseStudy, activeProjectIndex),
+    );
+
+    function handleCaseStudySelect(value: string | undefined) {
+        if (!value) return;
+        const item = caseStudyNavItems.find(
+            (candidate) =>
+                caseStudyValue(candidate.region, candidate.projectIndex) ===
+                value,
+        );
+        if (item) selectCaseStudy(item.region, item.projectIndex);
+    }
+
+    function previewResidentTopic(topicIndex: number) {
+        activeResidentTopic = topicIndex;
+    }
+
+    function restorePinnedResidentTopic() {
+        activeResidentTopic = pinnedResidentTopic;
+    }
+
+    function toggleResidentTopic(topicIndex: number) {
+        pinnedResidentTopic =
+            pinnedResidentTopic === topicIndex ? null : topicIndex;
+        activeResidentTopic = pinnedResidentTopic;
+    }
+
+    function clearResidentTopic() {
+        pinnedResidentTopic = null;
+        activeResidentTopic = null;
+        activeResidentQuote = null;
+    }
+
+    function previewResidentQuote(quoteIndex: number) {
+        activeResidentQuote = quoteIndex;
+    }
+
+    function clearResidentQuote() {
+        activeResidentQuote = null;
+    }
+
+    function measureResidentSankey() {
+        if (!residentSankeyBody) return;
+        const bodyBounds = residentSankeyBody.getBoundingClientRect();
+        if (!bodyBounds.height) return;
+
+        residentTopicPositions = residentTopicEls.map((element) => {
+            const bounds = element.getBoundingClientRect();
+            return (
+                ((bounds.top + bounds.height / 2 - bodyBounds.top) /
+                    bodyBounds.height) *
+                100
+            );
+        });
+
+        residentQuotePositions = residentQuoteEls.map((element) => {
+            const bounds = element.getBoundingClientRect();
+            return (
+                ((bounds.top + bounds.height / 2 - bodyBounds.top) /
+                    bodyBounds.height) *
+                100
+            );
+        });
     }
 
     onMount(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                residentQuotesInView = entry.isIntersecting;
-            },
-            { threshold: 0.35 },
-        );
-        if (residentQuotesEl) observer.observe(residentQuotesEl);
-        return () => observer.disconnect();
-    });
+        captionDebugMode =
+            new URL(window.location.href).searchParams.get("caption-debug") ===
+            "1";
+        if (!captionDebugMode) return;
 
-    $effect(() => {
-        activeProjectIndex;
-        requestAnimationFrame(syncProjectIndicator);
-    });
+        window.addEventListener("pointermove", handleCaptionPointerMove);
+        window.addEventListener("mousemove", handleCaptionPointerMove);
+        window.addEventListener("pointerup", finishCaptionDrag);
+        window.addEventListener("mouseup", finishCaptionDrag);
 
-    $effect(() => {
-        residentTopicIndex;
-        requestAnimationFrame(syncResidentIndicator);
-    });
-
-    $effect(() => {
-        const api = residentCarouselApi;
-        if (!api) return;
-        const syncResidentQuote = () => {
-            residentQuoteIndex = api.selectedScrollSnap();
+        return () => {
+            window.removeEventListener("pointermove", handleCaptionPointerMove);
+            window.removeEventListener("mousemove", handleCaptionPointerMove);
+            window.removeEventListener("pointerup", finishCaptionDrag);
+            window.removeEventListener("mouseup", finishCaptionDrag);
         };
-        syncResidentQuote();
-        api.on("select", syncResidentQuote);
-        return () => api.off("select", syncResidentQuote);
     });
 
-    $effect(() => {
-        residentTopicIndex;
-        residentQuoteIndex;
-        const api = residentCarouselApi;
-        if (!api || !residentQuotesInView) return;
-        const timeout = window.setTimeout(() => {
-            const quotes = residentTopics[residentTopicIndex].quotes;
-            if (residentQuoteIndex < quotes.length - 1) {
-                api.scrollNext();
-            } else {
-                selectResidentTopic(
-                    (residentTopicIndex + 1) % residentTopics.length,
-                );
-            }
-        }, 6500);
-        return () => window.clearTimeout(timeout);
+    onMount(() => {
+        const frame = requestAnimationFrame(syncCaseStudyNavState);
+        return () => cancelAnimationFrame(frame);
+    });
+
+    onMount(() => {
+        if (!residentSankeyBody) return;
+        const scheduleMeasurement = () =>
+            requestAnimationFrame(measureResidentSankey);
+        const observer = new ResizeObserver(scheduleMeasurement);
+        observer.observe(residentSankeyBody);
+        window.addEventListener("resize", scheduleMeasurement);
+        scheduleMeasurement();
+        document.fonts?.ready.then(scheduleMeasurement);
+        return () => {
+            observer.disconnect();
+            window.removeEventListener("resize", scheduleMeasurement);
+        };
     });
 
     $effect(() => {
@@ -417,14 +856,17 @@
     });
 </script>
 
-<svelte:window onscroll={handleStoryScroll} onresize={handleResize} />
+<svelte:window
+    onscroll={handleStoryScroll}
+    onresize={handleResize}
+/>
 
-<section id="socio-econometrics" class="py-12">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h2 class="text-3xl font-bold">
-            A call for more post-occupancy evaluations
-        </h2>
-        <p class="mt-2 text-gray-600">
+<section id="socio-econometrics" class="page-shell">
+    <div class="prose-column">
+        <h1 class="page-title">
+            A call for more post‑occupancy evaluations
+        </h1>
+        <p class="page-intro-body">
             This call proposes to shift attention from how many social housing
             units are delivered to how they are actually lived in. Under
             frameworks such as the Loi SRU, we now have twenty‑plus years of
@@ -437,7 +879,7 @@
             maintenance, environmental performance) with qualitative insights on
             dignity, everyday use, and social relations.
         </p>
-        <p class="mt-2 text-gray-600">
+        <p class="mt-5 text-gray-600">
             The goal is to move beyond compliance metrics and architectural
             intentions, and to build an evidence base that allows us to identify
             what actually works, what fails, and how future projects and
@@ -446,30 +888,49 @@
             studies, and collaborations around post-occupancy evaluations in
             social housing, and to invite others to join this agenda.
         </p>
-        <p class="mt-2 text-gray-700">
-            This call is grounded in four post-occupancy case studies (from
+        <p class="mt-5 text-gray-700">
+            This call is grounded in seven post-occupancy case studies (from
             Paris to Brittany, the French Riviera to the overseas territories)
             that anchor these questions in concrete places and lived
             experiences.
         </p>
     </div>
 
-    <!-- Temporarily hidden region nav:
-    <div class="max-w-3xl mx-auto mt-8 px-4 sm:px-6">
-        <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+    <div class="case-study-index-shell">
+        <nav class="case-study-index" aria-label="Case studies by region">
             {#each regions as region (region)}
-                <a
-                    href="#{slug(region)}"
-                    class="text-gray-700 underline-offset-4 hover:underline"
+                <span
+                    class:case-study-region-label--paris={region === "Paris"}
+                    class="case-study-region-label"
                 >
                     {region}
-                </a>
+                </span>
+            {/each}
+            {#each caseStudyNavItems as item (`${item.region}-${item.project.label}`)}
+                <button
+                    type="button"
+                    class:case-study-case-button--active={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex}
+                    class="case-study-case-button"
+                    aria-current={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex ? "true" : undefined}
+                    aria-label={`${item.region}: ${item.project.label}`}
+                    onclick={() => selectCaseStudy(item.region, item.projectIndex)}
+                >
+                    <span class="case-study-thumbnail" aria-hidden="true">
+                        <img
+                            src={asset(item.project.images[item.project.thumbnailIndex ?? 0].src)}
+                            alt=""
+                            loading="eager"
+                        />
+                    </span>
+                    <span class="case-study-case-label">
+                        {item.project.label}
+                    </span>
+                </button>
             {/each}
         </nav>
     </div>
-    -->
 
-    <div class="relative mt-12">
+    <div class="relative mt-6">
         {#if useLegacyCarousel}
             <!-- Legacy carousel: intentionally retained so this direction can
                  be restored without rebuilding the galleries. -->
@@ -479,11 +940,11 @@
                         ? 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]'
                         : 'text-gray-900'}"
                 >
-                    <h1 class="text-4xl font-bold leading-tight">
+                    <h2 class="text-4xl font-bold leading-tight">
                         {activeRegion}{#if activeLabel}<br /><span
                                 class="font-normal">{activeLabel}</span
                             >{/if}
-                    </h1>
+                    </h2>
                 </div>
             </div>
 
@@ -505,33 +966,54 @@
                 {/each}
             </div>
         {:else}
-            <div id={slug("Paris")} class="story scroll-mt-24">
-                <div class="story-project-nav">
-                    <div
-                        bind:this={projectTabsEl}
-                        class="story-project-tabs"
-                        role="group"
-                        aria-label="Projects"
-                    >
-                        <span class="story-region-inline">Paris</span>
-                        <span
-                            class="story-project-indicator"
-                            style:left="{indicatorLeft}px"
-                            style:width="{indicatorWidth}px"
-                        ></span>
-                        {#each parisProjects as project, projectIndex (project.label)}
-                            <button
-                                bind:this={projectButtonEls[projectIndex]}
-                                type="button"
-                                class:story-project-button--active={projectIndex === activeProjectIndex}
-                                class="story-project-button"
-                                aria-current={projectIndex === activeProjectIndex ? "true" : undefined}
-                                onclick={() => scrollToProject(projectIndex)}
+            <div
+                bind:this={storyEl}
+                id="case-study-gallery"
+                class="story scroll-mt-24"
+            >
+                <div class="case-study-compact-anchor">
+                    {#if caseStudyNavCompact}
+                        <nav
+                            class="case-study-compact-index"
+                            aria-label="Current case study"
+                        >
+                            <Select.Root
+                                type="single"
+                                value={activeCaseStudyValue}
+                                onValueChange={handleCaseStudySelect}
                             >
-                                {project.label}
-                            </button>
-                        {/each}
-                    </div>
+                                <Select.Trigger
+                                    class="min-w-[13.5rem] max-w-[calc(100vw-1.5rem)] rounded-none border-0 bg-white/[0.88] px-3 text-left font-medium text-gray-900 shadow-none hover:bg-white/[0.94] focus-visible:ring-0"
+                                >
+                                    <span class="min-w-0 flex-1 truncate text-left">
+                                        {activeCaseStudy} – {storyFrames[activeFrame]?.projectLabel}
+                                    </span>
+                                </Select.Trigger>
+                                <Select.Content
+                                    align="start"
+                                    sideOffset={8}
+                                    class="w-(--bits-select-anchor-width) max-w-[calc(100vw-1.5rem)] rounded-none border-0 bg-white/[0.88] text-gray-900 shadow-none"
+                                >
+                                    {#each regions as region (`compact-group-${region}`)}
+                                        <Select.Group>
+                                            <Select.GroupHeading
+                                                class="px-2 pb-1 pt-2 text-left text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-gray-500"
+                                            >
+                                                {region}
+                                            </Select.GroupHeading>
+                                            {#each caseStudyProjects[region] as project, projectIndex (`compact-${region}-${project.label}`)}
+                                                <Select.Item
+                                                    class="justify-start rounded-none text-left data-[highlighted]:bg-white/55"
+                                                    value={caseStudyValue(region, projectIndex)}
+                                                    label={project.label}
+                                                />
+                                            {/each}
+                                        </Select.Group>
+                                    {/each}
+                                </Select.Content>
+                            </Select.Root>
+                        </nav>
+                    {/if}
                 </div>
 
                 <div bind:this={storyCardsEl} class="story-cards">
@@ -541,26 +1023,69 @@
                             data-frame={frameIndex}
                             data-project={frame.projectLabel}
                             class:story-card--landscape={frame.image.landscape}
+                            class:story-card--last={frameIndex === storyFrames.length - 1}
                             class:story-card--retired={frameIndex < activeFrame - 2}
                             class="story-card"
                             style:z-index={frameIndex + 1}
-                            aria-label="{frame.projectLabel}, photograph {frame.imageIndex + 1} of {parisProjects[frame.projectIndex].images.length}"
+                            aria-label="{frame.projectLabel}, photograph {frame.imageIndex + 1} of {frame.project.images.length}"
                         >
                             <img
                                 src={asset(frame.image.src)}
                                 alt={frame.image.alt}
                                 class="story-image"
                                 loading={frameIndex < 2 ? "eager" : "lazy"}
+                                style:object-position={frame.image.objectPosition}
                             />
+                            {#if captionDebugMode}
+                                <div class="caption-debug-grid" aria-hidden="true">
+                                    {#each captionGrid as cell (cell)}
+                                        <span></span>
+                                    {/each}
+                                </div>
+                            {/if}
                             {#if frame.image.caption}
-                                <p class="story-caption">
-                                    {frame.image.caption}
-                                </p>
+                                {#if captionDebugMode}
+                                    <button
+                                        type="button"
+                                        draggable="true"
+                                        class="story-caption story-caption--{captionPositionFor(frame.image)} story-caption--debug"
+                                        class:story-caption--dragging={draggingCaption === frame.image.src}
+                                        onpointerdown={(event) => startCaptionDrag(event, frame.image.src)}
+                                        onpointerup={() => finishCaptionDrag()}
+                                        onpointercancel={() => finishCaptionDrag()}
+                                        onmousedown={(event) => startCaptionDrag(event, frame.image.src)}
+                                        onmouseup={() => finishCaptionDrag()}
+                                        ondragstart={(event) => startCaptionDrag(event, frame.image.src)}
+                                        ondrag={(event) => updateCaptionFromPointer(event, frame.image.src)}
+                                        ondragend={() => finishCaptionDrag()}
+                                    >
+                                        {frame.image.caption}
+                                    </button>
+                                {:else}
+                                    <p class="story-caption story-caption--{captionPositionFor(frame.image)}">
+                                        {frame.image.caption}
+                                    </p>
+                                {/if}
                             {/if}
                         </article>
                     {/each}
                 </div>
             </div>
+
+            {#if captionDebugMode}
+                <aside class="caption-debug-toolbar">
+                    <button
+                        type="button"
+                        onclick={copyCaptionPositions}
+                        disabled={adjustedCaptionCount === 0}
+                    >
+                        Copy positions ({adjustedCaptionCount})
+                    </button>
+                    {#if captionCopyState}
+                        <output aria-live="polite">{captionCopyState}</output>
+                    {/if}
+                </aside>
+            {/if}
         {/if}
 
         <!-- Temporarily hidden: Brittany, French Riviera, Overseas Territories
@@ -596,71 +1121,139 @@
     </div>
 
     <section
-        bind:this={residentQuotesEl}
         class="resident-voices"
         aria-labelledby="resident-voices-title"
     >
         <div class="resident-voices-inner">
             <h2 id="resident-voices-title" class="text-3xl font-bold">
-                What residents told us
+                Residents assess the housing projects
             </h2>
+            <p id="resident-sankey-instructions" class="sr-only">
+                Hover or focus on a category to highlight its connected quotes.
+                Select a category to keep it highlighted.
+            </p>
 
             <div
-                bind:this={residentTabsEl}
-                class="resident-topic-tabs"
-                role="tablist"
-                aria-label="Resident quote themes"
+                class="resident-sankey"
+                role="group"
+                aria-label="Resident assessment themes and quotes"
+                aria-describedby="resident-sankey-instructions"
             >
-                <span
-                    class="resident-topic-indicator"
-                    style:left="{residentIndicatorLeft}px"
-                    style:width="{residentIndicatorWidth}px"
-                ></span>
-                {#each residentTopics as topic, topicIndex (topic.label)}
-                    <button
-                        bind:this={residentButtonEls[topicIndex]}
-                        type="button"
-                        role="tab"
-                        aria-selected={topicIndex === residentTopicIndex}
-                        aria-controls="resident-quote-panel"
-                        tabindex={topicIndex === residentTopicIndex ? 0 : -1}
-                        class:resident-topic-button--active={topicIndex === residentTopicIndex}
-                        class="resident-topic-button"
-                        onclick={() => selectResidentTopic(topicIndex)}
+                <div bind:this={residentSankeyBody} class="resident-sankey-body">
+                    <svg
+                        class="resident-sankey-links"
+                        viewBox="0 0 1000 1000"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
                     >
-                        {topic.label}
-                    </button>
-                {/each}
-            </div>
-
-            {#key residentTopicIndex}
-                <Carousel.Root
-                    opts={{ loop: false }}
-                    setApi={(api) => (residentCarouselApi = api)}
-                    class="resident-carousel"
-                    aria-label={residentTopics[residentTopicIndex].label}
-                >
-                    <Carousel.Content>
-                        {#each residentTopics[residentTopicIndex].quotes as quote (quote)}
-                            <Carousel.Item>
-                                <div class="resident-quote-slide">
-                                    <blockquote class="resident-quote">
-                                        “{quote}”
-                                    </blockquote>
-                                </div>
-                            </Carousel.Item>
+                        {#each residentTopics as topic, topicIndex (topic.label)}
+                            <rect
+                                class="resident-sankey-node"
+                                class:resident-sankey-node--matched={activeResidentTopic === topicIndex || (activeResidentQuote !== null && residentQuoteList[activeResidentQuote]?.topicIndex === topicIndex)}
+                                class:resident-sankey-node--muted={(activeResidentTopic !== null && activeResidentTopic !== topicIndex) || (activeResidentQuote !== null && residentQuoteList[activeResidentQuote]?.topicIndex !== topicIndex)}
+                                x="205"
+                                y={residentTopicPositions[topicIndex] * 10 - residentTopicNodeHeight(topicIndex) / 2}
+                                width="8"
+                                height={residentTopicNodeHeight(topicIndex)}
+                                fill={residentTopicColors[topicIndex]}
+                            />
                         {/each}
-                    </Carousel.Content>
-                    {#if residentTopics[residentTopicIndex].quotes.length > 1}
-                        <Carousel.Previous class="resident-carousel-previous" />
-                        <Carousel.Next class="resident-carousel-next" />
-                    {/if}
-                </Carousel.Root>
-            {/key}
 
-            <p class="resident-quote-count" aria-live="polite">
-                {residentQuoteIndex + 1} / {residentTopics[residentTopicIndex].quotes.length}
-            </p>
+                        {#each residentQuoteList as item, quoteIndex (`${item.topicIndex}-${item.quoteIndex}`)}
+                            <path
+                                class="resident-sankey-link"
+                                class:resident-sankey-link--matched={activeResidentQuote === quoteIndex || (activeResidentQuote === null && activeResidentTopic === item.topicIndex)}
+                                class:resident-sankey-link--muted={(activeResidentQuote !== null && activeResidentQuote !== quoteIndex) || (activeResidentQuote === null && activeResidentTopic !== null && activeResidentTopic !== item.topicIndex)}
+                                d={residentLinkPath(item, quoteIndex)}
+                                stroke={item.color}
+                                vector-effect="non-scaling-stroke"
+                            />
+                            <rect
+                                class="resident-sankey-node resident-sankey-quote-node"
+                                class:resident-sankey-node--matched={activeResidentQuote === quoteIndex || (activeResidentQuote === null && activeResidentTopic === item.topicIndex)}
+                                class:resident-sankey-node--muted={(activeResidentQuote !== null && activeResidentQuote !== quoteIndex) || (activeResidentQuote === null && activeResidentTopic !== null && activeResidentTopic !== item.topicIndex)}
+                                x="500"
+                                y={residentQuotePositions[quoteIndex] * 10 - 8}
+                                width="8"
+                                height="16"
+                                fill={item.color}
+                            />
+                        {/each}
+                    </svg>
+
+                    <div
+                        class="resident-sankey-topics"
+                        role="group"
+                        aria-label="Resident quote categories"
+                    >
+                        {#each residentTopics as topic, topicIndex (topic.label)}
+                            <button
+                                bind:this={residentTopicEls[topicIndex]}
+                                type="button"
+                                class="resident-topic-button"
+                                class:resident-topic-button--active={activeResidentTopic === topicIndex || (activeResidentQuote !== null && residentQuoteList[activeResidentQuote]?.topicIndex === topicIndex)}
+                                aria-pressed={pinnedResidentTopic === topicIndex}
+                                aria-controls="resident-sankey-quotes"
+                                style:--topic-color={residentTopicColors[topicIndex]}
+                                style:top={`${residentTopicPositions[topicIndex]}%`}
+                                onmouseenter={() => previewResidentTopic(topicIndex)}
+                                onmouseleave={restorePinnedResidentTopic}
+                                onfocus={() => previewResidentTopic(topicIndex)}
+                                onblur={restorePinnedResidentTopic}
+                                onclick={() => toggleResidentTopic(topicIndex)}
+                                onkeydown={(event) => {
+                                    if (event.key === "Escape") {
+                                        clearResidentTopic();
+                                        event.currentTarget.blur();
+                                    }
+                                }}
+                            >
+                                <span>{topic.label}</span>
+                                <span class="sr-only">
+                                    {topic.quotes.length} connected
+                                    {topic.quotes.length === 1 ? "quote" : "quotes"}.
+                                </span>
+                            </button>
+                        {/each}
+                    </div>
+
+                    <div
+                        id="resident-sankey-quotes"
+                        class="resident-sankey-quotes"
+                    >
+                        {#each residentQuoteList as item, quoteIndex (`${item.topicIndex}-${item.quoteIndex}`)}
+                            <button
+                                bind:this={residentQuoteEls[quoteIndex]}
+                                type="button"
+                                class="resident-quote-item"
+                                class:resident-quote-item--matched={activeResidentQuote === quoteIndex || (activeResidentQuote === null && activeResidentTopic === item.topicIndex)}
+                                class:resident-quote-item--muted={(activeResidentQuote !== null && activeResidentQuote !== quoteIndex) || (activeResidentQuote === null && activeResidentTopic !== null && activeResidentTopic !== item.topicIndex)}
+                                style:--topic-color={item.color}
+                                onmouseenter={() => previewResidentQuote(quoteIndex)}
+                                onmouseleave={clearResidentQuote}
+                                onfocus={() => previewResidentQuote(quoteIndex)}
+                                onblur={clearResidentQuote}
+                                onkeydown={(event) => {
+                                    if (event.key === "Escape") {
+                                        clearResidentQuote();
+                                        event.currentTarget.blur();
+                                    }
+                                }}
+                            >
+                                <span class="sr-only">
+                                    Category: {item.topicLabel}. Quote {quoteIndex + 1}:
+                                </span>
+                                <span class="resident-quote-number" aria-hidden="true">
+                                    {String(quoteIndex + 1).padStart(2, "0")}
+                                </span>
+                                <span class="resident-quote">
+                                    “{item.quote}”
+                                </span>
+                            </button>
+                        {/each}
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </section>
@@ -668,103 +1261,142 @@
 <EditorialMarkdown source={editorialContent} section="post-occupancy" />
 
 <style>
-    :global(html) {
-        scroll-behavior: smooth;
-    }
-
     .story {
         position: relative;
         overflow: clip;
         background: #111;
     }
 
-    .story-project-nav {
+    .case-study-index-shell {
+        width: min(100%, 80rem);
+        margin: 2rem auto 0;
+        padding-inline: 1.5rem;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #aaa transparent;
+    }
+
+    .case-study-index {
+        display: grid;
+        min-width: 56rem;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 1px;
+        padding: 1px;
+        background: #d6d6d2;
+    }
+
+    .case-study-region-label {
+        display: flex;
+        min-height: 2.4rem;
+        align-items: center;
+        justify-content: center;
+        padding: 0.55rem 0.35rem;
+        background: #fff;
+        color: #262626;
+        font-size: 0.78rem;
+        font-weight: 650;
+        line-height: 1.1;
+        text-align: center;
+    }
+
+    .case-study-region-label--paris {
+        grid-column: span 4;
+    }
+
+    .case-study-case-button {
+        display: grid;
+        min-width: 0;
+        grid-template-rows: auto 1fr;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        background: #fff;
+        color: #3f3f3f;
+        font: inherit;
+        cursor: pointer;
+        transition:
+            background-color 140ms ease,
+            box-shadow 140ms ease;
+    }
+
+    .case-study-case-button:hover {
+        background: #f1f1ef;
+    }
+
+    .case-study-case-button:focus-visible {
+        position: relative;
+        z-index: 2;
+        outline: 2px solid #d97f18;
+        outline-offset: -2px;
+    }
+
+    .case-study-case-button--active {
+        position: relative;
+        z-index: 1;
+        color: #111;
+        box-shadow: inset 0 0 0 1px #6f6f6a;
+    }
+
+    .case-study-thumbnail {
+        display: block;
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #ededeb;
+    }
+
+    .case-study-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .case-study-case-label {
+        display: flex;
+        min-height: 3.1rem;
+        align-items: center;
+        justify-content: center;
+        border-top: 1px solid #d6d6d2;
+        padding: 0.65rem 0.45rem 0.75rem;
+        font-size: clamp(0.67rem, 0.82vw, 0.8rem);
+        font-weight: 500;
+        line-height: 1.15;
+        text-align: center;
+        text-wrap: balance;
+    }
+
+    .case-study-case-button--active .case-study-case-label {
+        background: #ececea;
+        font-weight: 750;
+    }
+
+    .case-study-compact-anchor {
         position: sticky;
         top: 4.0625rem;
         z-index: 100;
         height: 0;
-        width: min(58rem, calc(100% - 2rem));
-        margin-inline: auto;
-        transform: translateY(1.25rem);
-        text-align: center;
+        width: 100%;
+        pointer-events: none;
+    }
+
+    .case-study-compact-index {
+        position: relative;
+        top: clamp(1rem, 2vw, 1.5rem);
+        width: fit-content;
+        margin-left: clamp(1rem, 2vw, 1.5rem);
+        animation: case-study-index-enter 160ms ease-out;
         pointer-events: auto;
     }
 
-    .story-project-tabs {
-        position: relative;
-        display: flex;
-        width: max-content;
-        max-width: 100%;
-        margin: 0 auto;
-        overflow-x: auto;
-        scrollbar-width: none;
-    }
-
-    .story-project-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .story-region-inline {
-        position: relative;
-        z-index: 1;
-        flex: 0 0 auto;
-        padding: 0.52rem 0.9rem;
-        color: #fff;
-        font: inherit;
-        font-size: clamp(0.68rem, 1.25vw, 0.875rem);
-        font-weight: 700;
-        line-height: 1;
-        text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
-        white-space: nowrap;
-    }
-
-    .story-project-indicator {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        z-index: 0;
-        border: 1px solid #fff;
-        border-radius: 9999px;
-        background: transparent;
-        transition:
-            left 420ms cubic-bezier(0.22, 1, 0.36, 1),
-            width 420ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .story-project-button {
-        position: relative;
-        z-index: 1;
-        flex: 0 0 auto;
-        border: 0;
-        border-radius: 9999px;
-        padding: 0.52rem 0.9rem;
-        background: transparent;
-        color: #fff;
-        font: inherit;
-        font-size: clamp(0.68rem, 1.25vw, 0.875rem);
-        line-height: 1;
-        text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
-        white-space: nowrap;
-        cursor: pointer;
-        transition: opacity 220ms ease;
-    }
-
-    .story-project-button:hover {
-        text-decoration: underline;
-        text-underline-offset: 0.2em;
-    }
-
-    .story-project-button:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 3px;
-    }
-
-    .story-project-button--active {
-        color: #fff;
-    }
-
-    .story-project-button--active:focus-visible {
-        outline: none;
+    @keyframes case-study-index-enter {
+        from {
+            opacity: 0;
+            transform: translateY(-0.35rem);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .story-cards {
@@ -807,183 +1439,430 @@
         object-fit: cover;
     }
 
+    .story-card--last {
+        flex-direction: column;
+        background: #fff;
+    }
+
+    .story-card--last .story-image {
+        order: 2;
+        flex: 1 1 0;
+        min-height: 0;
+        box-sizing: border-box;
+        padding: clamp(1rem, 2vw, 1.5rem);
+        object-fit: contain;
+    }
+
+    .story-card--last .story-caption {
+        position: relative;
+        order: 1;
+        top: auto;
+        right: auto;
+        align-self: flex-end;
+        flex: 0 0 auto;
+        margin: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.5rem) 0;
+    }
+
     .story-caption {
+        --caption-edge-inset: clamp(1rem, 2vw, 1.5rem);
         position: absolute;
         z-index: 2;
-        top: 50%;
-        left: 50%;
         width: min(28rem, calc(100% - 2rem));
         margin: 0;
+        border: 0;
+        border-radius: 0;
         padding: clamp(0.9rem, 1.6vw, 1.25rem)
             clamp(1rem, 1.9vw, 1.5rem);
-        transform: translate(-50%, -50%);
         background: rgb(255 255 255 / 88%);
         color: #0a0a0a;
+        font-family: inherit;
         font-size: clamp(0.875rem, 1.15vw, 1.075rem);
         font-weight: 400;
         letter-spacing: -0.012em;
         line-height: 1.4;
+        text-align: left;
+        transition:
+            inset 180ms ease,
+            transform 180ms ease;
+    }
+
+    .story-caption--top-left {
+        top: var(--caption-edge-inset);
+        left: var(--caption-edge-inset);
+    }
+
+    .story-caption--top-center {
+        top: var(--caption-edge-inset);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .story-caption--top-right {
+        top: var(--caption-edge-inset);
+        right: var(--caption-edge-inset);
+    }
+
+    .story-caption--center-left {
+        top: 50%;
+        left: var(--caption-edge-inset);
+        transform: translateY(-50%);
+    }
+
+    .story-caption--center-center {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .story-caption--center-right {
+        top: 50%;
+        right: var(--caption-edge-inset);
+        transform: translateY(-50%);
+    }
+
+    .story-caption--bottom-left {
+        bottom: var(--caption-edge-inset);
+        left: var(--caption-edge-inset);
+    }
+
+    .story-caption--bottom-center {
+        bottom: var(--caption-edge-inset);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .story-caption--bottom-right {
+        right: var(--caption-edge-inset);
+        bottom: var(--caption-edge-inset);
+    }
+
+    .caption-debug-grid {
+        position: absolute;
+        z-index: 2;
+        inset: 0;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        pointer-events: none;
+    }
+
+    .caption-debug-grid > span {
+        border: 1px dashed rgb(255 255 255 / 68%);
+    }
+
+    .story-caption--debug {
+        z-index: 3;
+        outline: 2px solid #f3a712;
+        outline-offset: 2px;
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+    }
+
+    .story-caption--dragging {
+        cursor: grabbing;
+        transition: none;
+    }
+
+    .caption-debug-toolbar {
+        position: fixed;
+        z-index: 10000;
+        right: 1rem;
+        bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid #111;
+        padding: 0.4rem;
+        background: rgb(255 255 255 / 96%);
+        color: #111;
+        font-size: 0.75rem;
+    }
+
+    .caption-debug-toolbar button {
+        border: 1px solid #111;
+        border-radius: 0;
+        padding: 0.42rem 0.65rem;
+        background: #111;
+        color: #fff;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .caption-debug-toolbar button:disabled {
+        cursor: default;
+        opacity: 0.38;
+    }
+
+    .caption-debug-toolbar button:focus-visible {
+        outline: 2px solid #d97f18;
+        outline-offset: 2px;
+    }
+
+    .caption-debug-toolbar output {
+        color: #246b52;
+        font-weight: 700;
     }
 
     .resident-voices {
+        height: calc(100svh - 4.0625rem);
+        overflow: hidden;
         background: #fff;
         color: #111;
     }
 
     .resident-voices-inner {
-        width: min(48rem, calc(100% - 2rem));
+        width: min(86rem, calc(100% - 3rem));
+        height: 100%;
         margin-inline: auto;
-        padding: clamp(4.5rem, 9vw, 8rem) 0;
+        padding: clamp(2rem, 4vh, 2.75rem) 0 clamp(0.75rem, 2vh, 1.25rem);
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: clamp(0.55rem, 1.5vh, 0.9rem);
     }
 
     .resident-voices-inner > h2 {
-        margin-bottom: 2rem;
+        max-width: 48rem;
+        margin: 0;
+        font-size: clamp(1.55rem, 2.6vw, 2rem);
+        line-height: 1.05;
     }
 
-    .resident-topic-tabs {
+    .resident-sankey {
         position: relative;
-        display: flex;
-        width: 100%;
-        gap: 0;
-        overflow-x: auto;
-        scrollbar-width: none;
+        min-height: 0;
+        overflow: hidden;
     }
 
-    .resident-topic-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .resident-topic-indicator {
+    .resident-sankey-body {
         position: absolute;
-        top: 0;
-        bottom: 0;
-        z-index: 0;
-        border: 1px solid #111827;
-        border-radius: 9999px;
+        inset: 0;
+        min-height: 0;
+    }
+
+    .resident-sankey-links {
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        pointer-events: none;
+    }
+
+    .resident-sankey-link {
+        fill: none;
+        stroke-width: 2.25;
+        opacity: 0.18;
         transition:
-            left 420ms cubic-bezier(0.22, 1, 0.36, 1),
-            width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 160ms ease,
+            stroke-width 160ms ease;
+    }
+
+    .resident-sankey-link--matched {
+        stroke-width: 3.5;
+        opacity: 0.78;
+    }
+
+    .resident-sankey-link--muted {
+        opacity: 0.012;
+    }
+
+    .resident-sankey-node {
+        opacity: 0.72;
+        transition: opacity 160ms ease;
+    }
+
+    .resident-sankey-node--matched {
+        opacity: 1;
+    }
+
+    .resident-sankey-node--muted {
+        opacity: 0.08;
+    }
+
+    .resident-sankey-topics {
+        position: absolute;
+        z-index: 3;
+        inset: 0 79% 0 0;
+        pointer-events: none;
     }
 
     .resident-topic-button {
-        position: relative;
-        z-index: 1;
-        flex: 0 0 auto;
+        position: absolute;
+        left: 0;
+        display: grid;
+        width: 100%;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.5rem;
+        align-items: center;
+        transform: translateY(-50%);
         border: 0;
-        border-radius: 9999px;
-        padding: 0.62rem 0.9rem;
+        border-left: 3px solid transparent;
+        border-radius: 0;
+        padding: 0.3rem 0.3rem 0.34rem 0.55rem;
         background: transparent;
-        color: #384152;
+        color: #5f5f5f;
         font: inherit;
-        font-size: clamp(0.72rem, 1vw, 0.875rem);
-        line-height: 1.15;
-        white-space: nowrap;
+        font-size: clamp(0.58rem, 0.9vw, 0.78rem);
+        font-weight: 600;
+        line-height: 1.18;
+        text-align: left;
         cursor: pointer;
-        transition: color 200ms ease;
+        pointer-events: auto;
+        transition:
+            background-color 180ms ease,
+            border-color 180ms ease,
+            color 180ms ease;
     }
 
     .resident-topic-button:hover,
     .resident-topic-button--active {
+        border-left-color: var(--topic-color);
+        background: color-mix(in srgb, var(--topic-color) 8%, white);
         color: #111;
     }
 
     .resident-topic-button:focus-visible {
-        outline: 2px solid #111827;
-        outline-offset: 3px;
+        outline: 2px solid var(--topic-color);
+        outline-offset: 2px;
     }
 
-    :global(.resident-carousel) {
-        width: calc(100% - 5rem);
-        margin: 0 auto;
+    .resident-quote-number {
+        color: #777;
+        font-size: clamp(0.48rem, 0.58vw, 0.6rem);
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        line-height: 1.15;
     }
 
-    .resident-quote-slide {
+    .resident-sankey-quotes {
+        position: absolute;
+        z-index: 3;
+        inset: 0 0 0 51.5%;
+        display: flex;
+        min-height: 0;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .resident-quote-item {
         display: grid;
-        min-height: clamp(19rem, 36vw, 28rem);
-        place-items: center;
-        padding: clamp(3rem, 7vw, 6rem) 0 clamp(2rem, 4vw, 3rem);
+        width: 100%;
+        grid-template-columns: 1.35rem minmax(0, 1fr);
+        gap: 0.35rem;
+        align-items: start;
+        border: 0;
+        border-radius: 0;
+        padding: 0.08rem 0.25rem;
+        background: transparent;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition:
+            background-color 180ms ease,
+            opacity 180ms ease;
+    }
+
+    .resident-quote-item:hover,
+    .resident-quote-item--matched {
+        background: color-mix(in srgb, var(--topic-color) 9%, white);
+    }
+
+    .resident-quote-item--muted {
+        opacity: 0.12;
+    }
+
+    .resident-quote-item:focus-visible {
+        outline: 2px solid var(--topic-color);
+        outline-offset: 1px;
+    }
+
+    .resident-quote-number {
+        padding-top: 0.08rem;
+        color: var(--topic-color);
     }
 
     .resident-quote {
-        max-width: 54rem;
-        margin: 0 auto;
-        font-size: clamp(1.55rem, 3.2vw, 3rem);
+        color: #202020;
+        font-family: inherit;
+        font-size: clamp(0.54rem, 0.78vw, 0.72rem);
         font-weight: 400;
-        letter-spacing: -0.035em;
-        line-height: 1.18;
-        text-align: center;
-        text-wrap: balance;
+        letter-spacing: -0.01em;
+        line-height: 1.14;
+        text-wrap: pretty;
     }
 
-    :global(.resident-carousel-previous) {
-        left: -2.5rem;
-    }
+    @media (max-width: 720px) {
+        .resident-voices-inner {
+            width: calc(100% - 1.5rem);
+        }
 
-    :global(.resident-carousel-next) {
-        right: -2.5rem;
-    }
+        .resident-voices-inner > h2 {
+            font-size: clamp(1.2rem, 5vw, 1.55rem);
+        }
 
-    .resident-quote-count {
-        margin: 0;
-        color: #697181;
-        font-size: 0.75rem;
-        font-variant-numeric: tabular-nums;
-        text-align: center;
+        .resident-topic-button {
+            font-size: clamp(0.46rem, 1.8vw, 0.6rem);
+            line-height: 1.08;
+        }
+
+        .resident-quote {
+            font-size: clamp(0.4rem, 1.55vw, 0.52rem);
+            line-height: 1.06;
+        }
+
+        .resident-quote-item {
+            grid-template-columns: 0.85rem minmax(0, 1fr);
+            gap: 0.15rem;
+            padding-block: 0.03rem;
+        }
+
+        .resident-quote-number {
+            font-size: 0.42rem;
+        }
     }
 
     @media (max-width: 640px) {
-        .story-project-nav {
-            top: 4.0625rem;
-            width: calc(100% - 1rem);
-            transform: translateY(1rem);
+        .case-study-index-shell {
+            padding-inline: 0.75rem;
         }
 
-        .story-project-tabs {
-            margin-inline: 0;
+        .case-study-index {
+            min-width: 49rem;
         }
 
-        .story-project-button {
-            padding-inline: 0.72rem;
-        }
-
-        .story-region-inline {
-            padding-inline: 0.72rem;
+        .case-study-compact-index {
+            position: fixed;
+            top: auto;
+            bottom: max(0.75rem, env(safe-area-inset-bottom));
+            left: 50%;
+            margin-left: 0;
+            transform: translateX(-50%);
+            animation: none;
         }
 
         .story-caption {
             width: calc(100% - 1.5rem);
         }
 
-        .resident-voices-inner {
-            width: calc(100% - 1.5rem);
+        .story-caption--bottom-left,
+        .story-caption--bottom-center,
+        .story-caption--bottom-right {
+            bottom: calc(var(--caption-edge-inset) + 3.25rem);
         }
 
-        :global(.resident-carousel) {
-            width: calc(100% - 3.5rem);
-        }
-
-        :global(.resident-carousel-previous) {
-            left: -1.75rem;
-        }
-
-        :global(.resident-carousel-next) {
-            right: -1.75rem;
-        }
-
-        .resident-quote {
-            font-size: clamp(1.35rem, 7vw, 2rem);
-            text-wrap: pretty;
-        }
     }
 
     @media (prefers-reduced-motion: reduce) {
-        :global(html) {
-            scroll-behavior: auto;
-        }
-
-        .story-project-indicator,
-        .resident-topic-indicator,
-        .story-card {
+        .case-study-compact-index,
+        .story-card,
+        .resident-topic-button,
+        .resident-quote-item,
+        .resident-sankey-link,
+        .resident-sankey-node {
             transition-duration: 1ms;
         }
     }

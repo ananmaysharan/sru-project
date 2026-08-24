@@ -3,7 +3,6 @@
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as Select from '$lib/components/ui/select';
-	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import {
 		mapState as DEFAULT_MAP_STATE,
 		MapState,
@@ -57,9 +56,9 @@
 	}
 </script>
 
-<div class="w-full md:w-84 shrink-0 border border-gray-200 bg-white p-4 flex flex-col gap-4">
+<div class="flex w-full shrink-0 flex-col gap-5 border border-gray-200 bg-white p-5 md:w-84">
 	<div>
-		<p class="text-xs font-medium text-gray-500 mb-1.5">Search</p>
+		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">Search</p>
 		<Combobox.Root
 			type="single"
 			bind:open={mapState.searchOpen}
@@ -69,13 +68,15 @@
 			<div class="relative" bind:this={searchInputEl}>
 				<SearchIcon class="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
 				<Combobox.Input
-					placeholder="Search for a place..."
+					aria-label="Search the health map"
+					placeholder="Search for a place…"
 					class="flex h-9 w-full rounded-md border border-input bg-transparent pl-8 pr-8 py-1 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 					oninput={(e: Event) => { mapState.searchQuery = (e.target as HTMLInputElement).value; mapState.searchOpen = true; }}
 				/>
 				{#if mapState.searchQuery.length > 0 || mapState.searchValue}
 					<button
 						type="button"
+						aria-label="Clear map search"
 						class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
 						onclick={clearSearch}
 					>
@@ -123,9 +124,9 @@
 	</div>
 
 	<div>
-		<p class="text-xs font-medium text-gray-500 mb-1.5">Select Variable</p>
+		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">Variable</p>
 		<Select.Root type="single" value={mapState.activeMetric} onValueChange={handleMetricChange}>
-			<Select.Trigger class="w-full">
+			<Select.Trigger class="w-full" aria-label="Health map variable">
 				{mapState.currentConfig.label}
 			</Select.Trigger>
 			<Select.Content>
@@ -137,9 +138,9 @@
 	</div>
 
 	<div>
-		<p class="text-xs font-medium text-gray-500 mb-1.5">Year</p>
+		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">Year</p>
 		<Select.Root type="single" value={String(mapState.activeYear)} onValueChange={handleYearChange}>
-			<Select.Trigger class="w-full">
+			<Select.Trigger class="w-full" aria-label="Health map year">
 				{mapState.activeYear}
 			</Select.Trigger>
 			<Select.Content>
@@ -151,7 +152,7 @@
 	</div>
 
 	<div class="mt-auto border-t border-gray-200 pt-4">
-		<p class="text-xs font-medium text-gray-500 mb-2">Legend</p>
+		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">Legend</p>
 
 		{#if mapState.cornerMode}
 			<div class="space-y-2.5">
@@ -215,12 +216,5 @@
 			</div>
 		{/if}
 
-		<div class="mt-3 flex items-center gap-2 text-[10px] text-gray-500">
-			<span
-				class="h-3.5 w-5 shrink-0 border"
-				style="background-color: {GRAPHICS_COLORS.noData}; border-color: {GRAPHICS_COLORS.grid};"
-			></span>
-			<span>Not available</span>
-		</div>
 	</div>
 </div>

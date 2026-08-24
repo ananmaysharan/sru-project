@@ -3,6 +3,7 @@
     import { asset } from "$app/paths";
     import SocialHousingStockChart from "$lib/components/charts/SocialHousingStockChart.svelte";
     import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
+    import Acknowledgements from "$lib/components/sections/Acknowledgements.svelte";
     import Logos from "$lib/components/elements/Logos.svelte";
     import { STORY_PHASES, phaseProgress } from "$lib/data/charts/scroll-story";
     import editorialContent from "$lib/data/editorial-content.md?raw";
@@ -48,6 +49,9 @@
     <img
         src={asset("/intro-hero.webp")}
         alt="View from a Parisian balcony"
+        width="5244"
+        height="3870"
+        fetchpriority="high"
         class="absolute inset-0 w-full h-full object-cover"
     />
     <div
@@ -151,9 +155,9 @@
     </div>
 </section>
 
-<section class="py-12">
+<section class="support-section">
     <div class="max-w-6xl mx-auto px-6 pb-4">
-        <h3 class="text-sm font-medium text-gray-500">Supported By:</h3>
+        <h2 class="text-sm font-semibold uppercase tracking-[0.08em] text-gray-500">Supported by</h2>
     </div>
     <Logos />
 </section>
@@ -171,8 +175,7 @@
         <!-- Crossfading caption — the heading swaps from the data story to the
              news story in step with the chart's zoom beat. -->
         <div
-            class="relative max-w-3xl mx-auto px-6 pt-6 w-full"
-            style="height: 240px;"
+            class="story-copy-frame relative max-w-3xl mx-auto px-6 pt-6 w-full"
         >
             <div
                 class="absolute inset-x-6"
@@ -211,39 +214,7 @@
     </div>
 </section>
 
-<EditorialMarkdown source={editorialContent} section="introduction" />
-
-<section class="pt-8 pb-12 md:pt-12">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6">
-        <h2 class="text-3xl font-bold text-gray-900">Acknowledgements</h2>
-        <div class="mt-6 space-y-6 text-gray-700">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900">
-                    Data Access and Policy Context
-                </h3>
-                <p class="mt-1">
-                    Julie Bergeot, Clément Petitimbert from the Mission SRU at
-                    the Ministry of Housing; Dr. Julie Vallée (CNRS Research
-                    Director &amp; Head of Mobiliscope), Dr. Rolf Pendall, AICP
-                    (University of New Mexico)
-                </p>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900">Photography</h3>
-                <p class="mt-1">
-                    All images developed in partnership with docar films (Rocío
-                    Calzado Lopez + Jasper Meurer).
-                </p>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900">
-                    Research Assistantship Team
-                </h3>
-                <p class="mt-1">
-                    Ananmay Sharan, Sebastian Rodriguez, Matt Thibodeau, Yihan
-                    Zhang, Anishta Khan
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
+<EditorialMarkdown source={editorialContent} section="introduction" render="content" />
+<EditorialMarkdown source={editorialContent} section="dashboard-guide" render="content" compact />
+<Acknowledgements />
+<EditorialMarkdown source={editorialContent} section="introduction" render="notes" compact />

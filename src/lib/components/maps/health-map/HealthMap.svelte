@@ -247,6 +247,7 @@
 				<Button
 					variant="outline"
 					size="sm"
+					aria-label="Return to the territory overview"
 					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; }}
 				>
 					<ArrowLeftIcon class="size-4" />

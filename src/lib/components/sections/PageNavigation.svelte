@@ -18,7 +18,7 @@
 </script>
 
 <nav
-	class="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-12 sm:px-6"
+	class="mx-auto mt-16 flex max-w-3xl items-center justify-between gap-3 px-4 py-10 sm:px-6"
 	aria-label="Page navigation"
 >
 	{#if previousRoute}

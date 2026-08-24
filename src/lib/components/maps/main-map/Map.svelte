@@ -398,6 +398,7 @@
 				<Button
 					variant="outline"
 					size="sm"
+					aria-label="Return to the territory overview"
 					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; }}
 				>
 					<ArrowLeftIcon class="size-4" />
@@ -436,6 +437,7 @@
 		<!-- Year slider bar -->
 		<div class="border-t border-gray-200 bg-white px-4 py-2 shrink-0" class:opacity-40={mapState.yearSliderDisabled}>
 			<Slider.Root
+				aria-label="Supply map year"
 				type="single"
 				min={YEAR_MIN}
 				max={YEAR_MAX}
@@ -458,7 +460,14 @@
 					{/each}
 				{/snippet}
 			</Slider.Root>
-			<div class="flex justify-between mt-0.5">
+			<div class="mt-1 flex justify-between sm:hidden">
+				<span class="text-[10px] text-gray-400">{YEAR_MIN}</span>
+				<span class="text-[10px] font-semibold" style:color={timelineAccent}>
+					{mapState.activeYear}
+				</span>
+				<span class="text-[10px] text-gray-400">{YEAR_MAX}</span>
+			</div>
+			<div class="mt-0.5 hidden justify-between sm:flex">
 				{#each YEARS as year (year)}
 					<span
 						class="text-[10px] text-gray-400"

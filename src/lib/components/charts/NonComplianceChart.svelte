@@ -275,7 +275,7 @@
 
 <svelte:window bind:innerWidth={viewportWidth} />
 
-<div class="mt-4">
+<div class="noncompliance-chart-shell mx-4 mt-4 md:mx-12">
 	<div class="mx-auto max-w-3xl px-4 sm:px-6">
 		<div class="filter-pills" aria-label="Region filters">
 			<Button
@@ -301,17 +301,8 @@
 				</Button>
 			{/each}
 		</div>
-		<div class="frequency-legend" aria-label="Marker colors show repeated noncompliance">
-			<span class="frequency-legend-title">Repeated noncompliance</span>
-			{#each frequencyLegend as item (item.count)}
-				<span class="frequency-legend-item">
-					<span class="frequency-swatch" style={`background:${item.color}`}></span>
-					{item.label}
-				</span>
-			{/each}
-		</div>
 	</div>
-	<div class="list-columns-wrap mx-4 md:mx-12">
+	<div class="list-columns-wrap">
 		<div
 			id="noncompliance-list"
 			class="list-columns"
@@ -357,9 +348,24 @@
 			{/each}
 		</div>
 	</div>
+	<div class="frequency-legend" aria-label="Marker colors show repeated noncompliance">
+		<span class="frequency-legend-title">Repeated noncompliance</span>
+		{#each frequencyLegend as item (item.count)}
+			<span class="frequency-legend-item">
+				<span class="frequency-swatch" style={`background:${item.color}`}></span>
+				{item.label}
+			</span>
+		{/each}
+	</div>
 </div>
 
 <style>
+	.noncompliance-chart-shell {
+		border: 1px solid var(--editorial-rule, #dadad7);
+		padding: clamp(1rem, 1.7vw, 1.5rem);
+		background: #fff;
+	}
+
 	.filter-pills {
 		display: flex;
 		flex-wrap: wrap;
@@ -374,7 +380,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 6px 14px;
-		margin: -2px 0 18px;
+		margin: 18px 0 0;
 		color: #5f5f5f;
 		font-family: 'Open Sans', Arial, ui-sans-serif, system-ui, sans-serif;
 		font-size: 12px;
