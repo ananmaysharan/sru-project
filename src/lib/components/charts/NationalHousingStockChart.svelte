@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { nationalHousingStock } from '$lib/data/charts/national-housing-stock';
+	import { language } from '$lib/i18n';
 
 	let chartEl: HTMLDivElement;
 
@@ -51,7 +52,7 @@
 					axisLabel: {
 						fontSize: 11,
 						color: GRAPHICS_COLORS.secondaryText,
-						formatter: (v: number) => v.toLocaleString()
+						formatter: (v: number) => v.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')
 					}
 				},
 				series: [

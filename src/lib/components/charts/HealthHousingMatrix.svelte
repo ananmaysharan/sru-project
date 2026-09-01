@@ -7,6 +7,7 @@
 		type HealthHousingStudy
 	} from '$lib/data/charts/health-housing-matrix';
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
+	import { language } from '$lib/i18n';
 
 	type Tooltip = {
 		key: string;
@@ -22,6 +23,27 @@
 		indoor: GRAPHICS_COLORS.primary,
 		outdoor: GRAPHICS_COLORS.primaryDark
 	} as const;
+
+	const translations: Record<string, string> = {
+		'How Housing Impacts Health': 'Le logement, un déterminant de la santé',
+		'Physical Health': 'Santé physique', 'Mental Health': 'Santé mentale',
+		'Housing': 'Logement', 'Environment': 'Environnement',
+		'Location + Conditions': 'Localisation et conditions', 'Location': 'Localisation',
+		'Housing Quality': 'Qualité du logement', 'Proximities + Accessibility': 'Proximité et accessibilité',
+		'Proximity to Services': 'Proximité des services', 'Proximity to Green Spaces': 'Proximité des espaces verts',
+		'Proximity to Industrial Sites': 'Proximité des sites industriels', 'Transit Accessibility': 'Accessibilité des transports',
+		'Indoor Environmental Quality': 'Qualité de l’environnement intérieur', 'Thermal Comfort': 'Confort thermique',
+		'Indoor Air Quality': 'Qualité de l’air intérieur', 'Chemical Exposure': 'Exposition aux substances chimiques',
+		'Outdoor Environmental Quality': 'Qualité de l’environnement extérieur', 'Prevalence of Air Pollution': 'Prévalence de la pollution atmosphérique',
+		'Significant Extreme Heat / UHI': 'Fortes chaleurs extrêmes / îlots de chaleur urbains', 'Noise Pollution': 'Pollution sonore',
+		'Prevalence of Respiratory Illness': 'Prévalence des maladies respiratoires',
+		'Prevalence of Non-Communicable Disease (diabetes, obesity, cardiovascular)': 'Prévalence des maladies non transmissibles (diabète, obésité, maladies cardiovasculaires)',
+		'Prevalence of Thermal Discomforts + Disease (heatstroke, hypothermia)': 'Prévalence de l’inconfort thermique et des maladies associées (coup de chaleur, hypothermie)',
+		'Prevalence of Communicable Disease or Toxic Poisoning (water-borne, Pb, aesbestos)': 'Prévalence des maladies transmissibles ou des intoxications toxiques (maladies hydriques, plomb, amiante)',
+		'Stress and Anxiety': 'Stress et anxiété', 'Depression and Social Isolation': 'Dépression et isolement social',
+		'Cognitive and Behavioral Issues': 'Troubles cognitifs et comportementaux'
+	};
+	function label(value: string) { return $language === 'fr' ? translations[value] ?? value : value; }
 
 	const subcategories = [
 		{ key: 'location', label: 'Location + Conditions', gridRow: 3 },
@@ -112,15 +134,15 @@
 					width="2800"
 					height="406"
 				/>
-				<h2 id="health-housing-title">How Housing<br /> Impacts Health</h2>
+				<h2 id="health-housing-title">{#if $language === 'fr'}Le logement,<br /> un déterminant de la santé{:else}How Housing<br /> Impacts Health{/if}</h2>
 			</header>
 
 			<div class="matrix-grid">
 				<div class="domain-frame physical-frame" aria-hidden="true"></div>
 				<div class="domain-frame mental-frame" aria-hidden="true"></div>
 				<div class="domain-divider" aria-hidden="true"></div>
-				<div class="health-domain physical-domain">Physical Health</div>
-				<div class="health-domain mental-domain">Mental Health</div>
+				<div class="health-domain physical-domain">{label('Physical Health')}</div>
+				<div class="health-domain mental-domain">{label('Mental Health')}</div>
 
 				<div class="outcome-spacer" aria-hidden="true"></div>
 				{#each HEALTH_OUTCOMES as outcome, outcomeIndex (outcome)}
@@ -130,7 +152,7 @@
 						class:last-outcome={outcomeIndex === HEALTH_OUTCOMES.length - 1}
 						style={`grid-column:${outcomeIndex + 3};grid-row:2;`}
 					>
-						{outcome}
+						{label(outcome)}
 					</div>
 				{/each}
 
@@ -139,7 +161,7 @@
 						class={`parent-category ${parent.className}`}
 						style={`grid-column:1;grid-row:${parent.gridStart}/${parent.gridEnd};--parent-color:${parent.color};`}
 					>
-						<span>{parent.label}</span>
+						<span>{label(parent.label)}</span>
 					</div>
 				{/each}
 
@@ -148,7 +170,7 @@
 						class="subcategory-label"
 						style={`grid-column:2;grid-row:${subcategory.gridRow};--group-color:${groupColors[subcategory.key]};`}
 					>
-						{subcategory.label}
+						{label(subcategory.label)}
 					</div>
 					<div
 						class="subcategory-rule"
@@ -165,7 +187,7 @@
 						class:last-row={rowIndex === HEALTH_HOUSING_ROWS.length - 1}
 						style={`grid-column:2;grid-row:${gridRow};--group-color:${groupColors[row.group]};`}
 					>
-						{row.label}
+						{label(row.label)}
 					</div>
 
 					{#each row.studies as study, outcomeIndex (`${row.label}-${outcomeIndex}`)}
@@ -183,7 +205,7 @@
 									target="_blank"
 									rel="noreferrer"
 									style={`--dot-color:${groupColors[row.group]};`}
-									aria-label={`${row.label} and ${HEALTH_OUTCOMES[outcomeIndex]}: ${study.title}`}
+									aria-label={`${label(row.label)} et ${label(HEALTH_OUTCOMES[outcomeIndex])} : ${study.title}`}
 									aria-describedby={tooltip?.key === key ? 'health-housing-study-tooltip' : undefined}
 									onpointerenter={(event) =>
 										showPointerTooltip(event, key, study, groupColors[row.group])}

@@ -35,13 +35,13 @@ export const socialMixPolicies = [
 	{
 		iso3: 'GBR',
 		country: 'United Kingdom',
-		policyName: 'Section 106 (S106) Agreements',
+		policyName: 'Section 106 (S106) Agreements / Town and Country Planning Act 1990',
 		description:
 			'Under Section 106 of the Town and Country Planning Act, planning authorities can require developers to provide a proportion of affordable units or make in-lieu contributions. Many local plans set explicit percentage targets for affordable housing in new developments. S106 contributions allow alternatives such as producing affordable units at a different location, paying cash in lieu, or donating land for future affordable housing.',
 		differenceFromSru:
 			'Not as relevant since the spatial aspect is avoidable and this is a focus on ownership rather than social housing.',
 		category: 'Inclusionary Zoning',
-		years: null
+		years: '1990'
 	},
 	{
 		iso3: 'BEL',
@@ -57,12 +57,12 @@ export const socialMixPolicies = [
 	{
 		iso3: 'NLD',
 		country: 'Netherlands',
-		policyName: 'Proposed Housing Governance Strengthening Act (Wet Versterking Regie Volkshuisvesting)',
+		policyName: 'Housing Governance Strengthening Act (Wet Versterking Regie Volkshuisvesting) / 2026',
 		description:
 			'Under this law, two-thirds of all new housing built within a region must meet national affordability standards, with 30% reserved for social housing (maximum monthly rent of roughly €900). These national targets build on existing local agreements — for instance, Amsterdam has applied the "40-40-20" rule since 2017. The shared goal is to keep the housing market accessible to low- and middle-income households.',
 		differenceFromSru:
 			'Similar to SRU with nationally set percentage expectations, but framed around new construction rather than total stock. There are no financial penalties for not meeting set goals, though municipalities are responsible for setting their own affordability goals.',
 		category: null,
-		years: 'Proposal, not yet law'
+		years: '2026'
 	}
 ];

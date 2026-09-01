@@ -2,35 +2,36 @@
 	import { onMount } from 'svelte';
 	import { COMPARISON_PALETTE, GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { residencesByYear } from '$lib/data/charts/residences-summary';
+	import { language } from '$lib/i18n';
 
 	let chartEl: HTMLDivElement;
 
-	const series = [
+	const series = $derived([
 		{
-			name: 'Social Rental Tenants',
+			name: $language === 'fr' ? 'Locataires du parc social' : 'Social Rental Tenants',
 			key: 'socialRental',
 			color: COMPARISON_PALETTE[0],
 			labelColor: GRAPHICS_COLORS.canvas
 		},
 		{
-			name: 'Private Rental Tenants',
+			name: $language === 'fr' ? 'Locataires du parc privé' : 'Private Rental Tenants',
 			key: 'privateRental',
 			color: COMPARISON_PALETTE[1],
 			labelColor: GRAPHICS_COLORS.ink
 		},
 		{
-			name: 'Owner-Occupied (Mortgaged)',
+			name: $language === 'fr' ? 'Propriétaires accédants' : 'Owner-Occupied (Mortgaged)',
 			key: 'ownerMortgaged',
 			color: COMPARISON_PALETTE[2],
 			labelColor: GRAPHICS_COLORS.canvas
 		},
 		{
-			name: 'Owner-Occupied (Mortgage-Free)',
+			name: $language === 'fr' ? 'Propriétaires sans emprunt' : 'Owner-Occupied (Mortgage-Free)',
 			key: 'ownerMortgageFree',
 			color: COMPARISON_PALETTE[3],
 			labelColor: GRAPHICS_COLORS.canvas
 		}
-	] as const;
+	] as const);
 
 	onMount(() => {
 		let chart: ReturnType<typeof import('echarts')['init']>;
@@ -46,7 +47,7 @@
 						type: 'line',
 						lineStyle: { color: GRAPHICS_COLORS.secondaryText, width: 1 }
 					},
-					valueFormatter: (v: number) => `${v.toFixed(1)}M`
+					valueFormatter: (v: number) => `${v.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} M`
 				},
 				legend: {
 					bottom: 0,
@@ -94,7 +95,7 @@
 					label: {
 						show: true,
 						position: 'inside',
-						formatter: (p: any) => p.value.toFixed(1),
+						formatter: (p: any) => Number(p.value).toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
 						fontSize: 11,
 						color: s.labelColor
 					}

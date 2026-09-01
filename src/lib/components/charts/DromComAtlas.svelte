@@ -5,6 +5,7 @@
 	import type { Feature, FeatureCollection, Geometry, Position } from 'geojson';
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { dromComTerritories } from '$lib/data/charts/drom-com-summary';
+	import { language } from '$lib/i18n';
 
 	type RegionProperties = {
 		code: string;
@@ -32,7 +33,24 @@
 	let territoryPaths = $state<Record<string, string>>({});
 
 	function formatNumber(value: number): string {
-		return value.toLocaleString('en-US');
+		return value.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US');
+	}
+
+	function territoryName(name: string) {
+		return $language === 'fr' && name === 'Guyane (French Guiana)' ? 'Guyane' : name;
+	}
+
+	function translateMeta(value: string) {
+		if ($language === 'en') return value;
+		return ({
+			'South America': 'Amérique du Sud',
+			'Atlantic Ocean': 'Océan Atlantique',
+			'Indian Ocean': 'Océan Indien',
+			'Pacific Ocean': 'Océan Pacifique',
+			'Overseas department and region': 'Département et région d’outre-mer',
+			'Overseas collectivity': 'Collectivité d’outre-mer',
+			'Sui generis collectivity': 'Collectivité sui generis'
+		} as Record<string, string>)[value] ?? value;
 	}
 
 	function signedArea(ring: Position[]): number {
@@ -98,7 +116,7 @@
 </script>
 
 <div class="overseas-atlas" data-visual="small-multiples">
-	<h4>{selected.name}</h4>
+	<h4>{territoryName(selected.name)}</h4>
 	<div class="overseas-summary">
 		<div class="overseas-stat">
 			<p class="overseas-stat-value">{formatNumber(selected.population)}</p>
@@ -108,15 +126,15 @@
 			{#if selected.socialHousingRate !== null}
 				<p class="overseas-stat-value">{selected.socialHousingRate}%</p>
 			{:else}
-				<p class="overseas-stat-value overseas-stat-value--missing">N/A</p>
+				<p class="overseas-stat-value overseas-stat-value--missing">{$language === 'fr' ? 'N/D' : 'N/A'}</p>
 			{/if}
-			<p class="overseas-stat-label">Social Housing Rate ({selected.socialHousingYear})</p>
+			<p class="overseas-stat-label">{$language === 'fr' ? 'Taux de logements sociaux' : 'Social Housing Rate'} ({selected.socialHousingYear})</p>
 		</div>
 		<div class="overseas-meta-card">
-			{selected.location}
+			{translateMeta(selected.location)}
 		</div>
 		<div class="overseas-meta-card">
-			{selected.status}
+			{translateMeta(selected.status)}
 		</div>
 	</div>
 
@@ -132,7 +150,7 @@
 				<svg
 					viewBox={`0 0 ${tileWidth} ${tileHeight}`}
 					role="img"
-					aria-label={`Map of ${territory.name}`}
+					aria-label={$language === 'fr' ? `Carte de ${territoryName(territory.name)}` : `Map of ${territory.name}`}
 				>
 					<path
 						d={territoryPaths[territory.name] ?? ''}
@@ -141,7 +159,7 @@
 						vector-effect="non-scaling-stroke"
 					/>
 				</svg>
-				<span>{territory.name}</span>
+				<span>{territoryName(territory.name)}</span>
 			</button>
 		{/each}
 	</div>

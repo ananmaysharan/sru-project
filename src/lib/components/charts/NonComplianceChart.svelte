@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { language } from '$lib/i18n';
 	import { Button } from '$lib/components/ui/button';
 	import rawCommuneData from '$lib/data/charts/commune-health-index-scatter.json';
 	import { GRAPHICS_COLORS, RISK_SEQUENTIAL_SCALE } from '$lib/data/charts/chart-colors';
@@ -40,12 +41,12 @@
 		2: RISK_SEQUENTIAL_SCALE[2],
 		1: RISK_SEQUENTIAL_SCALE[1]
 	} as const;
-	const frequencyLegend = [
-		{ count: 1, label: '1 period', color: frequencyColors[1] },
-		{ count: 2, label: '2 periods', color: frequencyColors[2] },
-		{ count: 3, label: '3 periods', color: frequencyColors[3] },
-		{ count: 4, label: '4+ periods', color: frequencyColors[4] }
-	] as const;
+	const frequencyLegend = $derived([
+		{ count: 1, label: $language === 'fr' ? '1 période' : '1 period', color: frequencyColors[1] },
+		{ count: 2, label: $language === 'fr' ? '2 périodes' : '2 periods', color: frequencyColors[2] },
+		{ count: 3, label: $language === 'fr' ? '3 périodes' : '3 periods', color: frequencyColors[3] },
+		{ count: 4, label: $language === 'fr' ? '4 périodes ou plus' : '4+ periods', color: frequencyColors[4] }
+	]);
 	const pageOneRows: Row[] = [
 		{ name: "Chazay-d'Azergues", periods: ['2005', '2008', '2014', '2017'] },
 		{ name: 'Nice', periods: ['2005', '2008', '2014', '2020'] },
@@ -277,7 +278,7 @@
 
 <div class="noncompliance-chart-shell mx-4 mt-4 md:mx-12">
 	<div class="mx-auto max-w-3xl px-4 sm:px-6">
-		<div class="filter-pills" aria-label="Region filters">
+		<div class="filter-pills" aria-label={$language === 'fr' ? 'Filtres par région' : 'Region filters'}>
 			<Button
 				variant={selectedRegions.length === 0 ? 'default' : 'outline'}
 				size="sm"
@@ -286,7 +287,7 @@
 				aria-controls="noncompliance-list"
 				onclick={() => (selectedRegions = [])}
 			>
-				All regions
+				{$language === 'fr' ? 'Toutes les régions' : 'All regions'}
 			</Button>
 			{#each regions as region (region)}
 				<Button
@@ -315,9 +316,9 @@
 					class="list-column"
 					viewBox={`0 0 ${pageWidth} ${columnHeight}`}
 					role="img"
-					aria-label={`Noncompliant communes, column ${columnIndex + 1} of ${rowColumns.length}`}
+					aria-label={$language === 'fr' ? `Communes carencées, colonne ${columnIndex + 1} sur ${rowColumns.length}` : `Noncompliant communes, column ${columnIndex + 1} of ${rowColumns.length}`}
 				>
-					<title>Noncompliant communes (2005-2022), column {columnIndex + 1}</title>
+					<title>{$language === 'fr' ? 'Communes carencées' : 'Noncompliant communes'} (2005–2022), {$language === 'fr' ? 'colonne' : 'column'} {columnIndex + 1}</title>
 					<rect width={pageWidth} height={columnHeight} fill={GRAPHICS_COLORS.canvas} />
 
 					<g class="noncompliance-text">
@@ -348,8 +349,8 @@
 			{/each}
 		</div>
 	</div>
-	<div class="frequency-legend" aria-label="Marker colors show repeated noncompliance">
-		<span class="frequency-legend-title">Repeated noncompliance</span>
+	<div class="frequency-legend" aria-label={$language === 'fr' ? 'Les couleurs indiquent les carences répétées' : 'Marker colors show repeated noncompliance'}>
+		<span class="frequency-legend-title">{$language === 'fr' ? 'Carences répétées' : 'Repeated noncompliance'}</span>
 		{#each frequencyLegend as item (item.count)}
 			<span class="frequency-legend-item">
 				<span class="frequency-swatch" style={`background:${item.color}`}></span>

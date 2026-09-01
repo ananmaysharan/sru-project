@@ -103,7 +103,7 @@ export const METRIC_CONFIG: Record<
 			A1: { title: 'Rural / struggling', body: 'Low income + low growth — stagnant policy.' },
 			A3: { title: 'Redistributive', body: 'Low income + high growth — investing despite a low tax base.' },
 			C1: { title: 'Exclusionary', body: 'High income + low growth — wealthy but supply-constrained.' },
-			C3: { title: 'Inclusive growth', body: 'High income + high growth — prosperous areas expanding affordable housing.' }
+			C3: { title: 'Inclusive growth', body: 'High income + high growth — prosperous areas expanding social housing.' }
 		}
 	},
 	poverty: {

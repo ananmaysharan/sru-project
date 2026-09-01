@@ -8,6 +8,7 @@
 	import { Slider } from 'bits-ui';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
+	import { language } from '$lib/i18n';
 	import MapSidebar from './MapSidebar.svelte';
 	import {
 		mapState,
@@ -31,6 +32,13 @@
 	let regionsSourceLayer = '';
 	let departementsSourceLayer = '';
 	let usePmtiles = false;
+	function localizedValue(value: string) {
+		if (value.endsWith('€')) {
+			const number = value.slice(0, -1);
+			return $language === 'fr' ? `${number.replace(/(\d)\.(\d)/g, '$1,$2')} €` : `€${number}`;
+		}
+		return $language === 'fr' ? value.replace(/(\d)\.(\d)/g, '$1,$2').replace(/%/g, ' %') : value;
+	}
 	const timelineAccent = GRAPHICS_COLORS.primary;
 
 	function choroplethWithHover() {
@@ -121,7 +129,7 @@
 
 		const map = new maplibregl.Map({
 			container: mapContainer,
-			style: 'https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC',
+			style: `https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC&language=${$language}`,
 			center: [2.2, 46.6],
 			zoom: 5,
 			attributionControl: false
@@ -398,7 +406,7 @@
 				<Button
 					variant="outline"
 					size="sm"
-					aria-label="Return to the territory overview"
+					aria-label={$language === 'fr' ? 'Revenir à la vue d’ensemble du territoire' : 'Return to the territory overview'}
 					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; }}
 				>
 					<ArrowLeftIcon class="size-4" />
@@ -420,7 +428,7 @@
 					class="flex-1"
 					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; flyTo(MAINLAND_CENTER, MAINLAND_ZOOM); }}
 				>
-					Mainland
+					{$language === 'fr' ? 'France métropolitaine' : 'Mainland'}
 				</Button>
 				<Button
 					variant="outline"
@@ -428,7 +436,7 @@
 					class="flex-1"
 					onclick={() => { mapState.activeTerritory = 'overseas'; mapState.activeRegion = null; }}
 				>
-					Overseas
+					{$language === 'fr' ? 'Outre-mer' : 'Overseas'}
 				</Button>
 			{/if}
 		</div>
@@ -437,7 +445,7 @@
 		<!-- Year slider bar -->
 		<div class="border-t border-gray-200 bg-white px-4 py-2 shrink-0" class:opacity-40={mapState.yearSliderDisabled}>
 			<Slider.Root
-				aria-label="Supply map year"
+				aria-label={$language === 'fr' ? 'Année de la carte de l’offre' : 'Supply map year'}
 				type="single"
 				min={YEAR_MIN}
 				max={YEAR_MAX}
@@ -487,7 +495,7 @@
 				style="left:{mapState.tooltip.x + 12}px;top:{mapState.tooltip.y - 10}px"
 			>
 				<p class="font-semibold">{mapState.tooltip.name}</p>
-				<p class="text-gray-300">{mapState.tooltip.value}</p>
+				<p class="text-gray-300">{localizedValue(mapState.tooltip.value)}</p>
 			</div>
 		{/if}
 	</div>

@@ -3,6 +3,7 @@
         parseEditorialStory,
         type EditorialSectionKey,
     } from "$lib/utils/editorial-markdown";
+    import { language } from '$lib/i18n';
 
     let {
         source,
@@ -26,13 +27,22 @@
         "health-method": "Health methods note",
         "post-occupancy": "Housing regimes project essay",
     };
+
+	const sectionLabelsFr: Record<EditorialSectionKey, string> = {
+		introduction: 'Essai d’introduction au projet',
+		'dashboard-guide': 'Utiliser le tableau de bord',
+		supply: 'Méthodes et positionnement du projet',
+		'health-chart': 'Guide du graphique de santé',
+		'health-method': 'Note méthodologique sur la santé',
+		'post-occupancy': 'Essai sur les typologies de logement'
+	};
 </script>
 
 <section
     id={render === "notes" ? `editorial-${section}-notes` : `editorial-${section}`}
     class:compact
     class="editorial-section"
-    aria-label={sectionLabels[section]}
+    aria-label={$language === 'fr' ? sectionLabelsFr[section] : sectionLabels[section]}
 >
     <article class="editorial-article">
         {#if render !== "notes"}
@@ -60,7 +70,7 @@
         {/if}
 
         {#if render !== "content" && story.notes.length}
-            <aside class="editorial-notes" role="doc-endnotes" aria-label="Footnotes">
+            <aside class="editorial-notes" role="doc-endnotes" aria-label={$language === 'fr' ? 'Notes' : 'Footnotes'}>
                 <ol start={story.notes[0].number}>
                     {#each story.notes as note}
                         <li id={`editorial-${section}-note-${note.number}`} value={note.number}>
@@ -68,7 +78,7 @@
                             <a
                                 class="editorial-note-backlink"
                                 href={`#editorial-${section}-noteref-${note.number}`}
-                                aria-label={`Back to footnote reference ${note.number}`}
+                                aria-label={$language === 'fr' ? `Retour à l’appel de note ${note.number}` : `Back to footnote reference ${note.number}`}
                                 >↩</a
                             >
                         </li>

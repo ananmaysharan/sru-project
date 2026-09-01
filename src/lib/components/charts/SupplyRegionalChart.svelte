@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { GRAPHICS_COLORS, normalizeRegionName } from '$lib/data/charts/chart-colors';
 	import { regionalHousing } from '$lib/data/charts/regional-housing-summary';
+	import { language } from '$lib/i18n';
 
 	let chartEl: HTMLDivElement;
 
@@ -41,12 +42,14 @@
 						const d = params.find((p: any) => p.value != null);
 						if (!d) return '';
 						const item = data[d.dataIndex];
-						return `<strong>${item.region}</strong><br/>${item.per10k.toLocaleString()} per 10,000 people<br/>Avg rent: ${item.rentPerSqm.toFixed(2)} €/m²`;
+						return $language === 'fr'
+							? `<strong>${item.region}</strong><br/>${item.per10k.toLocaleString('fr-FR')} pour 10 000 habitants<br/>Loyer moyen : ${item.rentPerSqm.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €/m²`
+							: `<strong>${item.region}</strong><br/>${item.per10k.toLocaleString('en-US')} per 10,000 people<br/>Avg rent: €${item.rentPerSqm.toFixed(2)}/m²`;
 					}
 				},
 				xAxis: {
 					type: 'value',
-					name: 'Units per 10,000 inhabitants',
+					name: $language === 'fr' ? 'Logements pour 10 000 habitants' : 'Units per 10,000 inhabitants',
 					nameLocation: 'middle',
 					nameGap: 30,
 					nameTextStyle: { color: GRAPHICS_COLORS.secondaryText },
@@ -64,7 +67,7 @@
 				},
 				series: [
 					{
-						name: 'Metropolitan France',
+						name: $language === 'fr' ? 'France métropolitaine' : 'Metropolitan France',
 						type: 'bar',
 						barWidth: '60%',
 						data: data.map((d) => (isOverseas(d.region) ? null : d.per10k)),
@@ -72,7 +75,7 @@
 						emphasis: { itemStyle: { color: GRAPHICS_COLORS.primary } }
 					},
 					{
-						name: 'Overseas territories',
+						name: $language === 'fr' ? 'Territoires ultramarins' : 'Overseas territories',
 						type: 'bar',
 						barWidth: '60%',
 						barGap: '-100%',

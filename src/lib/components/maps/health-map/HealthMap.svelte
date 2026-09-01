@@ -6,6 +6,7 @@
 	import { Protocol, PMTiles } from 'pmtiles';
 	import { Button } from '$lib/components/ui/button';
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
+	import { language } from '$lib/i18n';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import MapSidebar from './MapSidebar.svelte';
 	import {
@@ -27,6 +28,19 @@
 	let communesSourceLayer = '';
 	let regionsSourceLayer = '';
 	let usePmtiles = false;
+	const metricLabelsFr: Record<string, string> = {
+		'Median household income': 'Revenu médian des ménages',
+		'Share of residents in poverty': 'Part des habitants vivant sous le seuil de pauvreté',
+		'Older adult share (65+)': 'Part des personnes âgées de 65 ans ou plus',
+		'Municipal political leadership': 'Orientation politique de l’exécutif municipal',
+		'DPE energy-efficient building share (A-C)': 'Part des bâtiments énergétiquement performants selon le DPE (A–C)',
+		'Urban heat island exposure': 'Exposition aux îlots de chaleur urbains',
+		'Proximity to green spaces': 'Proximité des espaces verts',
+		'Proximity to healthcare and hospital infrastructure': 'Proximité des services de santé et des établissements hospitaliers',
+		'Social housing change': 'Évolution de la part de logement social'
+	};
+	function localizedLabel(value: string) { return $language === 'fr' ? metricLabelsFr[value] ?? value : value; }
+	function localizedValue(value: string) { return $language === 'fr' ? value.replace(/(\d)\.(\d)/g, '$1,$2').replace(/%/g, ' %') : value; }
 
 	function flyTo(center: [number, number], zoom: number) {
 		mapInstance?.flyTo({ center, zoom, duration: 1500 });
@@ -62,7 +76,7 @@
 
 		const map = new maplibregl.Map({
 			container: mapContainer,
-			style: 'https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC',
+			style: `https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC&language=${$language}`,
 			center: [2.2, 46.6],
 			zoom: 5,
 			attributionControl: false
@@ -247,7 +261,7 @@
 				<Button
 					variant="outline"
 					size="sm"
-					aria-label="Return to the territory overview"
+					aria-label={$language === 'fr' ? 'Revenir à la vue d’ensemble du territoire' : 'Return to the territory overview'}
 					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; }}
 				>
 					<ArrowLeftIcon class="size-4" />
@@ -269,7 +283,7 @@
 					class="flex-1"
 					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; flyTo(MAINLAND_CENTER, MAINLAND_ZOOM); }}
 				>
-					Mainland
+					{$language === 'fr' ? 'France métropolitaine' : 'Mainland'}
 				</Button>
 				<Button
 					variant="outline"
@@ -277,7 +291,7 @@
 					class="flex-1"
 					onclick={() => { mapState.activeTerritory = 'overseas'; mapState.activeRegion = null; }}
 				>
-					Overseas
+					{$language === 'fr' ? 'Outre-mer' : 'Overseas'}
 				</Button>
 			{/if}
 		</div>
@@ -291,12 +305,12 @@
 				<p class="font-semibold">{mapState.tooltip.name}</p>
 				{#if mapState.tooltip.metricValue}
 					<p class="mt-1 text-gray-200">
-						{mapState.tooltip.metricLabel}: {mapState.tooltip.metricValue}
+						{localizedLabel(mapState.tooltip.metricLabel)} : {localizedValue(mapState.tooltip.metricValue)}
 					</p>
 				{/if}
 				{#if mapState.tooltip.socialHousingValue}
 					<p class="text-gray-200">
-						{mapState.tooltip.socialHousingLabel}: {mapState.tooltip.socialHousingValue}
+						{localizedLabel(mapState.tooltip.socialHousingLabel)} : {localizedValue(mapState.tooltip.socialHousingValue)}
 					</p>
 				{/if}
 			</div>

@@ -3,6 +3,7 @@
 	import { X } from '@lucide/svelte';
 	import { siteRoutes, type SiteRoute } from '$lib/data/routes';
 	import Glossary from '$lib/components/sections/Glossary.svelte';
+	import { language, setLanguage, type Language } from '$lib/i18n';
 
 	let { routeId }: { routeId: string | null } = $props();
 
@@ -24,6 +25,7 @@
 	const transparent = $derived(isIntro && !scrolledPastHero);
 
 	const isActive = (route: SiteRoute) => routeId === route;
+	const languageLabel = (value: Language) => (value === 'fr' ? 'Français' : 'English');
 
 	function closeLexicon() {
 		lexiconOpen = false;
@@ -69,9 +71,37 @@
 			? 'border-transparent bg-transparent text-white'
 			: 'border-gray-200 bg-white text-gray-900'
 	]}
-	aria-label="Table of contents"
+	aria-label={$language === 'fr' ? 'Sommaire' : 'Table of contents'}
 >
-	<div class="relative flex w-full items-center px-2 sm:block sm:px-6">
+	<div class="relative flex w-full items-center gap-1 px-2 sm:block sm:px-6">
+		<div
+			class={[
+				'grid h-8 w-20 shrink-0 grid-cols-2 items-stretch rounded-full border p-0.5 text-[0.7rem] font-semibold tracking-[0.06em] sm:absolute sm:left-6 sm:top-1/2 sm:-translate-y-1/2',
+				transparent ? 'border-white/70 bg-black/10 text-white' : 'border-[#6d1d3b] bg-white text-[#6d1d3b]'
+			]}
+			aria-label={$language === 'fr' ? 'Choisir la langue' : 'Choose language'}
+		>
+			{#each ['fr', 'en'] as value (value)}
+				<button
+					type="button"
+					class={[
+						'inline-flex h-full min-h-0 min-w-0 items-center justify-center rounded-full border border-transparent p-0 leading-none transition-colors',
+						$language === value
+							? transparent
+								? 'bg-white text-gray-950'
+								: 'bg-[#6d1d3b] text-white'
+							: transparent
+								? 'text-white/80 hover:text-white'
+								: 'hover:bg-[#6d1d3b]/10'
+					]}
+					aria-label={languageLabel(value as Language)}
+					aria-pressed={$language === value}
+					onclick={() => setLanguage(value as Language)}
+				>
+					{value.toUpperCase()}
+				</button>
+			{/each}
+		</div>
 		<ul
 			bind:this={navList}
 			class="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap pr-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-auto sm:max-w-5xl sm:justify-center sm:gap-8 sm:overflow-visible sm:whitespace-normal sm:px-24 [&::-webkit-scrollbar]:hidden"
@@ -88,7 +118,7 @@
 								: 'border-transparent hover:underline'
 						]}
 					>
-						{section.label}
+						{section.label[$language]}
 					</a>
 				</li>
 			{/each}
@@ -100,15 +130,15 @@
 			class={[
 				'relative shrink-0 rounded-full border px-3 py-1.5 text-sm transition-colors sm:absolute sm:right-6 sm:top-1/2 sm:-translate-y-1/2 sm:px-4',
 				transparent
-					? 'border-white/70 text-white hover:border-white'
-					: 'border-gray-300 text-gray-700 hover:border-gray-900 hover:text-gray-900',
+					? 'border-white/70 bg-black/10 text-white hover:border-white'
+					: 'border-[#6d1d3b] bg-[#6d1d3b] text-white hover:bg-[#54162e]',
 				lexiconOpen && !transparent ? 'border-gray-900 text-gray-900' : ''
 			]}
 			aria-expanded={lexiconOpen}
 			aria-controls="dashboard-lexicon-panel"
 			onclick={() => (lexiconOpen = !lexiconOpen)}
 		>
-			Lexicon
+			{$language === 'fr' ? 'Lexique' : 'Lexicon'}
 		</button>
 
 		{#if lexiconOpen}
@@ -120,7 +150,7 @@
 				<button
 					type="button"
 					class="absolute right-3 top-3 border border-transparent p-1 text-gray-500 hover:border-gray-300 hover:text-gray-900"
-					aria-label="Close lexicon"
+					aria-label={$language === 'fr' ? 'Fermer le lexique' : 'Close lexicon'}
 					onclick={closeLexicon}
 				>
 					<X size={16} strokeWidth={1.75} />

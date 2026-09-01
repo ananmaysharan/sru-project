@@ -7,6 +7,7 @@
 	} from '$lib/data/charts/chart-colors';
 	import { socialHousingByRegion2022 } from '$lib/data/charts/region-supply-summary';
 	import { departmentSupply2022 } from '$lib/data/charts/department-supply-summary';
+	import { language } from '$lib/i18n';
 
 	let chartEl: HTMLDivElement;
 	let drillLabel: string | null = $state(null);
@@ -72,7 +73,9 @@
 				trigger: 'item',
 				formatter: (params: any) => {
 					const d = params.data;
-					return `<strong>${params.name}</strong><br/>${d.value.toLocaleString()} social units<br/>${d.rate}% SRU rate`;
+					return $language === 'fr'
+						? `<strong>${params.name}</strong><br/>${d.value.toLocaleString('fr-FR')} logements sociaux<br/>Taux SRU : ${d.rate.toLocaleString('fr-FR')} %`
+						: `<strong>${params.name}</strong><br/>${d.value.toLocaleString('en-US')} social units<br/>${d.rate}% SRU rate`;
 				}
 			},
 			series: [
@@ -166,7 +169,7 @@
 			<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
 				<path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
 			</svg>
-			Back to all regions
+			{$language === 'fr' ? 'Retour à toutes les régions' : 'Back to all regions'}
 		</button>
 	{/if}
 	<div bind:this={chartEl} class="h-full w-full"></div>

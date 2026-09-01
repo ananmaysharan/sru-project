@@ -10,6 +10,7 @@
     import { asset } from "$app/paths";
     import { STORY_PHASES, phaseProgress } from "$lib/data/charts/scroll-story";
     import { GRAPHICS_COLORS, INTRO_LINE_BLUE } from "$lib/data/charts/chart-colors";
+    import { language } from "$lib/i18n";
 
     interface Props {
         /** Normalized scroll progress through the story section, 0 → 1. */
@@ -94,10 +95,21 @@
         return a && b ? a.units + (b.units - a.units) * t : (a?.units ?? 0);
     }
 
-    const decoratedLegislations = legislations.map((l) => {
+    const lawTranslationsFr: Record<number, { date: string; objectives: string; sanctions: string }> = {
+        2000: { date: '13 décembre 2000', objectives: 'Les grandes communes doivent consacrer 20 % de leur parc total de logements au logement social', sanctions: 'Amende pouvant atteindre 5 % des recettes municipales, assortie de pénalités financières supplémentaires (PFL) d’environ 150 € par logement manquant' },
+        2006: { date: '13 juillet 2006', objectives: 'Les communes doivent prévoir au moins 30 % de logements locatifs sociaux dans les nouvelles opérations de construction', sanctions: 'Généralisation du calcul des amendes' },
+        2007: { date: '5 mars 2007', objectives: 'Élargissement du champ des obligations de la loi SRU aux communes des agglomérations de plus de 50 000 habitants', sanctions: '' },
+        2013: { date: '18 janvier 2013', objectives: 'Relèvement de l’objectif de 20 % à 25 %, avec une échéance fixée à 2025 pour la plupart des communes, et priorité accrue aux logements très sociaux', sanctions: 'Amende pouvant atteindre 7,5 % des recettes municipales, assortie d’une augmentation des pénalités financières (PFL) appliquées aux communes' },
+        2014: { date: '24 mars 2014', objectives: 'Pouvoir donné aux préfets de reprendre le contrôle de la délivrance des permis de construire dans les communes ne respectant pas leurs obligations', sanctions: '' },
+        2017: { date: '21 janvier 2017', objectives: 'Pouvoir donné aux préfets de prendre en main et de contrôler l’attribution de logements sociaux à des ménages extérieurs à la commune', sanctions: 'Renforcement des sanctions applicables aux communes ne respectant pas leurs obligations' },
+        2018: { date: '23 novembre 2018', objectives: 'Les communes soumises à l’objectif de 20 % (et non de 25 %) bénéficient de délais d’ajustement plus longs ; les incitations sont élargies au logement intermédiaire', sanctions: '' },
+        2022: { date: '21 février 2022', objectives: 'Suppression de l’échéance de 2025, permettant à la loi de rester juridiquement contraignante jusqu’à sa modification ; assouplissement de la définition des logements sociaux pris en compte au titre de la loi SRU, avec l’inclusion de logements intermédiaires', sanctions: '' }
+    };
+
+    const decoratedLegislations = $derived(legislations.map((l) => {
         const frac = fractionalYear(l.date);
-        return { ...l, frac, units: unitsAt(frac) };
-    });
+        return { ...l, frac, units: unitsAt(frac), ...($language === 'fr' ? lawTranslationsFr[l.year] : {}) };
+    }));
 
     const decoratedHeadlines = headlines.map((h) => ({
         ...h,
@@ -411,7 +423,23 @@
         }
     });
 
-    const formatValue = (v: number) => `${(v / 1_000_000).toFixed(2)}M`;
+    const formatValue = (v: number) => {
+        const amount = v / 1_000_000;
+        return `${amount.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US', { maximumFractionDigits: 2 })} M`;
+    };
+
+    function buildingDetail(detail: string) {
+        if ($language === 'en') return detail;
+        return detail
+            .replace(/social units/g, 'logements sociaux')
+            .replace(/social housing/g, 'logements sociaux')
+            .replace(/ units/g, ' logements')
+            .replace(/social \+/g, 'sociaux +')
+            .replace(/private|market/g, 'privés')
+            .replace(/Brittany/g, 'Bretagne')
+            .replace(/French Riviera/g, 'Provence')
+            .replace(/€(\d+)\.(\d+)([mk])/g, '€$1,$2$3');
+    }
 
     // Y of the data line at an arbitrary x pixel (line is piecewise-linear).
     function lineYAtX(px: number): number {
@@ -675,7 +703,7 @@
                         {formatValue(m.units)}
                     </div>
                     <div class="text-[10px] opacity-70 leading-none mt-0.5">
-                        total units
+                        {$language === 'fr' ? 'logements' : 'total units'}
                     </div>
                 </div>
             {/if}
@@ -693,7 +721,7 @@
                     {formatValue(tipValue)}
                 </div>
                 <div class="text-[10px] opacity-70 leading-none mt-0.5">
-                    total units
+                    {$language === 'fr' ? 'logements' : 'total units'}
                 </div>
             </div>
         {/if}
@@ -708,7 +736,7 @@
                     {BUILDING_INFO[hoveredFile].name}
                 </div>
                 <div class="text-[10px] leading-tight text-gray-600">
-                    {BUILDING_INFO[hoveredFile].detail}
+                    {buildingDetail(BUILDING_INFO[hoveredFile].detail)}
                 </div>
             </div>
         {/if}
@@ -747,7 +775,7 @@
                         </div>
                         <div class="mt-1.5">
                             <div class="text-[9px] font-semibold text-gray-800">
-                                Key Objectives
+                                {$language === 'fr' ? 'Objectifs principaux' : 'Key Objectives'}
                             </div>
                             <div
                                 class="text-[8px] text-gray-600 leading-snug mt-0.5"
@@ -760,7 +788,7 @@
                                 <div
                                     class="text-[9px] font-semibold text-gray-800"
                                 >
-                                    Key Sanctions
+                                    {$language === 'fr' ? 'Principales sanctions' : 'Key Sanctions'}
                                 </div>
                                 <div
                                     class="text-[8px] text-gray-600 leading-snug mt-0.5"

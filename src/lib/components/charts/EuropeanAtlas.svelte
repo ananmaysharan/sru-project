@@ -6,6 +6,7 @@
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { socialRentalByCountry } from '$lib/data/charts/european-social-rental-summary';
 	import { socialMixPolicies } from '$lib/data/charts/european-social-mix-policies';
+	import { language } from '$lib/i18n';
 
 	type CountryProperties = {
 		ISO_A3?: string;
@@ -43,6 +44,29 @@
 	let selectedPolicy = $derived(
 		socialMixPolicies.find((policy) => policy.iso3 === selectedCode) ?? null
 	);
+
+	const countryNamesFr: Record<string, string> = {
+		FRA: 'France', ESP: 'Espagne', GBR: 'Royaume-Uni', IRL: 'Irlande',
+		DNK: 'Danemark', NLD: 'Pays-Bas', BEL: 'Belgique'
+	};
+	const policiesFr: Record<string, { adopted: string; name: string; description: string; comparison: string }> = {
+		ESP: { adopted: 'Adoptée en 2023', name: 'Loi espagnole sur le logement (Loi 12/2023)', description: 'La loi sur le logement augmente les pourcentages minimaux de terrains à réserver au logement social : de 30 % à 40 % pour les nouvelles opérations d’aménagement en zone rurale, et de 10 % à 20 % pour les opérations de renouvellement ou de rénovation en zone urbaine. Le classement d’un terrain en tant que terrain réservé au logement social ne peut être modifié, sauf dans des cas exceptionnels. Les régions sont tenues de fixer le pourcentage de terrains réservés destinés à la location, qui ne doit généralement pas être inférieur à 50 %.', comparison: 'La loi impose de réserver des pourcentages minimaux de terrains à un zonage exclusivement destiné au logement social ; elle n’impose pas directement la construction d’un nombre déterminé de logements sociaux ni la réalisation de logements sociaux.' },
+		GBR: { adopted: 'Adoptés en 1990', name: 'Section 106 (S106) Agreements / Town and Country Planning Act 1990', description: 'En vertu de l’article 106 de la loi de 1990 sur l’aménagement du territoire et l’urbanisme, les autorités chargées de l’urbanisme peuvent imposer aux promoteurs de prévoir une proportion de logements abordables ou de verser des contributions compensatoires. De nombreux plans locaux fixent des objectifs explicites concernant la part de logements abordables à intégrer dans les nouvelles opérations de construction. Les contributions au titre de l’article 106 permettent également d’autres modalités, telles que la réalisation de logements abordables sur un autre site, le versement d’une contribution financière compensatoire ou la cession de terrains destinés à la construction future de logements abordables.', comparison: 'Le dispositif est moins comparable à la loi SRU, car sa dimension territoriale peut être contournée. De plus, il porte principalement sur l’accession à la propriété plutôt que sur le logement social.' },
+		IRL: { adopted: 'Adoptée en 2000, puis modifiée à plusieurs reprises', name: 'Part V of the Planning and Development Act / 2000', description: 'La partie V de la loi de 2000 sur l’aménagement et le développement permet aux autorités locales d’acquérir jusqu’à 10 % des terrains classés pour la construction de logements à leur « valeur d’usage existante », plutôt qu’à leur « valeur de développement ». Elle s’applique à toute opération résidentielle comprenant au moins 9 logements ou réalisée sur un terrain de plus de 0,1 hectare. Son objectif est de favoriser la mixité sociale et d’éviter un retour au modèle traditionnel des « cités de logements sociaux ».', comparison: 'L’application des exigences prévues par la partie V relève des collectivités locales. Il n’existe pas d’obligation nationale imposant aux communes d’atteindre ou de respecter des quotas de logements sociaux.' },
+		DNK: { adopted: 'Adoptées en 2018 et 2021', name: 'Lois anti-ghetto (Ét Danmark uden parallelsamfund) / 2018, 2021', description: 'La problématique législation danoise anti-ghetto vise à faire disparaître, d’ici 2030, les quartiers comptant plus de 50 % de résidents issus de pays non-occidentaux, présentant un taux de chômage élevé ou un niveau élevé de criminalité. Elle prévoit notamment des déplacements forcés de résidents, des démolitions et une réduction de la part de logements sociaux à 40 %. La législation distingue trois types de territoires : les zones défavorisées, les « ghettos » et les « ghettos durs », renommés en 2021 « sociétés parallèles » et « zones de restructuration ».', comparison: 'Plutôt que de chercher à introduire une offre de logements abordables dans des enclaves aisées et exclusives, les lois anti-ghetto poursuivent l’objectif inverse : faire venir des Danois issus des classes moyennes et supérieures dans des quartiers majoritairement immigrés afin d’y favoriser la mixité sociale et de « préserver la culture danoise ». Cette législation a fait l’objet de nombreuses critiques et sa conformité au droit européen est actuellement examinée par la Cour de justice de l’Union européenne.' },
+		NLD: { adopted: 'Adoptée en 2026', name: 'Projet de loi visant à renforcer le pilotage du logement public (Wet Versterking Regie Volkshuisvesting) / 2026', description: 'En vertu de ce projet de loi, les deux tiers de l’ensemble des logements neufs construits dans une région devraient respecter les normes nationales d’accessibilité financière, dont 30 % seraient réservés au logement social, avec un loyer mensuel maximal d’environ 900 €. Ces objectifs nationaux s’appuient sur des accords locaux existants. À Amsterdam, par exemple, la règle dite « 40-40-20 » est appliquée depuis 2017. L’objectif commun est de maintenir un marché du logement accessible aux ménages à revenus modestes et intermédiaires.', comparison: 'Ce dispositif est comparable à la loi SRU dans la mesure où il fixe des objectifs nationaux en matière de pourcentages, mais il est axé sur la construction neuve plutôt que sur l’ensemble du parc de logements. Aucune pénalité financière n’est prévue en cas de non-atteinte des objectifs fixés, même si les communes sont chargées de définir leurs propres objectifs en matière d’accessibilité financière.' },
+		BEL: { adopted: 'Adoptée en 2009 (renouvelée en 2025)', name: 'Objectif social contraignant (Bindend sociaal objectief) / 2009, 2025', description: 'Le gouvernement flamand a fixé l’objectif de produire 54 000 logements sociaux d’ici 2042, en l’imposant aux communes au moyen d’un objectif social contraignant. Tout promoteur réalisant au moins 10 logements individuels ou 50 appartements est soumis à une obligation de production de logements sociaux, généralement fixée à 20 %, et pouvant atteindre 40 %, pour obtenir un permis de construire. Les logements doivent être cédés à des prix plafonnés aux bailleurs sociaux. Le gouvernement vise à porter la part du logement social à 15 % dans chaque commune.', comparison: 'Il s’agit globalement d’un modèle comparable à celui de la loi SRU, mais moins complet, et qui combine des objectifs contraignants avec une forme de zonage incitatif, puisque les obligations s’appliquent directement aux promoteurs immobiliers. Les communes ne disposent pas d’objectifs clairement définis en matière de logements sociaux, et les sanctions financières ne sont pas clairement établies.' }
+	};
+	let selectedPolicyFr = $derived(policiesFr[selectedCode] ?? null);
+	function displayedCountry(code: string, fallback: string) {
+		return $language === 'fr' ? countryNamesFr[code] ?? fallback : fallback;
+	}
+	function policyStatus() {
+		if ($language === 'fr' && selectedPolicyFr) return selectedPolicyFr.adopted;
+		if (selectedCode === 'GBR') return 'Adopted in 1990';
+		if (selectedCode === 'NLD') return 'Established in 2026';
+		return selectedPolicy?.years ? `Established ${selectedPolicy.years}` : 'Policy';
+	}
 
 	function countryCode(properties: CountryProperties | null | undefined) {
 		return properties?.ISO_A3_EH || properties?.ADM0_A3 || properties?.ISO_A3 || '';
@@ -148,8 +172,8 @@
 <div class="europe-atlas" data-visual="europe-infographic">
 	<div class="europe-layout">
 		<aside class="europe-sidebar">
-			<h4>{selectedCountry.country}</h4>
-			<p class="europe-instruction">Select a country to compare its housing profile.</p>
+			<h4>{displayedCountry(selectedCode, selectedCountry.country)}</h4>
+			<p class="europe-instruction">{$language === 'fr' ? 'Sélectionnez un pays pour comparer son parc de logement social.' : 'Select a country to compare its housing profile.'}</p>
 
 			<div class="europe-chart-card">
 				<CountryComparisonChart countryCode={selectedCode} />
@@ -157,23 +181,23 @@
 
 			<div class="europe-membership-card">
 				<div>
-					<span>European Union</span>
-					<strong>{selectedCountry.euMember ? 'Member' : 'Non-member'}</strong>
+					<span>{$language === 'fr' ? 'Union européenne' : 'European Union'}</span>
+					<strong>{$language === 'fr' ? (selectedCountry.euMember ? 'Membre' : 'Non-membre') : (selectedCountry.euMember ? 'Member' : 'Non-member')}</strong>
 				</div>
 				<div>
-					<span>OECD</span>
-					<strong>{selectedCountry.oecdMember ? 'Member' : 'Non-member'}</strong>
+					<span>{$language === 'fr' ? 'OCDE' : 'OECD'}</span>
+					<strong>{$language === 'fr' ? (selectedCountry.oecdMember ? 'Membre' : 'Non-membre') : (selectedCountry.oecdMember ? 'Member' : 'Non-member')}</strong>
 				</div>
 			</div>
 
 			{#if selectedPolicy}
 				<div class="europe-policy-card">
-					<span>{selectedPolicy.years ? `Established ${selectedPolicy.years}` : 'Policy'}</span>
-					<strong>{selectedPolicy.policyName}</strong>
-					<p>{selectedPolicy.description}</p>
+					<span>{policyStatus()}</span>
+					<strong>{$language === 'fr' && selectedPolicyFr ? selectedPolicyFr.name : selectedPolicy.policyName}</strong>
+					<p>{$language === 'fr' && selectedPolicyFr ? selectedPolicyFr.description : selectedPolicy.description}</p>
 					<div class="europe-policy-comparison">
-						<span>Comparison to SRU</span>
-						<p>{selectedPolicy.differenceFromSru}</p>
+						<span>{$language === 'fr' ? 'Comparaison avec la loi SRU' : 'Comparison to SRU'}</span>
+						<p>{$language === 'fr' && selectedPolicyFr ? selectedPolicyFr.comparison : selectedPolicy.differenceFromSru}</p>
 					</div>
 				</div>
 			{/if}
@@ -181,9 +205,9 @@
 
 		<div class="europe-map-panel">
 			{#if loadFailed}
-				<p>European boundaries could not be loaded.</p>
+				<p>{$language === 'fr' ? 'Les limites européennes n’ont pas pu être chargées.' : 'European boundaries could not be loaded.'}</p>
 			{:else}
-				<svg viewBox={mapViewBox} role="img" aria-label="Selectable map of Europe">
+				<svg viewBox={mapViewBox} role="img" aria-label={$language === 'fr' ? 'Carte interactive de l’Europe' : 'Selectable map of Europe'}>
 					{#each atlasCountries as country (country.code)}
 						{#if country.interactive}
 							<path
@@ -194,12 +218,12 @@
 								class:selected={country.code === selectedCode}
 								role="button"
 								tabindex="0"
-								aria-label={country.name}
+								aria-label={displayedCountry(country.code, country.name)}
 								aria-pressed={country.code === selectedCode}
 								onclick={() => selectCountry(country.code)}
 								onkeydown={(event) => handleCountryKeydown(event, country.code)}
 							>
-								<title>{country.name}</title>
+								<title>{displayedCountry(country.code, country.name)}</title>
 							</path>
 						{:else}
 							<path

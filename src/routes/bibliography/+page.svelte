@@ -1,20 +1,40 @@
 <script lang="ts">
+	import { bibliographySectionsFr } from '$lib/data/bibliography-fr';
+	import { language } from '$lib/i18n';
+
 	const linkCls =
 		'text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900';
 </script>
 
 <section id="bibliography" class="page-shell">
 	<div class="prose-column">
-	<h1 class="page-title">Bibliography</h1>
+	<h1 class="page-title">{$language === 'fr' ? 'Bibliographie' : 'Bibliography'}</h1>
 
 	<div class="index-groups text-gray-700">
+		{#if $language === 'fr'}
+			{#each bibliographySectionsFr as section (section.title)}
+				<section class="index-group">
+					<h2>{section.title}</h2>
+					<ul>
+						{#each section.items as item}
+							<li>
+								{item.text}
+								{#if item.url}
+									<a href={item.url} target="_blank" rel="noreferrer" class={linkCls}>Source</a>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/each}
+		{:else}
 		<!-- Peer-reviewed papers -->
 		<section class="index-group">
 			<h2>Peer-reviewed papers</h2>
 			<ul>
 				<li>Monkkonen, Paavo, Magda Maaoui, and Aurora Echevarria. "<a href="https://www.anderson.ucla.edu/sites/default/files/document/2025-10/2025-09wp.pdf" target="_blank" rel="noreferrer" class={linkCls}>Fair housing or the right to housing? Comparing policies and frames in France, the United States, and Mexico</a>", <em>UCLA Ziman Center for Real Estate Working Papers</em>, October 2025.</li>
 				<li>Whitney Airgood-Obrycki, Magda Maaoui, and Sophia Wedeen. "<a href="https://www.tandfonline.com/doi/full/10.1080/07352166.2025.2455606?scroll=top&amp;needAccess=true" target="_blank" rel="noreferrer" class={linkCls}>Rental Deserts, Segregation, and Zoning</a>", <em>Journal of Urban Affairs</em>, February 2025.</li>
-				<li>Lance Freeman, and Magda Maaoui. "<a href="https://www.lincolninst.edu/es/publications/working-papers/inclusionary-zoning-in-new-york-paris" target="_blank" rel="noreferrer" class={linkCls}>Inclusionary Zoning in New York and Paris: Trojan horse or Antidote to Gentrification?</a>", <em>Lincoln Institute of Land Policy Working Paper</em>, June 2022.</li>
+				<li>Lance Freeman and Magda Maaoui. "<a href="https://www.lincolninst.edu/es/publications/working-papers/inclusionary-zoning-in-new-york-paris" target="_blank" rel="noreferrer" class={linkCls}>Inclusionary Zoning in New York and Paris: Trojan horse or Antidote to Gentrification?</a>", <em>Lincoln Institute of Land Policy Working Paper</em>, June 2022.</li>
 				<li>Maaoui, Magda. "<a href="https://www.tandfonline.com/doi/abs/10.1080/02673037.2021.1941790" target="_blank" rel="noreferrer" class={linkCls}>The SRU Law, twenty years later: evaluating the legacy of France's most important social housing program</a>", <em>Housing Studies</em>, August 2021.</li>
 				<li>Maaoui, Magda. "<a href="https://metropolitics.org/In-Search-of-Grand-Paris-Pierre-Mansat-on-the-Eve-of-the-June-2020-Municipal.html" target="_blank" rel="noreferrer" class={linkCls}>In Search of the Grand Paris: an Interview with Pierre Mansat on the Eve of the June 2020 municipal elections</a>", <em>Metropolitics - Métropolitiques</em>, June 2020.</li>
 			</ul>
@@ -25,7 +45,7 @@
 			<h2>Book chapters</h2>
 			<ul>
 				<li>Maaoui, Magda. 2026. "The Pleasure of Living: Renée Gailhoustet's Vision of Healthy Housing / Plaisir d'habiter : la vision de Renée Gailhoustet en faveur d'un habitat sain", in <em>Renée Gailhoustet</em> [editor: Barrington-Leach], London: Architectural Association Publications.</li>
-				<li>Maaoui, Magda (2020). "The SRU Law: When French Zoning Says No to Inclusion" [Pop-out Case], in <em><a href="https://www.routledge.com/Zoning-A-Guide-for-21st-Century-Planning/Sclar-Baird-Zars-Fischer-Stahl/p/book/9781138593886" target="_blank" rel="noreferrer" class={linkCls}>Zoning: A Guide for 21st-Century Planning</a></em> [editors: Sclar, Stahl, Baird-Zars, with contributions by Jerold Kayden, Rachel Meltzer et al.], Routledge.</li>
+				<li>Maaoui, Magda (2020). "The SRU Law: When French Zoning Says No to Inclusion" [Pop-out Case], in <em><a href="https://www.routledge.com/Zoning-A-Guide-for-21st-Century-Planning/Sclar-Baird-Zars-Fischer-Stahl/p/book/9781138593886" target="_blank" rel="noreferrer" class={linkCls}>Zoning: A Guide for 21st-Century Planning</a></em> [editors: Sclar, Stahl, Baird-Zars], Routledge.</li>
 				<li>Maaoui, Magda, et al. (Preface). <em><a href="https://archicity.fr/edition-pour-en-finir-avec-le-petit-paris/" target="_blank" rel="noreferrer" class={linkCls}>Pour en finir avec le petit Paris</a></em>, Paris: Archicity, November 2024.</li>
 			</ul>
 		</section>
@@ -34,10 +54,10 @@
 		<section class="index-group">
 			<h2>Planning reports</h2>
 			<ul>
-				<li>Contribution to the APUR Executive Report "Inégalités sociales et territoriales de santé dans la Métropole du Grand Paris" (Clément Boisseuil, project manager, Emilie Moreau, Director of social and economic projects), Paris, October 2023.</li>
-				<li>Contribution to the APUR Report "Recours aux soins et aux dispositifs de prévention : Inégalités sociales et territoriales de santé dans la Métropole du Grand Paris" (Clément Boisseuil, project manager, Emilie Moreau, Director of social and economic projects), Paris, October 2023.</li>
-				<li>Contribution to the APUR Report "<a href="https://www.apur.org/sites/default/files/inegalites_sante_volet02_actions-sante-publique.pdf?token=txqATjHG" target="_blank" rel="noreferrer" class={linkCls}>Actions en santé publique : sensibilisation, promotion et prévention</a>" (Clément Boisseuil, project manager, Emilie Moreau, Director of social and economic projects), Paris, May 2023.</li>
-				<li>Contribution to the APUR Report "L'offre de soins dans la Métropole du Grand Paris : Inégalités sociales et territoriales de santé" (Clément Boisseuil, project manager, Emilie Moreau, Director of social and economic projects), Paris, March 2023.</li>
+				<li>Contribution to the APUR Executive Report "Inégalités sociales et territoriales de santé dans la Métropole du Grand Paris", Paris, October 2023.</li>
+				<li>Contribution to the APUR Report "Recours aux soins et aux dispositifs de prévention : Inégalités sociales et territoriales de santé dans la Métropole du Grand Paris", Paris, October 2023.</li>
+				<li>Contribution to the APUR Report "<a href="https://www.apur.org/sites/default/files/inegalites_sante_volet02_actions-sante-publique.pdf?token=txqATjHG" target="_blank" rel="noreferrer" class={linkCls}>Actions en santé publique : sensibilisation, promotion et prévention</a>", Paris, May 2023.</li>
+				<li>Contribution to the APUR Report "L'offre de soins dans la Métropole du Grand Paris : Inégalités sociales et territoriales de santé", Paris, March 2023.</li>
 			</ul>
 		</section>
 
@@ -78,7 +98,7 @@
 
 		<!-- Media mentions -->
 		<section class="index-group">
-			<h2>Media mentions of our work</h2>
+			<h2>Media mentions of my work</h2>
 			<ul>
 				<li>"<a href="https://www.theguardian.com/artanddesign/2026/feb/10/riotous-post-apocalyptic-eco-brutalist-renee-gailhoustet" target="_blank" rel="noreferrer" class={linkCls}>Back gardens in the sky! The riotous, post-apocalyptic buildings of 'eco-brutalist' Renée Gailhoustet</a>", <em>The Guardian</em> (posted February 10, 2026).</li>
 				<li>"<a href="https://www.dezeen.com/2026/01/23/renee-gailhoustet-exhibition-architectural-association/" target="_blank" rel="noreferrer" class={linkCls}>Full-scale paper replica of Renée Gailhoustet apartment installed at London's Architectural Association</a>", <em>Dezeen</em> (posted January 23, 2026).</li>
@@ -96,6 +116,7 @@
 				<li>"<a href="https://www.lagazettedescommunes.com/765814/les-sanctions-de-la-loi-sru-nont-pas-deffet-incitatif/" target="_blank" rel="noreferrer" class={linkCls}>Les sanctions de la Loi SRU n'ont pas d'effet incitatif</a>", <em>La Gazette des Communes</em> (posted October 1, 2021).</li>
 			</ul>
 		</section>
+		{/if}
 
 	</div>
 	</div>

@@ -9,6 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Select from '$lib/components/ui/select';
 	import rawData from '$lib/data/charts/commune-health-index-scatter.json';
+	import { language } from '$lib/i18n';
 
 	type IndicatorKey = 'income' | 'poverty' | 'ageing' | 'heat' | 'energy' | 'green' | 'health';
 	type MetricKey = 'weighted' | IndicatorKey;
@@ -108,6 +109,19 @@
 		}
 	};
 	const metrics = Object.keys(metricConfig) as MetricKey[];
+	const metricConfigFr: Record<MetricKey, { label: string; shortLabel: string; axisLabel: string }> = {
+		weighted: { label: 'Moyenne pondérée de tous les indicateurs', shortLabel: 'Moyenne pondérée', axisLabel: 'Moyenne pondérée des indicateurs de bien-être et d’accès aux aménités' },
+		income: { label: 'Revenu médian des ménages', shortLabel: 'Revenu', axisLabel: 'Score de revenu (0–10 ; plus élevé = mieux)' },
+		poverty: { label: 'Part des habitants vivant sous le seuil de pauvreté', shortLabel: 'Pauvreté', axisLabel: 'Score de pauvreté (0–10 ; plus élevé = mieux)' },
+		ageing: { label: 'Part des personnes âgées de 65 ans ou plus', shortLabel: 'Personnes âgées', axisLabel: 'Score de la part des personnes âgées (0–10 ; plus élevé = mieux)' },
+		heat: { label: 'Exposition aux îlots de chaleur urbains', shortLabel: 'Exposition à la chaleur', axisLabel: 'Score d’exposition à la chaleur (0–10 ; plus élevé = mieux)' },
+		energy: { label: 'Part de bâtiments performants selon le DPE (A–C)', shortLabel: 'Performance énergétique', axisLabel: 'Score de performance énergétique (0–10 ; plus élevé = mieux)' },
+		green: { label: 'Proximité des espaces verts', shortLabel: 'Espaces verts', axisLabel: 'Score de proximité des espaces verts (0–10 ; plus élevé = mieux)' },
+		health: { label: 'Proximité des services de santé et des hôpitaux', shortLabel: 'Services de santé', axisLabel: 'Score de proximité des services de santé (0–10 ; plus élevé = mieux)' }
+	};
+	function metricText(metric: MetricKey) {
+		return $language === 'fr' ? metricConfigFr[metric] : metricConfig[metric];
+	}
 
 	const curatedLabelPositions: Record<string, LabelPosition> = {
 		'Top 20:13005': { x: 253.9, y: 173.4 },
@@ -166,9 +180,9 @@
 		.domain([0, populationRadiusMax])
 		.range([2, 9])
 		.clamp(true);
-	const formatPercent = d3.format('.0%');
-	const formatNumber = d3.format(',');
-	const formatMetric = d3.format('.1f');
+	const formatPercent = (value: number) => `${(value * 100).toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US', { maximumFractionDigits: 0 })}${$language === 'fr' ? ' %' : '%'}`;
+	const formatNumber = (value: number) => value.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US');
+	const formatMetric = (value: number) => value.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 	const regions = Array.from(new Set(points.map((point) => point.region))).sort();
 
 	let brushElement: SVGGElement;
@@ -784,21 +798,21 @@
 <div class="chart-shell">
 	<aside class="chart-sidebar">
 		<div>
-			<p class="control-label">Outcome measure</p>
+			<p class="control-label">{$language === 'fr' ? 'Indicateur de résultat' : 'Outcome measure'}</p>
 			<Select.Root type="single" value={activeMetric} onValueChange={handleMetricChange}>
-				<Select.Trigger class="w-full" aria-label="Health outcome measure">
-					{metricConfig[activeMetric].shortLabel}
+				<Select.Trigger class="w-full" aria-label={$language === 'fr' ? 'Indicateur de santé' : 'Health outcome measure'}>
+					{metricText(activeMetric).shortLabel}
 				</Select.Trigger>
 				<Select.Content>
 					{#each metrics as metric (metric)}
-						<Select.Item value={metric} label={metricConfig[metric].label} />
+						<Select.Item value={metric} label={metricText(metric).label} />
 					{/each}
 				</Select.Content>
 			</Select.Root>
 		</div>
 
 		<div>
-			<p class="control-label">Search</p>
+			<p class="control-label">{$language === 'fr' ? 'Recherche' : 'Search'}</p>
 			<Combobox.Root
 				type="single"
 				bind:open={searchOpen}
@@ -808,8 +822,8 @@
 				<div class="search-wrap" bind:this={searchInputEl}>
 					<SearchIcon class="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
 					<Combobox.Input
-						aria-label="Search for a commune"
-						placeholder="Search commune…"
+						aria-label={$language === 'fr' ? 'Rechercher une commune' : 'Search for a commune'}
+						placeholder={$language === 'fr' ? 'Rechercher une commune…' : 'Search commune…'}
 						class="flex h-9 w-full rounded-md border border-input bg-transparent pl-8 pr-8 py-1 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
 						oninput={handleSearchInput}
 						onkeydown={handleSearchKeydown}
@@ -819,7 +833,7 @@
 							type="button"
 							class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
 							onclick={clearSearch}
-							aria-label="Clear search"
+							aria-label={$language === 'fr' ? 'Effacer la recherche' : 'Clear search'}
 						>
 							<XIcon class="size-4" />
 						</button>
@@ -828,7 +842,7 @@
 
 				<Combobox.Content class="w-(--bits-combobox-anchor-width)! max-h-64 overflow-y-auto rounded-md border bg-popover p-1 shadow-md z-50" sideOffset={4}>
 					{#if searchQuery.length >= 2 && searchMatches.length === 0}
-						<div class="px-2 py-1.5 text-sm text-muted-foreground">No results found.</div>
+						<div class="px-2 py-1.5 text-sm text-muted-foreground">{$language === 'fr' ? 'Aucun résultat.' : 'No results found.'}</div>
 					{/if}
 					{#if searchMatches.length > 0}
 						<Combobox.Group>
@@ -851,7 +865,7 @@
 
 		{#if activeMetric === 'weighted'}
 			<div>
-				<p class="control-label">Rank</p>
+				<p class="control-label">{$language === 'fr' ? 'Classement' : 'Rank'}</p>
 				<div class="rank-buttons">
 					<Button
 						variant={activeRanking === 'Top 20' ? 'default' : 'outline'}
@@ -867,14 +881,14 @@
 						class="flex-1"
 						onclick={() => setRankingFilter('Bottom 20')}
 					>
-						Worst 20
+						{$language === 'fr' ? '20 derniers' : 'Worst 20'}
 					</Button>
 				</div>
 			</div>
 		{/if}
 
-		<div class="region-legend" aria-label="Region legend">
-			<p class="control-label">Regions</p>
+		<div class="region-legend" aria-label={$language === 'fr' ? 'Légende des régions' : 'Region legend'}>
+			<p class="control-label">{$language === 'fr' ? 'Régions' : 'Regions'}</p>
 			{#each regions as region (region)}
 				<button
 					type="button"
@@ -889,7 +903,7 @@
 				</button>
 			{/each}
 			<Button variant="outline" size="sm" class="mt-2 w-full" onclick={resetChart}>
-				Reset
+				{$language === 'fr' ? 'Réinitialiser' : 'Reset'}
 			</Button>
 		</div>
 	</aside>
@@ -898,7 +912,7 @@
 			<svg
 			viewBox={`0 0 ${width} ${height}`}
 			role="img"
-			aria-label={`Commune cumulative social housing share evolution by ${metricConfig[activeMetric].label}`}
+			aria-label={$language === 'fr' ? `Évolution cumulée de la part de logements sociaux par ${metricText(activeMetric).label}` : `Commune cumulative social housing share evolution by ${metricText(activeMetric).label}`}
 			class="chart"
 			ondblclick={resetZoom}
 		>
@@ -966,7 +980,7 @@
 					text-anchor="middle"
 					class="quota-label-text"
 				>
-					mandatory 25% municipal social housing quota
+					{$language === 'fr' ? 'quota municipal obligatoire de 25 % de logements sociaux' : 'mandatory 25% municipal social housing quota'}
 				</text>
 			</g>
 		{/if}
@@ -988,7 +1002,7 @@
 	/>
 
 	<text x={width / 2} y={height - 14} text-anchor="middle" class="axis-title">
-		Cumulative evolution of the social housing share, 2005–2022
+		{$language === 'fr' ? 'Évolution cumulée de la part de logements sociaux, 2005–2022' : 'Cumulative evolution of the social housing share, 2005–2022'}
 	</text>
 	<text
 		x={-height / 2}
@@ -997,7 +1011,7 @@
 		transform="rotate(-90)"
 		class="axis-title"
 	>
-		{metricConfig[activeMetric].axisLabel}
+		{metricText(activeMetric).axisLabel}
 	</text>
 
 	<g bind:this={brushElement} class="brush-layer"></g>
@@ -1021,7 +1035,7 @@
 				onpointerleave={() => (hovered = null)}
 			>
 				<title>
-					{point.name}: {metricConfig[activeMetric].shortLabel} {formatMetricValue(point)}; population {formatNumber(point.population)}
+					{point.name}: {metricText(activeMetric).shortLabel} {formatMetricValue(point)}; population {formatNumber(point.population)}
 				</title>
 			</circle>
 		{/each}
@@ -1057,16 +1071,16 @@
 			>
 				<p class="font-semibold">{activePoint.name}</p>
 				<p class="mt-1 text-gray-200">
-					{metricConfig[activeMetric].shortLabel}: {formatMetricValue(activePoint)}
+					{metricText(activeMetric).shortLabel}: {formatMetricValue(activePoint)}
 				</p>
 				{#if activeMetric === 'weighted' && activePoint.rank}
 					<p class="text-gray-200">
 						{activePoint.rankGroup === 'Top 20' ? 'Top' : 'Worst'} rank: {activePoint.rank}
 					</p>
 				{/if}
-				<p class="text-gray-200">Population: {formatNumber(activePoint.population)}</p>
+				<p class="text-gray-200">Population : {formatNumber(activePoint.population)}</p>
 				<p class="text-gray-200">
-					Social housing: {formatPercent(activePoint.socialHousingShare2022)}
+					{$language === 'fr' ? 'Logements sociaux' : 'Social housing'} : {formatPercent(activePoint.socialHousingShare2022)}
 				</p>
 			</div>
 		{/if}

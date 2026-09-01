@@ -2,6 +2,11 @@
     import { asset } from "$app/paths";
     import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
     import editorialContent from "$lib/data/editorial-content.md?raw";
+    import editorialContentFr from "$lib/data/editorial-content.fr.md?raw";
+    import ProjectIdCard from "$lib/components/sections/ProjectIdCard.svelte";
+    import { projectIdCards } from "$lib/data/project-id-cards";
+    import { postOccupancyCaptionsFr, residentTopicsFr } from "$lib/data/post-occupancy.fr";
+    import { language } from "$lib/i18n";
     import AutoCarousel from "$lib/components/gallery/AutoCarousel.svelte";
     import * as Select from "$lib/components/ui/select";
     import { onMount } from "svelte";
@@ -99,7 +104,7 @@
     type CaseStudyName =
         | "Paris"
         | "Brittany"
-        | "French Riviera"
+        | "Provence"
         | "Overseas Territories";
 
     // Keep the previous carousel presentation available while the new
@@ -116,6 +121,8 @@
     let storyCardsEl = $state<HTMLDivElement | null>(null);
     let storyEl = $state<HTMLDivElement | null>(null);
     let caseStudyNavCompact = $state(false);
+    let visibleProjectCard = $state<string | null>(null);
+    let projectCardCloseTimer: ReturnType<typeof setTimeout> | null = null;
     let scrollFrame = 0;
 
     let captionDebugMode = $state(false);
@@ -146,6 +153,34 @@
             .replace(/[̀-ͯ]/g, "")
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)/g, "");
+    }
+
+    function cancelProjectCardClose() {
+        if (projectCardCloseTimer === null) return;
+        clearTimeout(projectCardCloseTimer);
+        projectCardCloseTimer = null;
+    }
+
+    function showProjectCard(projectLabel: string) {
+        cancelProjectCardClose();
+        visibleProjectCard = projectLabel;
+    }
+
+    function scheduleProjectCardClose() {
+        cancelProjectCardClose();
+        projectCardCloseTimer = setTimeout(() => {
+            visibleProjectCard = null;
+            projectCardCloseTimer = null;
+        }, 600);
+    }
+
+    function closeProjectCard() {
+        cancelProjectCardClose();
+        visibleProjectCard = null;
+    }
+
+    function handlePageKeydown(event: KeyboardEvent) {
+        if (event.key === "Escape") closeProjectCard();
     }
 
     function captionPositionFor(_image: StoryImage): CaptionGridPosition {
@@ -459,7 +494,7 @@
                     alt: "Axonometric view of Cœur de Ville in La Possession",
                     landscape: false,
                     caption:
-                        "The axonometric view presents Cœur de Ville as a socially mixed neighbourhood combining housing, shops, offices, healthcare, schools, gardens and shared public spaces. Its planning links access to affordable housing with access to the facilities of a new town centre.",
+                        "The axonometric view presents Cœur de Ville as a socially mixed neighborhood combining housing, shops, offices, healthcare, schools, gardens and shared public spaces. Its planning links access to affordable housing with access to the facilities of a new town center.",
                 },
             ],
         },
@@ -468,11 +503,11 @@
     const caseStudyProjects: Record<CaseStudyName, StoryProject[]> = {
         Paris: parisProjects,
         Brittany: brittanyProjects,
-        "French Riviera": frenchRivieraProjects,
+        "Provence": frenchRivieraProjects,
         "Overseas Territories": overseasTerritoriesProjects,
     };
 
-    const residentTopics = [
+    const residentTopicsEn = [
         {
             label: "Residential pride and the symbolic value of place",
             quotes: [
@@ -524,6 +559,8 @@
         },
     ];
 
+    const residentTopics = $derived($language === 'fr' ? residentTopicsFr : residentTopicsEn);
+
     const residentTopicColors = [
         GRAPHICS_COLORS.primary,
         GRAPHICS_COLORS.focus,
@@ -533,23 +570,26 @@
         GRAPHICS_COLORS.primaryDark,
     ];
 
-    const residentQuoteList = residentTopics.flatMap((topic, topicIndex) =>
-        topic.quotes.map((quote, quoteIndex) => ({
-            quote,
-            quoteIndex,
-            topicIndex,
-            topicLabel: topic.label,
-            color: residentTopicColors[topicIndex] ?? COMPARISON_PALETTE[0],
-        })),
+    const residentQuoteList = $derived.by(() =>
+        residentTopics.flatMap((topic, topicIndex) =>
+            topic.quotes.map((quote, quoteIndex) => ({
+                quote,
+                quoteIndex,
+                topicIndex,
+                topicLabel: topic.label,
+                color: residentTopicColors[topicIndex] ?? COMPARISON_PALETTE[0],
+            })),
+        ),
     );
 
-    let residentTopicPositions = $state(residentTopics.map(
-        (_, topicIndex) => ((topicIndex + 0.5) / residentTopics.length) * 100,
+    let residentTopicPositions = $state(residentTopicsEn.map(
+        (_, topicIndex) => ((topicIndex + 0.5) / residentTopicsEn.length) * 100,
     ));
 
-    let residentQuotePositions = $state(residentQuoteList.map(
+    const residentQuoteCount = residentTopicsEn.reduce((sum, topic) => sum + topic.quotes.length, 0);
+    let residentQuotePositions = $state(Array.from({ length: residentQuoteCount },
         (_, quoteIndex) =>
-            ((quoteIndex + 0.5) / residentQuoteList.length) * 100,
+            ((quoteIndex + 0.5) / residentQuoteCount) * 100,
     ));
 
     function residentLinkPath(item: (typeof residentQuoteList)[number], quoteIndex: number) {
@@ -571,7 +611,7 @@
     const regions: CaseStudyName[] = [
         "Paris",
         "Brittany",
-        "French Riviera",
+        "Provence",
         "Overseas Territories",
     ];
 
@@ -589,18 +629,36 @@
         ),
     );
 
-    const storyFrames = $derived(
-        caseStudyNavItems.flatMap((item) =>
-            item.project.images.map((image, imageIndex) => ({
-                image,
-                imageIndex,
-                region: item.region,
-                project: item.project,
-                projectIndex: item.projectIndex,
-                projectLabel: item.project.label,
-            })),
-        ),
-    );
+    const storyFrames = $derived.by(() => {
+        let captionIndex = 0;
+        return caseStudyNavItems.flatMap((item) =>
+            item.project.images.map((image, imageIndex) => {
+                const localizedImage = {
+                    ...image,
+                    caption: $language === 'fr'
+                        ? postOccupancyCaptionsFr[captionIndex]
+                        : image.caption,
+                };
+                captionIndex += 1;
+                return {
+                    image: localizedImage,
+                    imageIndex,
+                    region: item.region,
+                    project: item.project,
+                    projectIndex: item.projectIndex,
+                    projectLabel: item.project.label,
+                };
+            }),
+        );
+    });
+
+    function regionLabel(region: CaseStudyName) {
+        if ($language === 'fr') {
+            if (region === 'Brittany') return 'Bretagne';
+            if (region === 'Overseas Territories') return 'DROM';
+        }
+        return region;
+    }
 
     const activeCaseStudy = $derived(
         storyFrames[activeFrame]?.region ?? "Paris",
@@ -698,7 +756,7 @@
         return (
             region === "Paris" ||
             region === "Brittany" ||
-            region === "French Riviera" ||
+            region === "Provence" ||
             region === "Overseas Territories"
         );
     }
@@ -808,7 +866,10 @@
 
     onMount(() => {
         const frame = requestAnimationFrame(syncCaseStudyNavState);
-        return () => cancelAnimationFrame(frame);
+        return () => {
+            cancelAnimationFrame(frame);
+            cancelProjectCardClose();
+        };
     });
 
     onMount(() => {
@@ -859,14 +920,30 @@
 <svelte:window
     onscroll={handleStoryScroll}
     onresize={handleResize}
+    onkeydown={handlePageKeydown}
 />
 
-<section id="socio-econometrics" class="page-shell">
+<section id="socio-econometrics" class="page-shell" lang={$language}>
     <div class="prose-column">
         <h1 class="page-title">
-            A call for more post‑occupancy evaluations
+            {$language === 'fr'
+                ? 'Appel à développer plus d’évaluations de l’usage des bâtiments de logements sociaux'
+                : 'A call for more post‑occupancy evaluations'}
         </h1>
         <p class="page-intro-body">
+            {#if $language === 'fr'}
+                Cet appel propose de déplacer l’attention du nombre de logements sociaux produits
+                vers la manière dont ils sont effectivement habités. Dans le cadre de dispositifs
+                tels que la loi SRU, plus de vingt ans de projets ont désormais été réalisés, mais
+                très peu d’évaluations post-occupationnelles systématiques ont été menées en plaçant
+                au centre l’expérience des habitants, la performance des bâtiments et les effets à
+                l’échelle des quartiers. Ce projet appelle les urbanistes, architectes, bailleurs
+                sociaux, chercheurs et organisations de résidents à élaborer des méthodes communes,
+                rigoureuses et reproductibles pour évaluer la vie dans ces opérations. Ces méthodes
+                devraient combiner des indicateurs quantitatifs (confort, santé, entretien et
+                performance environnementale) avec des données qualitatives portant sur la dignité,
+                les usages quotidiens et le lien social.
+            {:else}
             This call proposes to shift attention from how many social housing
             units are delivered to how they are actually lived in. Under
             frameworks such as the Loi SRU, we now have twenty‑plus years of
@@ -878,8 +955,18 @@
             developments—combining quantitative indicators (comfort, health,
             maintenance, environmental performance) with qualitative insights on
             dignity, everyday use, and social relations.
+            {/if}
         </p>
-        <p class="mt-5 text-gray-600">
+        <p class="page-intro-body mt-5">
+            {#if $language === 'fr'}
+                L’objectif est d’aller au-delà des quotas de logements sociaux et des intentions
+                architecturales, afin de constituer une base de connaissances permettant
+                d’identifier ce qui fonctionne réellement, ce qui échoue et la manière dont les
+                futurs projets et politiques devraient être repensés. Cette page servira de
+                plateforme évolutive pour rassembler des outils, des études de cas et des
+                collaborations autour des évaluations post-occupationnelles dans le logement social,
+                et pour inviter d’autres acteurs à rejoindre cette démarche.
+            {:else}
             The goal is to move beyond compliance metrics and architectural
             intentions, and to build an evidence base that allows us to identify
             what actually works, what fails, and how future projects and
@@ -887,23 +974,23 @@
             platform to gather tools, case
             studies, and collaborations around post-occupancy evaluations in
             social housing, and to invite others to join this agenda.
+            {/if}
         </p>
-        <p class="mt-5 text-gray-700">
-            This call is grounded in seven post-occupancy case studies (from
-            Paris to Brittany, the French Riviera to the overseas territories)
-            that anchor these questions in concrete places and lived
-            experiences.
+        <p class="page-intro-body mt-5">
+            {$language === 'fr'
+                ? 'Cet appel s’appuie sur sept études de cas post-occupationnelles, de Paris à la Bretagne, de la Provence aux départements et territoires d’outre-mer. Les sept zooms ancrent ces questions dans des lieux concrets et des expériences vécues.'
+                : 'This call is grounded in seven post-occupancy case studies, from Paris to Brittany, Provence, and the overseas territories, that anchor these questions in concrete places and lived experiences.'}
         </p>
     </div>
 
     <div class="case-study-index-shell">
-        <nav class="case-study-index" aria-label="Case studies by region">
+        <nav class="case-study-index" aria-label={$language === 'fr' ? 'Études de cas par région' : 'Case studies by region'}>
             {#each regions as region (region)}
                 <span
                     class:case-study-region-label--paris={region === "Paris"}
                     class="case-study-region-label"
                 >
-                    {region}
+                    {regionLabel(region)}
                 </span>
             {/each}
             {#each caseStudyNavItems as item (`${item.region}-${item.project.label}`)}
@@ -912,8 +999,20 @@
                     class:case-study-case-button--active={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex}
                     class="case-study-case-button"
                     aria-current={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex ? "true" : undefined}
-                    aria-label={`${item.region}: ${item.project.label}`}
+                    aria-label={`${regionLabel(item.region)}: ${item.project.label}`}
                     onclick={() => selectCaseStudy(item.region, item.projectIndex)}
+                    onmouseenter={() => {
+                        if (projectIdCards[item.project.label]) showProjectCard(item.project.label);
+                    }}
+                    onmouseleave={() => {
+                        if (projectIdCards[item.project.label]) scheduleProjectCardClose();
+                    }}
+                    onfocus={() => {
+                        if (projectIdCards[item.project.label]) showProjectCard(item.project.label);
+                    }}
+                    onblur={() => {
+                        if (projectIdCards[item.project.label]) scheduleProjectCardClose();
+                    }}
                 >
                     <span class="case-study-thumbnail" aria-hidden="true">
                         <img
@@ -929,6 +1028,14 @@
             {/each}
         </nav>
     </div>
+
+    {#if visibleProjectCard && projectIdCards[visibleProjectCard]}
+        <ProjectIdCard
+            card={projectIdCards[visibleProjectCard]}
+            onmouseenter={cancelProjectCardClose}
+            onmouseleave={scheduleProjectCardClose}
+        />
+    {/if}
 
     <div class="relative mt-6">
         {#if useLegacyCarousel}
@@ -975,7 +1082,7 @@
                     {#if caseStudyNavCompact}
                         <nav
                             class="case-study-compact-index"
-                            aria-label="Current case study"
+                            aria-label={$language === 'fr' ? 'Étude de cas actuelle' : 'Current case study'}
                         >
                             <Select.Root
                                 type="single"
@@ -986,7 +1093,7 @@
                                     class="min-w-[13.5rem] max-w-[calc(100vw-1.5rem)] rounded-none border-0 bg-white/[0.88] px-3 text-left font-medium text-gray-900 shadow-none hover:bg-white/[0.94] focus-visible:ring-0"
                                 >
                                     <span class="min-w-0 flex-1 truncate text-left">
-                                        {activeCaseStudy} – {storyFrames[activeFrame]?.projectLabel}
+                                        {regionLabel(activeCaseStudy)} – {storyFrames[activeFrame]?.projectLabel}
                                     </span>
                                 </Select.Trigger>
                                 <Select.Content
@@ -999,7 +1106,7 @@
                                             <Select.GroupHeading
                                                 class="px-2 pb-1 pt-2 text-left text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-gray-500"
                                             >
-                                                {region}
+                                                {regionLabel(region)}
                                             </Select.GroupHeading>
                                             {#each caseStudyProjects[region] as project, projectIndex (`compact-${region}-${project.label}`)}
                                                 <Select.Item
@@ -1027,7 +1134,9 @@
                             class:story-card--retired={frameIndex < activeFrame - 2}
                             class="story-card"
                             style:z-index={frameIndex + 1}
-                            aria-label="{frame.projectLabel}, photograph {frame.imageIndex + 1} of {frame.project.images.length}"
+                            aria-label={$language === 'fr'
+                                ? `${frame.projectLabel}, photographie ${frame.imageIndex + 1} sur ${frame.project.images.length}`
+                                : `${frame.projectLabel}, photograph ${frame.imageIndex + 1} of ${frame.project.images.length}`}
                         >
                             <img
                                 src={asset(frame.image.src)}
@@ -1088,7 +1197,7 @@
             {/if}
         {/if}
 
-        <!-- Temporarily hidden: Brittany, French Riviera, Overseas Territories
+        <!-- Temporarily hidden: Brittany, Provence, Overseas Territories
         <div
             id={slug("Brittany")}
             bind:this={panelEls[4]}
@@ -1101,9 +1210,9 @@
         </div>
 
         <div
-            id={slug("French Riviera")}
+            id={slug("Provence")}
             bind:this={panelEls[5]}
-            data-region="French Riviera"
+            data-region="Provence"
             data-label=""
             data-dark="false"
             class="mt-16 min-h-screen scroll-mt-24"
@@ -1126,17 +1235,20 @@
     >
         <div class="resident-voices-inner">
             <h2 id="resident-voices-title" class="text-3xl font-bold">
-                Residents assess the housing projects
+                {$language === 'fr'
+                    ? 'Les habitants évaluent les projets de logements'
+                    : 'Residents assess the housing projects'}
             </h2>
             <p id="resident-sankey-instructions" class="sr-only">
-                Hover or focus on a category to highlight its connected quotes.
-                Select a category to keep it highlighted.
+                {$language === 'fr'
+                    ? 'Survolez une catégorie ou placez-y le focus pour mettre en évidence les citations associées. Sélectionnez-la pour maintenir la mise en évidence.'
+                    : 'Hover or focus on a category to highlight its connected quotes. Select a category to keep it highlighted.'}
             </p>
 
             <div
                 class="resident-sankey"
                 role="group"
-                aria-label="Resident assessment themes and quotes"
+                aria-label={$language === 'fr' ? 'Thèmes et citations de l’évaluation des habitants' : 'Resident assessment themes and quotes'}
                 aria-describedby="resident-sankey-instructions"
             >
                 <div bind:this={residentSankeyBody} class="resident-sankey-body">
@@ -1184,7 +1296,7 @@
                     <div
                         class="resident-sankey-topics"
                         role="group"
-                        aria-label="Resident quote categories"
+                        aria-label={$language === 'fr' ? 'Catégories de citations des habitants' : 'Resident quote categories'}
                     >
                         {#each residentTopics as topic, topicIndex (topic.label)}
                             <button
@@ -1210,8 +1322,10 @@
                             >
                                 <span>{topic.label}</span>
                                 <span class="sr-only">
-                                    {topic.quotes.length} connected
-                                    {topic.quotes.length === 1 ? "quote" : "quotes"}.
+                                    {topic.quotes.length}
+                                    {$language === 'fr'
+                                        ? topic.quotes.length === 1 ? ' citation associée.' : ' citations associées.'
+                                        : topic.quotes.length === 1 ? ' connected quote.' : ' connected quotes.'}
                                 </span>
                             </button>
                         {/each}
@@ -1241,7 +1355,8 @@
                                 }}
                             >
                                 <span class="sr-only">
-                                    Category: {item.topicLabel}. Quote {quoteIndex + 1}:
+                                    {$language === 'fr' ? 'Catégorie' : 'Category'}: {item.topicLabel}.
+                                    {$language === 'fr' ? 'Citation' : 'Quote'} {quoteIndex + 1}:
                                 </span>
                                 <span class="resident-quote-number" aria-hidden="true">
                                     {String(quoteIndex + 1).padStart(2, "0")}
@@ -1258,7 +1373,10 @@
     </section>
 </section>
 
-<EditorialMarkdown source={editorialContent} section="post-occupancy" />
+<EditorialMarkdown
+    source={$language === 'fr' ? editorialContentFr : editorialContent}
+    section="post-occupancy"
+/>
 
 <style>
     .story {

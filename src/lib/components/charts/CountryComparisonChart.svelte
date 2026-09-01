@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { socialRentalByCountry } from '$lib/data/charts/european-social-rental-summary';
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
+	import { language } from '$lib/i18n';
 
 	let { countryCode = '' }: { countryCode?: string } = $props();
 	let chartEl: HTMLDivElement;
@@ -47,7 +48,7 @@
 		chart.setOption(
 			{
 				title: {
-					text: 'SOCIAL RENTAL SHARE (%)',
+					text: $language === 'fr' ? 'PART DES LOGEMENTS LOCATIFS SOCIAUX (%)' : 'SOCIAL RENTAL SHARE (%)',
 					left: 0,
 					top: 0,
 					textStyle: {
@@ -59,7 +60,9 @@
 				tooltip: {
 					trigger: 'item',
 					formatter: (params: any) =>
-						`<strong>${params.name}</strong><br/>${Number(params.value).toFixed(1)}% social rental housing`
+						$language === 'fr'
+							? `<strong>${params.name}</strong><br/>${Number(params.value).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} % de logements locatifs sociaux`
+							: `<strong>${params.name}</strong><br/>${Number(params.value).toFixed(1)}% social rental housing`
 				},
 				grid: { left: 38, right: 42, top: 30, bottom: 22 },
 				xAxis: {
@@ -72,7 +75,7 @@
 					axisLabel: {
 						fontSize: 10,
 						color: GRAPHICS_COLORS.secondaryText,
-						formatter: '{value}%'
+						formatter: (value: number) => `${value}${$language === 'fr' ? ' %' : '%'}`
 					},
 					splitLine: {
 						lineStyle: { color: GRAPHICS_COLORS.grid, width: 0.5, type: 'dashed' }
@@ -101,7 +104,9 @@
 							fontSize: 10,
 							fontWeight: 600,
 							color: GRAPHICS_COLORS.secondaryText,
-							formatter: (params: any) => `${Number(params.value).toFixed(1)}%`
+							formatter: (params: any) => $language === 'fr'
+								? `${Number(params.value).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %`
+								: `${Number(params.value).toFixed(1)}%`
 						},
 						emphasis: { disabled: true }
 					}
@@ -137,6 +142,7 @@
 		if (!chartReady) return;
 		countryCode;
 		countryData;
+		$language;
 		updateChart();
 	});
 </script>
@@ -150,9 +156,9 @@
 	></div>
 
 	{#if !countryCode}
-		<p>Select a country on the map</p>
+		<p>{$language === 'fr' ? 'Sélectionnez un pays sur la carte' : 'Select a country on the map'}</p>
 	{:else if !hasData}
-		<p>No data available for this country.</p>
+		<p>{$language === 'fr' ? 'Aucune donnée disponible pour ce pays.' : 'No data available for this country.'}</p>
 	{/if}
 </div>
 
