@@ -3,15 +3,16 @@
 	import { getVisualCenterTransform } from '@sanity-labs/logo-soup';
 	import { asset } from '$app/paths';
 
-	const logos: { src: string; alt: string }[] = [
-		{ src: asset('/logos/gsd.svg'), alt: 'Harvard GSD' },
-		{ src: asset('/logos/healthy-places-gsd.png'), alt: 'Healthy Places Design Lab' },
-		{ src: asset('/logos/harvard_university.svg'), alt: 'Harvard University' },
-		{ src: asset('/logos/hdsi.png'), alt: 'Harvard Data Science Initiative' },
-		{ src: asset('/logos/mellon_urban_initiative.png'), alt: 'Harvard Mellon Urban Initiative' },
-		{ src: asset('/logos/hcjs.svg'), alt: 'Harvard Joint Center for Housing Studies' },
-		{ src: asset('/logos/mtel.jpg'), alt: 'French Ministry of Housing' }
+	const logos: { src: string; alt: string; href: string }[] = [
+		{ src: asset('/logos/gsd.svg'), alt: 'Harvard GSD', href: 'https://www.gsd.harvard.edu/' },
+		{ src: asset('/logos/healthy-places-gsd.png'), alt: 'Healthy Places Design Lab', href: 'https://research.gsd.harvard.edu/healthy/' },
+		{ src: asset('/logos/harvard_university.svg'), alt: 'Harvard University', href: 'https://www.harvard.edu/' },
+		{ src: asset('/logos/hdsi.png'), alt: 'Harvard Data Science Initiative', href: 'https://datascience.harvard.edu/' },
+		{ src: asset('/logos/mellon_urban_initiative.png'), alt: 'Harvard Mellon Urban Initiative', href: 'https://mellonurbanism.harvard.edu/' },
+		{ src: asset('/logos/hcjs.svg'), alt: 'Harvard Joint Center for Housing Studies', href: 'https://www.jchs.harvard.edu/' },
+		{ src: asset('/logos/mtel.jpg'), alt: 'French Ministry of Housing', href: 'https://www.ecologie.gouv.fr/' }
 	];
+	const logoLinks = new Map(logos.map(({ src, href }) => [src, href]));
 
 	const soup = createLogoSoup();
 
@@ -27,12 +28,11 @@
 {#if soup.isReady}
 	<div class="mt-3 flex w-full max-w-6xl mx-auto flex-col items-center gap-y-4 px-6 md:flex-row md:flex-nowrap md:justify-between md:gap-x-4 md:gap-y-0">
 		{#each soup.normalizedLogos as logo, i (logo.src + i)}
-			{#if i === 1}
 				<a
-					href="https://research.gsd.harvard.edu/healthy/"
+					href={logoLinks.get(logo.src)}
 					target="_blank"
-					rel="noreferrer"
-					class="inline-block rounded-sm p-1 align-middle transition-opacity hover:opacity-75"
+					rel="noopener noreferrer"
+					class="inline-block rounded-sm p-1 align-middle transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d1d3b]"
 					style:opacity={soup.isLoading ? 0 : 1}
 					style:transition="opacity 0.2s ease-in-out"
 				>
@@ -48,25 +48,6 @@
 						style:transform={getVisualCenterTransform(logo, 'visual-center-y')}
 					/>
 				</a>
-			{:else}
-				<span
-					class="inline-block p-1 align-middle"
-					style:opacity={soup.isLoading ? 0 : 1}
-					style:transition="opacity 0.2s ease-in-out"
-				>
-					<img
-						src={logo.croppedSrc || logo.src}
-						alt={logo.alt}
-						width={logo.normalizedWidth}
-						height={logo.normalizedHeight}
-						style:display="block"
-						style:object-fit="contain"
-						style:width="{logo.normalizedWidth}px"
-						style:height="{logo.normalizedHeight}px"
-						style:transform={getVisualCenterTransform(logo, 'visual-center-y')}
-					/>
-				</span>
-			{/if}
 		{/each}
 	</div>
 {/if}
