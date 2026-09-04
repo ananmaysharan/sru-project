@@ -1,10 +1,14 @@
 <script lang="ts">
-	import { bibliographySectionsFr } from '$lib/data/bibliography-fr';
+	import { bibliographySectionsFr, type BibliographySegment } from '$lib/data/bibliography-fr';
 	import { language } from '$lib/i18n';
 
 	const linkCls =
 		'text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900';
 </script>
+
+{#snippet formattedSegment(segment: BibliographySegment)}
+	{#if segment.bold && segment.italic}<strong><em>{segment.text}</em></strong>{:else if segment.bold}<strong>{segment.text}</strong>{:else if segment.italic}<em>{segment.text}</em>{:else}{segment.text}{/if}
+{/snippet}
 
 <section id="bibliography" class="page-shell">
 	<div class="prose-column">
@@ -18,10 +22,7 @@
 					<ul>
 						{#each section.items as item}
 							<li>
-								{item.text}
-								{#if item.url}
-									<a href={item.url} target="_blank" rel="noreferrer" class={linkCls}>Source</a>
-								{/if}
+								{#each item.segments as segment}{#if segment.href}<a href={segment.href} target="_blank" rel="noopener noreferrer" class={linkCls}>{@render formattedSegment(segment)}</a>{:else}{@render formattedSegment(segment)}{/if}{/each}
 							</li>
 						{/each}
 					</ul>

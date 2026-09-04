@@ -124,7 +124,7 @@
     let caseStudyNavCompact = $state(false);
     let visibleProjectCard = $state<string | null>(null);
     let dismissedProjectCard: string | null = null;
-    let projectCardAnchor = $state<ProjectCardAnchor>({ x: 0, y: 0, bandTop: 0, bandBottom: 0 });
+    let projectCardAnchor = $state<ProjectCardAnchor>({ x: 0, y: 0 });
     let projectCardCloseTimer: ReturnType<typeof setTimeout> | null = null;
     let scrollFrame = 0;
 
@@ -175,12 +175,9 @@
         }
         const trigger = event.currentTarget as HTMLElement;
         const bounds = trigger.getBoundingClientRect();
-        const band = trigger.closest('.case-study-index')?.getBoundingClientRect() ?? bounds;
         projectCardAnchor = {
             x: 'clientX' in event ? event.clientX : bounds.left + bounds.width / 2,
             y: 'clientY' in event ? event.clientY : bounds.bottom,
-            bandTop: band.top,
-            bandBottom: band.bottom,
         };
         visibleProjectCard = projectLabel;
     }

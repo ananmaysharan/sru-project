@@ -37,7 +37,6 @@
         bind:offsetHeight={cardHeight}
         style:left={`${position.left}px`}
         style:top={`${position.top}px`}
-        style:max-height={`${position.maxHeight}px`}
         style:visibility={cardWidth && cardHeight ? 'visible' : 'hidden'}
         lang={$language}
         role="tooltip"
@@ -62,8 +61,7 @@
         z-index: 2147483647;
         box-sizing: border-box;
         width: min(32rem, calc(100vw - 24px));
-        overflow-y: auto;
-        overscroll-behavior: contain;
+        overflow: visible;
         padding: 1.25rem;
         border: 1px solid #d6d6d2;
         border-radius: 0;
@@ -117,9 +115,43 @@
     }
 
     @media (max-width: 639.98px) {
+        .project-id-card {
+            padding: 0.85rem;
+        }
+
+        dl {
+            margin-top: 0.65rem;
+        }
+
         dl > div {
-            grid-template-columns: 1fr;
-            gap: 0.2rem;
+            grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+            gap: 0.65rem;
+            padding-block: 0.45rem;
+        }
+    }
+
+    @media (max-height: 600px) and (min-width: 640px) {
+        .project-id-card {
+            width: min(48rem, calc(100vw - 24px));
+            padding: 0.85rem;
+        }
+
+        dl {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 1.25rem;
+            margin-top: 0.65rem;
+        }
+
+        dl > div {
+            grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+            gap: 0.65rem;
+            padding-block: 0.45rem;
+            border-bottom: 0;
+        }
+
+        dl > div:nth-child(n + 3) {
+            border-top: 1px solid #e2e2df;
         }
     }
 </style>
