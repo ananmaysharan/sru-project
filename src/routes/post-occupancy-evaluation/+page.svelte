@@ -4,6 +4,7 @@
     import editorialContent from "$lib/data/editorial-content.md?raw";
     import editorialContentFr from "$lib/data/editorial-content.fr.md?raw";
     import ProjectIdCard from "$lib/components/sections/ProjectIdCard.svelte";
+    import type { ProjectCardAnchor } from "$lib/components/sections/project-card-position";
     import { projectIdCards } from "$lib/data/project-id-cards";
     import { postOccupancyCaptionsFr, residentTopicsFr } from "$lib/data/post-occupancy.fr";
     import { language } from "$lib/i18n";
@@ -122,6 +123,8 @@
     let storyEl = $state<HTMLDivElement | null>(null);
     let caseStudyNavCompact = $state(false);
     let visibleProjectCard = $state<string | null>(null);
+    let dismissedProjectCard: string | null = null;
+    let projectCardAnchor = $state<ProjectCardAnchor>({ x: 0, y: 0, bandTop: 0, bandBottom: 0 });
     let projectCardCloseTimer: ReturnType<typeof setTimeout> | null = null;
     let scrollFrame = 0;
 
@@ -161,8 +164,24 @@
         projectCardCloseTimer = null;
     }
 
-    function showProjectCard(projectLabel: string) {
+    function showProjectCard(projectLabel: string, event: PointerEvent | FocusEvent) {
+        if ('pointerType' in event && event.pointerType === 'touch') return;
+        if (event.type === 'pointerenter' || event.type === 'focus') dismissedProjectCard = null;
+        if (dismissedProjectCard === projectLabel) return;
         cancelProjectCardClose();
+        if (!projectIdCards[projectLabel]) {
+            visibleProjectCard = null;
+            return;
+        }
+        const trigger = event.currentTarget as HTMLElement;
+        const bounds = trigger.getBoundingClientRect();
+        const band = trigger.closest('.case-study-index')?.getBoundingClientRect() ?? bounds;
+        projectCardAnchor = {
+            x: 'clientX' in event ? event.clientX : bounds.left + bounds.width / 2,
+            y: 'clientY' in event ? event.clientY : bounds.bottom,
+            bandTop: band.top,
+            bandBottom: band.bottom,
+        };
         visibleProjectCard = projectLabel;
     }
 
@@ -171,7 +190,7 @@
         projectCardCloseTimer = setTimeout(() => {
             visibleProjectCard = null;
             projectCardCloseTimer = null;
-        }, 600);
+        }, 300);
     }
 
     function closeProjectCard() {
@@ -180,7 +199,10 @@
     }
 
     function handlePageKeydown(event: KeyboardEvent) {
-        if (event.key === "Escape") closeProjectCard();
+        if (event.key === "Escape") {
+            dismissedProjectCard = visibleProjectCard;
+            closeProjectCard();
+        }
     }
 
     function captionPositionFor(_image: StoryImage): CaptionGridPosition {
@@ -696,6 +718,7 @@
     }
 
     function handleStoryScroll() {
+        closeProjectCard();
         if (scrollFrame) return;
         scrollFrame = requestAnimationFrame(() => {
             scrollFrame = 0;
@@ -705,6 +728,7 @@
     }
 
     function handleResize() {
+        closeProjectCard();
         syncActiveFrame();
         syncCaseStudyNavState();
     }
@@ -983,7 +1007,7 @@
         </p>
     </div>
 
-    <div class="case-study-index-shell">
+    <div class="case-study-index-shell" onscroll={closeProjectCard}>
         <nav class="case-study-index" aria-label={$language === 'fr' ? 'Études de cas par région' : 'Case studies by region'}>
             {#each regions as region (region)}
                 <span
@@ -1000,15 +1024,13 @@
                     class="case-study-case-button"
                     aria-current={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex ? "true" : undefined}
                     aria-label={`${regionLabel(item.region)}: ${item.project.label}`}
+                    aria-describedby={visibleProjectCard === item.project.label ? 'case-study-project-profile' : undefined}
                     onclick={() => selectCaseStudy(item.region, item.projectIndex)}
-                    onmouseenter={() => {
-                        if (projectIdCards[item.project.label]) showProjectCard(item.project.label);
-                    }}
-                    onmouseleave={() => {
-                        if (projectIdCards[item.project.label]) scheduleProjectCardClose();
-                    }}
-                    onfocus={() => {
-                        if (projectIdCards[item.project.label]) showProjectCard(item.project.label);
+                    onpointerenter={(event) => showProjectCard(item.project.label, event)}
+                    onpointermove={(event) => showProjectCard(item.project.label, event)}
+                    onpointerleave={scheduleProjectCardClose}
+                    onfocus={(event) => {
+                        if (event.currentTarget.matches(':focus-visible')) showProjectCard(item.project.label, event);
                     }}
                     onblur={() => {
                         if (projectIdCards[item.project.label]) scheduleProjectCardClose();
@@ -1032,6 +1054,7 @@
     {#if visibleProjectCard && projectIdCards[visibleProjectCard]}
         <ProjectIdCard
             card={projectIdCards[visibleProjectCard]}
+            anchor={projectCardAnchor}
             onmouseenter={cancelProjectCardClose}
             onmouseleave={scheduleProjectCardClose}
         />
