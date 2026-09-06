@@ -25,6 +25,13 @@
 		interactive: boolean;
 	};
 
+	type AtlasToponym = {
+		code: string;
+		name: string;
+		x: number;
+		y: number;
+	};
+
 	const countriesUrl =
 		'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
 	const countryCodes = new Set(socialRentalByCountry.map((country) => country.iso3));
@@ -34,6 +41,7 @@
 
 	let selectedCode = $state('FRA');
 	let atlasCountries = $state<AtlasCountry[]>([]);
+	let atlasToponyms = $state<AtlasToponym[]>([]);
 	let loadFailed = $state(false);
 	let mapViewBox = $state(`0 0 ${viewWidth} ${viewHeight}`);
 
@@ -46,8 +54,31 @@
 	);
 
 	const countryNamesFr: Record<string, string> = {
-		FRA: 'France', ESP: 'Espagne', GBR: 'Royaume-Uni', IRL: 'Irlande',
-		DNK: 'Danemark', NLD: 'Pays-Bas', BEL: 'Belgique'
+		AUT: 'Autriche', BEL: 'Belgique', BGR: 'Bulgarie', HRV: 'Croatie', CYP: 'Chypre',
+		CZE: 'Tchéquie', DNK: 'Danemark', EST: 'Estonie', FIN: 'Finlande', FRA: 'France',
+		DEU: 'Allemagne', GRC: 'Grèce', HUN: 'Hongrie', ISL: 'Islande', IRL: 'Irlande',
+		ITA: 'Italie', LVA: 'Lettonie', LIE: 'Liechtenstein', LTU: 'Lituanie', LUX: 'Luxembourg',
+		MLT: 'Malte', NLD: 'Pays-Bas', NOR: 'Norvège', POL: 'Pologne', PRT: 'Portugal',
+		ROU: 'Roumanie', SVK: 'Slovaquie', SVN: 'Slovénie', ESP: 'Espagne', SWE: 'Suède',
+		CHE: 'Suisse', GBR: 'Royaume-Uni'
+	};
+	const compactToponymNames: Record<string, { en: string; fr: string }> = {
+		BEL: { en: 'Belg.', fr: 'Belg.' },
+		LIE: { en: 'LI', fr: 'LI' },
+		LUX: { en: 'Lux.', fr: 'Lux.' }
+	};
+
+	// Stable geographic anchors keep labels on the European mainland portion of
+	// multi-part countries and avoid erratic centroids for islands and coastlines.
+	const toponymCoordinates: Record<string, [number, number]> = {
+		AUT: [13.3, 48.15], BEL: [3.4, 50.7], BGR: [25.25, 42.7], HRV: [16.6, 44.65],
+		CYP: [33.1, 35.1], CZE: [15.35, 49.9], DNK: [9.45, 56.05], EST: [25.55, 58.65],
+		FIN: [26, 64], FRA: [2.1, 46.55], DEU: [10.2, 51], GRC: [22.25, 39.15],
+		HUN: [19.35, 47.15], ISL: [-18.7, 64.9], IRL: [-8.15, 53.3], ITA: [12.5, 42.35],
+		LVA: [24.55, 57], LIE: [9.7, 46.35], LTU: [23.85, 55.2], LUX: [5.35, 49.45],
+		MLT: [14.4, 35.9], NLD: [4.55, 52.8], NOR: [9, 61.5], POL: [19.2, 52],
+		PRT: [-8, 39.65], ROU: [25, 45.8], SVK: [19.8, 49.15], SVN: [14.4, 45.85],
+		ESP: [-3.7, 40.3], SWE: [16, 62], CHE: [8.2, 46.8], GBR: [-2.8, 54.2]
 	};
 	const policiesFr: Record<string, { adopted: string; name: string; description: string; comparison: string }> = {
 		ESP: { adopted: 'Adoptée en 2023', name: 'Loi espagnole sur le logement (Loi 12/2023)', description: 'La loi sur le logement augmente les pourcentages minimaux de terrains à réserver au logement social : de 30 % à 40 % pour les nouvelles opérations d’aménagement en zone rurale, et de 10 % à 20 % pour les opérations de renouvellement ou de rénovation en zone urbaine. Le classement d’un terrain en tant que terrain réservé au logement social ne peut être modifié, sauf dans des cas exceptionnels. Les régions sont tenues de fixer le pourcentage de terrains réservés destinés à la location, qui ne doit généralement pas être inférieur à 50 %.', comparison: 'La loi impose de réserver des pourcentages minimaux de terrains à un zonage exclusivement destiné au logement social ; elle n’impose pas directement la construction d’un nombre déterminé de logements sociaux ni la réalisation de logements sociaux.' },
@@ -60,6 +91,11 @@
 	let selectedPolicyFr = $derived(policiesFr[selectedCode] ?? null);
 	function displayedCountry(code: string, fallback: string) {
 		return $language === 'fr' ? countryNamesFr[code] ?? fallback : fallback;
+	}
+	function displayedToponym(code: string, fallback: string) {
+		const compactName = compactToponymNames[code];
+		if (compactName) return $language === 'fr' ? compactName.fr : compactName.en;
+		return displayedCountry(code, fallback);
 	}
 	function policyStatus() {
 		if ($language === 'fr' && selectedPolicyFr) return selectedPolicyFr.adopted;
@@ -163,6 +199,13 @@
 				})
 				.filter((country) => country.path)
 				.sort((a, b) => Number(a.interactive) - Number(b.interactive));
+
+			atlasToponyms = socialRentalByCountry.flatMap((country) => {
+				const coordinates = toponymCoordinates[country.iso3];
+				const point = coordinates ? projection(coordinates) : null;
+				if (!point) return [];
+				return [{ code: country.iso3, name: country.country, x: point[0], y: point[1] }];
+			});
 		} catch {
 			loadFailed = true;
 		}
@@ -235,6 +278,16 @@
 							></path>
 						{/if}
 					{/each}
+
+					<g class="country-toponyms" aria-hidden="true">
+						{#each atlasToponyms as toponym (toponym.code)}
+							<text
+								x={toponym.x}
+								y={toponym.y}
+								class:selected={toponym.code === selectedCode}
+							>{displayedToponym(toponym.code, toponym.name)}</text>
+						{/each}
+					</g>
 				</svg>
 			{/if}
 		</div>
@@ -381,6 +434,32 @@
 		stroke-width: 3px;
 	}
 
+	.country-toponyms {
+		pointer-events: none;
+	}
+
+	.country-toponyms text {
+		fill: #292927;
+		stroke: rgba(255, 255, 255, 0.92);
+		stroke-width: 3px;
+		paint-order: stroke fill;
+		font-size: 8.25px;
+		font-weight: 650;
+		letter-spacing: 0.01em;
+		text-anchor: middle;
+		dominant-baseline: central;
+		transition:
+			fill 140ms ease,
+			font-weight 140ms ease;
+	}
+
+	.country-toponyms text.selected {
+		fill: #fff;
+		stroke: rgba(31, 62, 72, 0.9);
+		font-weight: 750;
+		font-size: 9.5px;
+	}
+
 	.europe-policy-card {
 		padding: 0.85rem 0.95rem;
 	}
@@ -438,6 +517,10 @@
 		.europe-map-panel {
 			height: 23rem;
 			min-height: 20rem;
+		}
+
+		.country-toponyms text {
+			font-size: 11px;
 		}
 	}
 
