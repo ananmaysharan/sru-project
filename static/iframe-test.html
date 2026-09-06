@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SRU iframe test</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f1f2f4; color: #20232a; font: 14px/1.5 system-ui, sans-serif; }
+    header { padding: 20px 24px; background: white; border-bottom: 1px solid #d9dce1; }
+    h1 { margin: 0 0 4px; font-size: 20px; }
+    p { margin: 0; color: #5c6470; }
+    .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin-top: 18px; }
+    label { display: grid; gap: 5px; font-weight: 600; }
+    button, select { font: inherit; color: inherit; background: white; border: 1px solid #bbc1ca; border-radius: 6px; padding: 7px 10px; }
+    button { cursor: pointer; }
+    button:hover { background: #f1f2f4; }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #4c7a88; outline-offset: 3px; }
+    input[type=range] { width: 180px; accent-color: #4c7a88; }
+    .presets { display: flex; gap: 5px; }
+    .stage { padding: 20px 24px 32px; overflow-x: auto; }
+    .frame-wrap { width: 100%; max-width: 1440px; margin: auto; }
+    .frame-label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: #5c6470; font-size: 12px; }
+    iframe { display: block; width: 100%; height: 500px; border: 1px solid #cbd0d8; background: white; box-shadow: 0 8px 30px #20232a0a; }
+    #status { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SRU iframe test</h1>
+    <p>Resize the embedded site below. Scroll inside it to explore the chart and law cards.</p>
+    <div class="controls">
+      <label>Language
+        <select id="language"><option value="fr">French</option><option value="en">English</option></select>
+      </label>
+      <label>Width
+        <select id="width"><option value="fit">Fit panel</option><option value="1440">1440 px</option><option value="1024">1024 px</option><option value="768">768 px</option><option value="320">320 px</option><option value="custom">Custom</option></select>
+      </label>
+      <label>Width: <output id="width-label">1440 px</output>
+        <input id="width-slider" aria-label="Iframe width" type="range" min="280" max="2560" step="1" value="1440">
+      </label>
+      <label>Height: <output id="height-label">500 px</output>
+        <input id="height" aria-label="Iframe height" type="range" min="320" max="1000" step="10" value="500">
+      </label>
+      <div class="presets" aria-label="Height presets">
+        <button data-height="350">350 px</button><button data-height="500">500 px</button><button data-height="700">700 px</button><button data-height="900">900 px</button>
+      </div>
+      <button id="wix-mobile">Wix mobile · 320 × 600</button>
+      <button id="chart">Show main chart</button>
+      <button id="top">Page top</button>
+    </div>
+    <p id="status" role="status">Loading the local site…</p>
+  </header>
+  <main class="stage">
+    <div class="frame-wrap">
+      <div class="frame-label"><span>Local site · real iframe</span><output id="dimensions"></output></div>
+      <iframe id="site" title="SRU site in an adjustable iframe"></iframe>
+    </div>
+  </main>
+  <script>
+    const frame = document.querySelector('#site');
+    const height = document.querySelector('#height');
+    const widthSlider = document.querySelector('#width-slider');
+    const status = document.querySelector('#status');
+    let chartMode = true;
+
+    function showChart() {
+      const win = frame.contentWindow;
+      const story = win.document.querySelector('#story-scroll');
+      const pinned = story?.firstElementChild;
+      if (!pinned || !story.querySelector('svg path')) return false;
+      const navHeight = parseFloat(win.getComputedStyle(pinned).top);
+      win.scrollTo({ top: win.scrollY + story.getBoundingClientRect().top - navHeight
+        + 0.48 * (navHeight + story.offsetHeight - win.innerHeight), behavior: 'instant' });
+      pinned.scrollTop = pinned.scrollHeight - pinned.clientHeight;
+      status.textContent = 'Main chart shown. The line should rise from 4 M to 5.37 M at every height.';
+      return true;
+    }
+
+    function measure() {
+      document.querySelector('#dimensions').textContent = `${frame.clientWidth} × ${frame.clientHeight} px`;
+      const width = Math.round(frame.getBoundingClientRect().width);
+      document.querySelector('#width-label').value = `${width} px`;
+      if (document.querySelector('#width').value === 'fit') widthSlider.value = width;
+    }
+
+    function resize() {
+      frame.style.height = `${height.value}px`;
+      document.querySelector('#height-label').value = `${height.value} px`;
+      const width = document.querySelector('#width').value;
+      const wrap = document.querySelector('.frame-wrap');
+      if (width !== 'fit' && width !== 'custom') widthSlider.value = width;
+      wrap.style.maxWidth = width === 'fit' ? '1440px' : 'none';
+      wrap.style.width = width === 'fit' ? '100%' : `${widthSlider.value}px`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        measure();
+        if (chartMode) showChart();
+      }));
+    }
+
+    function load() {
+      status.textContent = 'Loading the local site…';
+      const url = new URL('./', location.href);
+      url.searchParams.set('lang', document.querySelector('#language').value);
+      frame.src = url.href;
+    }
+
+    frame.addEventListener('load', async () => {
+      await frame.contentDocument.fonts.ready;
+      // Hydration and chart measurement finish after the document load event.
+      let attempts = 0;
+      const ready = setInterval(() => {
+        if (!chartMode || showChart()) {
+          clearInterval(ready);
+          measure();
+          if (!chartMode) status.textContent = 'Scroll inside the iframe to explore the site.';
+        } else if (++attempts >= 100) {
+          clearInterval(ready);
+          status.textContent = 'The chart is still loading. Use “Show main chart” to try again.';
+        }
+      }, 100);
+    });
+    height.addEventListener('input', resize);
+    widthSlider.addEventListener('input', () => {
+      document.querySelector('#width').value = 'custom';
+      resize();
+    });
+    document.querySelector('#width').addEventListener('change', resize);
+    document.querySelector('#language').addEventListener('change', load);
+    document.querySelectorAll('[data-height]').forEach(button => button.addEventListener('click', () => {
+      height.value = button.dataset.height;
+      resize();
+    }));
+    document.querySelector('#wix-mobile').addEventListener('click', () => {
+      document.querySelector('#width').value = '320';
+      widthSlider.value = '320';
+      height.value = '600';
+      resize();
+    });
+    document.querySelector('#chart').addEventListener('click', () => { chartMode = true; showChart(); });
+    document.querySelector('#top').addEventListener('click', () => {
+      chartMode = false;
+      frame.contentWindow.scrollTo({ top: 0, behavior: 'instant' });
+      status.textContent = 'Scroll inside the iframe to explore the site.';
+    });
+    new ResizeObserver(measure).observe(frame);
+    load();
+  </script>
+</body>
+</html>

@@ -293,13 +293,13 @@
     style="height: 400vh;"
 >
     <div
-        class="sticky flex flex-col"
+        class="sticky flex flex-col overflow-y-auto"
         style="top: {navHeight}px; height: calc(100vh - {navHeight}px);"
     >
         <!-- Crossfading caption — the heading swaps from the data story to the
              news story in step with the chart's zoom beat. -->
         <div
-            class="story-copy-frame relative max-w-3xl mx-auto px-6 pt-6 w-full"
+            class="story-copy-frame relative shrink-0 max-w-3xl mx-auto px-6 pt-6 w-full"
         >
             <div
                 class="absolute inset-x-6"
@@ -343,8 +343,8 @@
             </div>
         </div>
 
-        <!-- Chart fills the remaining viewport -->
-        <div class="flex-1 w-full min-h-0">
+        <!-- Fill the viewport, allowing the frame to scroll in short embeds. -->
+        <div class="flex flex-col flex-1 w-full">
             <SocialHousingStockChart {progress} />
         </div>
     </div>

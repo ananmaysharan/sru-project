@@ -64,7 +64,11 @@
 
     const SHOW_GRIDLINES = false;
 
-    const margin = { top: 40, right: 100, left: 100 };
+    const DESKTOP_TOP_MARGIN = 40;
+    const DESKTOP_SIDE_MARGIN = 100;
+    const MOBILE_TOP_MARGIN = 28;
+    const MOBILE_SIDE_MARGIN = 12;
+    const MOBILE_BREAKPOINT = 640;
 
     const milestoneYears = new Set([2000, 2005, 2010, 2015, 2020]);
     const milestones = socialHousingStock.filter((d) =>
@@ -254,6 +258,14 @@
     let width = $state(0);
     let height = $state(0);
 
+    // Wix gives the embedded page a phone-sized layout viewport. Keep the
+    // chart's desktop gutters from consuming nearly all of that width.
+    const compact = $derived(width > 0 && width < MOBILE_BREAKPOINT);
+    const topMargin = $derived(compact ? MOBILE_TOP_MARGIN : DESKTOP_TOP_MARGIN);
+    const sideMargin = $derived(
+        compact ? MOBILE_SIDE_MARGIN : DESKTOP_SIDE_MARGIN,
+    );
+
     let tipX = $state(0);
     let tipY = $state(0);
     let tipYear = $state(socialHousingStock[0].year);
@@ -272,7 +284,9 @@
     // or the 3-row news grid — is taller (they share the same band at different
     // scroll beats). Deriving it means trimming the cards grows the plot
     // automatically, with no hardcoded chart height.
-    const newsBlock = GRID_OFFSET + 3 * HL_BOX_H + 2 * ROW_GAP;
+    const newsBlock = $derived(
+        GRID_OFFSET + (compact ? HL_BOX_H : 3 * HL_BOX_H + 2 * ROW_GAP),
+    );
     const marginBottom = $derived(
         Math.max(BOX_OFFSET + cardsHeight, newsBlock) + 8,
     );
@@ -285,7 +299,7 @@
         d3
             .scaleLinear()
             .domain([domainLeft, ZOOM_RIGHT])
-            .range([margin.left, Math.max(margin.left, width - margin.right)])
+            .range([sideMargin, Math.max(sideMargin, width - sideMargin)])
             .clamp(true),
     );
 
@@ -293,6 +307,13 @@
     // labels, so the milestone value labels (which hang below their dots) and
     // the floating tip label always clear the years.
     const AXIS_GAP = 40;
+
+    // Short embeds must retain a real plotting area after the cards and labels
+    // are measured. The story frame scrolls when this minimum cannot fit.
+    const MIN_PLOT_HEIGHT = 120;
+    const minimumHeight = $derived(
+        topMargin + MIN_PLOT_HEIGHT + AXIS_GAP + marginBottom,
+    );
 
     // Y-domain floor sits right at the data minimum (2000 ≈ 4.00M) with the
     // ceiling held at 5.40M, so the climb and the 2014 / 2021 dips read as
@@ -306,8 +327,8 @@
             .scaleLinear()
             .domain([4_000_000, 5_400_000])
             .range([
-                Math.max(margin.top, height - marginBottom - AXIS_GAP),
-                margin.top,
+                Math.max(topMargin + MIN_PLOT_HEIGHT, height - marginBottom - AXIS_GAP),
+                topMargin,
             ]),
     );
 
@@ -320,8 +341,8 @@
             // Center the grid within the chart's drawable area so the news
             // block sits centered under the data line.
             const gLeft =
-                margin.left +
-                (Math.max(0, width - margin.left - margin.right) - GRID_WIDTH) /
+                sideMargin +
+                (Math.max(0, width - 2 * sideMargin) - GRID_WIDTH) /
                     2;
             return {
                 x: gLeft + (g.col - 1) * (HL_BOX_W + COL_GAP) + HL_BOX_W / 2,
@@ -336,6 +357,10 @@
             x: xScale(h.frac),
             y: height - marginBottom + HL_OFFSET,
         };
+    }
+
+    function showYearLabel(year: number): boolean {
+        return !compact || year % 5 === 0;
     }
 
     // The animated line runs 2000 → 2025. The flat 2024 → 2025 carry is part of
@@ -464,7 +489,8 @@
 
 <div
     bind:this={containerEl}
-    class="relative isolate m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] bg-white"
+    class="relative isolate m-4 flex-1 w-[calc(100%-2rem)] bg-white"
+    style="min-height: {minimumHeight}px;"
 >
     <!-- Newspaper texture backdrop: washed-out, covering the full chart (graph
          + headline grid) during the news beat. The mask fades symmetrically at
@@ -481,7 +507,7 @@
 
     {#if width > 0 && height > 0}
         {@const axisY = height - marginBottom}
-        <svg {width} {height} class="block" style="overflow: visible;">
+        <svg {width} {height} class="absolute inset-0 block" style="overflow: visible;">
             <defs>
                 <clipPath id="shs-reveal">
                     <rect x="0" y="0" width={revealX} {height} />
@@ -542,7 +568,7 @@
                         {@const x = xScale(d.year)}
                         <line
                             x1={x}
-                            y1={margin.top}
+                            y1={topMargin}
                             x2={x}
                             y2={axisY}
                             stroke={GRAPHICS_COLORS.grid}
@@ -556,44 +582,46 @@
             <!-- Connectors from each card up to its date on the data line.
                  Outer group carries scroll-driven policiesOpacity; inner
                  groups stagger in once cardsVisible flips true. -->
-            <g style="opacity: {policiesOpacity};">
-                {#each decoratedLegislations as law, i (law.date)}
-                    {@const cardX = cardCenterX(i, width)}
-                    {@const dateX = xScale(law.frac)}
-                    {@const cardTopY = axisY + BOX_OFFSET}
-                    {@const dataLineY = yScale(law.units) + 3}
-                    {@const railY =
-                        axisY +
-                        22 +
-                        (i / Math.max(1, decoratedLegislations.length - 1)) *
-                            (BOX_OFFSET - 28)}
-                    <g
-                        style="opacity: {cardsVisible
-                            ? 1
-                            : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {cardsVisible
-                            ? i * CARDS_STAGGER_MS
-                            : 0}ms;"
-                    >
-                        {#if straightYears.has(law.year)}
-                            <line
-                                x1={dateX}
-                                y1={cardTopY}
-                                x2={dateX}
-                                y2={dataLineY}
-                                stroke={GRAPHICS_COLORS.contextStrong}
-                                stroke-width="1"
-                            />
-                        {:else}
-                            <polyline
-                                points="{cardX},{cardTopY} {cardX},{railY} {dateX},{railY} {dateX},{dataLineY}"
-                                fill="none"
-                                stroke={GRAPHICS_COLORS.contextStrong}
-                                stroke-width="1"
-                            />
-                        {/if}
-                    </g>
-                {/each}
-            </g>
+            {#if !compact}
+                <g style="opacity: {policiesOpacity};">
+                    {#each decoratedLegislations as law, i (law.date)}
+                        {@const cardX = cardCenterX(i, width)}
+                        {@const dateX = xScale(law.frac)}
+                        {@const cardTopY = axisY + BOX_OFFSET}
+                        {@const dataLineY = yScale(law.units) + 3}
+                        {@const railY =
+                            axisY +
+                            22 +
+                            (i / Math.max(1, decoratedLegislations.length - 1)) *
+                                (BOX_OFFSET - 28)}
+                        <g
+                            style="opacity: {cardsVisible
+                                ? 1
+                                : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {cardsVisible
+                                ? i * CARDS_STAGGER_MS
+                                : 0}ms;"
+                        >
+                            {#if straightYears.has(law.year)}
+                                <line
+                                    x1={dateX}
+                                    y1={cardTopY}
+                                    x2={dateX}
+                                    y2={dataLineY}
+                                    stroke={GRAPHICS_COLORS.contextStrong}
+                                    stroke-width="1"
+                                />
+                            {:else}
+                                <polyline
+                                    points="{cardX},{cardTopY} {cardX},{railY} {dateX},{railY} {dateX},{dataLineY}"
+                                    fill="none"
+                                    stroke={GRAPHICS_COLORS.contextStrong}
+                                    stroke-width="1"
+                                />
+                            {/if}
+                        </g>
+                    {/each}
+                </g>
+            {/if}
 
             <g clip-path="url(#shs-reveal)">
                 <path
@@ -641,7 +669,7 @@
             >
                 {#each extendedStock as d (d.year)}
                     {@const x = xScale(d.year)}
-                    {#if d.year >= domainLeft - 0.001}
+                    {#if d.year >= domainLeft - 0.001 && showYearLabel(d.year)}
                         <text
                             {x}
                             y={axisY + 18}
@@ -657,35 +685,37 @@
 
             <!-- Headline connector line: only drawn for the currently
                  hovered headline. -->
-            <g style="opacity: {newsVisible ? 1 : 0};">
-                {#each decoratedHeadlines as h (h.id)}
-                    {#if h.frac >= domainLeft - 0.001 && hoveredId === h.id}
-                        {@const pos = getHeadlinePos(h)}
-                        {@const lineX = xScale(h.frac)}
-                        {@const lineY = yScale(h.units)}
-                        {@const below = pos.y > lineY}
-                        {@const startY = below ? lineY + 3 : lineY - 3}
-                        {#if Math.abs(lineX - pos.x) < 12}
-                            <line
-                                x1={pos.x}
-                                y1={startY}
-                                x2={pos.x}
-                                y2={pos.y}
-                                stroke={GRAPHICS_COLORS.contextStrong}
-                                stroke-width="1"
-                            />
-                        {:else}
-                            {@const midY = (startY + pos.y) / 2}
-                            <polyline
-                                points="{lineX},{startY} {lineX},{midY} {pos.x},{midY} {pos.x},{pos.y}"
-                                fill="none"
-                                stroke={GRAPHICS_COLORS.contextStrong}
-                                stroke-width="1"
-                            />
+            {#if !compact}
+                <g style="opacity: {newsVisible ? 1 : 0};">
+                    {#each decoratedHeadlines as h (h.id)}
+                        {#if h.frac >= domainLeft - 0.001 && hoveredId === h.id}
+                            {@const pos = getHeadlinePos(h)}
+                            {@const lineX = xScale(h.frac)}
+                            {@const lineY = yScale(h.units)}
+                            {@const below = pos.y > lineY}
+                            {@const startY = below ? lineY + 3 : lineY - 3}
+                            {#if Math.abs(lineX - pos.x) < 12}
+                                <line
+                                    x1={pos.x}
+                                    y1={startY}
+                                    x2={pos.x}
+                                    y2={pos.y}
+                                    stroke={GRAPHICS_COLORS.contextStrong}
+                                    stroke-width="1"
+                                />
+                            {:else}
+                                {@const midY = (startY + pos.y) / 2}
+                                <polyline
+                                    points="{lineX},{startY} {lineX},{midY} {pos.x},{midY} {pos.x},{pos.y}"
+                                    fill="none"
+                                    stroke={GRAPHICS_COLORS.contextStrong}
+                                    stroke-width="1"
+                                />
+                            {/if}
                         {/if}
-                    {/if}
-                {/each}
-            </g>
+                    {/each}
+                </g>
+            {/if}
         </svg>
 
         {#each milestones as m, i (m.year)}
@@ -746,13 +776,25 @@
              scroll-driven policiesOpacity. -->
         <div
             bind:clientHeight={cardsHeight}
-            class="absolute pointer-events-none select-none flex"
+            data-policy-cards
+            class="absolute select-none flex {compact
+                ? 'overflow-x-auto pointer-events-auto pb-2'
+                : 'pointer-events-none'}"
             style="left: {CARD_INSET}px; right: {CARD_INSET}px; top: {axisY +
                 BOX_OFFSET}px; gap: {CARD_GAP}px; opacity: {policiesOpacity};"
+            role={compact ? "region" : undefined}
+            aria-label={compact
+                ? $language === 'fr'
+                    ? 'Lois sur le logement, faire défiler horizontalement'
+                    : 'Housing laws, scroll horizontally'
+                : undefined}
         >
             {#each decoratedLegislations as law, i (law.date)}
                 <div
-                    class="flex-1 min-w-0 border border-gray-300 bg-white"
+                    data-policy-card
+                    class="border border-gray-300 bg-white {compact
+                        ? 'w-[210px] shrink-0'
+                        : 'flex-1 min-w-0'}"
                     style="opacity: {cardsVisible
                         ? 1
                         : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {cardsVisible
@@ -802,39 +844,75 @@
             {/each}
         </div>
 
-        <!-- News headline screenshots: reveal during the news beat; hover
-             scales the box and draws a connector to its date on the line. -->
-        {#each decoratedHeadlines as h, i (h.id)}
-            {#if h.frac >= domainLeft - 0.001}
-                {@const pos = getHeadlinePos(h)}
-                {@const isHovered = hoveredId === h.id}
-                {@const col = HEADLINE_GRID[h.id]?.col}
-                {@const xOrigin =
-                    col === 1 ? "0%" : col === GRID_COLS ? "100%" : "50%"}
-                <div
-                    role="presentation"
-                    class="absolute border border-gray-300 bg-white select-none cursor-pointer"
-                    style="left: {pos.x}px; top: {pos.y}px; width: {HL_BOX_W}px; height: {HL_BOX_H}px; transform: translateX(-50%) scale({isHovered
-                        ? HL_HOVER_SCALE
-                        : 1}); transform-origin: {xOrigin} 0; transition: transform 180ms ease-out, opacity {CARDS_DUR_MS}ms ease-out {newsVisible
-                        ? i * HL_STAGGER_MS
-                        : 0}ms; z-index: {isHovered
-                        ? 20
-                        : 1}; opacity: {newsVisible
-                        ? 1
-                        : 0}; pointer-events: {newsVisible ? 'auto' : 'none'};"
-                    onmouseenter={() => (hoveredId = h.id)}
-                    onmouseleave={() => (hoveredId = null)}
-                >
-                    <img
-                        src={asset(h.full)}
-                        alt={h.caption}
-                        loading="lazy"
-                        draggable="false"
-                        class="block h-full w-full object-contain pointer-events-none"
-                    />
-                </div>
-            {/if}
-        {/each}
+        <!-- News headline screenshots: use a swipeable strip on phone-sized
+             embeds. The desktop grid and hover connectors need more width. -->
+        {#if compact}
+            <div
+                data-mobile-headlines
+                class="absolute flex gap-3 overflow-x-auto pb-2"
+                style="left: {CARD_INSET}px; right: {CARD_INSET}px; top: {axisY +
+                    GRID_OFFSET}px; opacity: {newsVisible
+                    ? 1
+                    : 0}; pointer-events: {newsVisible ? 'auto' : 'none'};"
+                role="region"
+                aria-label={$language === 'fr'
+                    ? 'Titres de presse, faire défiler horizontalement'
+                    : 'News headlines, scroll horizontally'}
+            >
+                {#each decoratedHeadlines as h, i (h.id)}
+                    {#if h.frac >= domainLeft - 0.001}
+                        <div
+                            class="h-[40px] w-[140px] shrink-0 border border-gray-300 bg-white select-none"
+                            style="opacity: {newsVisible
+                                ? 1
+                                : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {newsVisible
+                                ? i * HL_STAGGER_MS
+                                : 0}ms;"
+                        >
+                            <img
+                                src={asset(h.full)}
+                                alt={h.caption}
+                                loading="lazy"
+                                draggable="false"
+                                class="block h-full w-full object-contain pointer-events-none"
+                            />
+                        </div>
+                    {/if}
+                {/each}
+            </div>
+        {:else}
+            {#each decoratedHeadlines as h, i (h.id)}
+                {#if h.frac >= domainLeft - 0.001}
+                    {@const pos = getHeadlinePos(h)}
+                    {@const isHovered = hoveredId === h.id}
+                    {@const col = HEADLINE_GRID[h.id]?.col}
+                    {@const xOrigin =
+                        col === 1 ? "0%" : col === GRID_COLS ? "100%" : "50%"}
+                    <div
+                        role="presentation"
+                        class="absolute border border-gray-300 bg-white select-none cursor-pointer"
+                        style="left: {pos.x}px; top: {pos.y}px; width: {HL_BOX_W}px; height: {HL_BOX_H}px; transform: translateX(-50%) scale({isHovered
+                            ? HL_HOVER_SCALE
+                            : 1}); transform-origin: {xOrigin} 0; transition: transform 180ms ease-out, opacity {CARDS_DUR_MS}ms ease-out {newsVisible
+                            ? i * HL_STAGGER_MS
+                            : 0}ms; z-index: {isHovered
+                            ? 20
+                            : 1}; opacity: {newsVisible
+                            ? 1
+                            : 0}; pointer-events: {newsVisible ? 'auto' : 'none'};"
+                        onmouseenter={() => (hoveredId = h.id)}
+                        onmouseleave={() => (hoveredId = null)}
+                    >
+                        <img
+                            src={asset(h.full)}
+                            alt={h.caption}
+                            loading="lazy"
+                            draggable="false"
+                            class="block h-full w-full object-contain pointer-events-none"
+                        />
+                    </div>
+                {/if}
+            {/each}
+        {/if}
     {/if}
 </div>
