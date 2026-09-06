@@ -140,6 +140,7 @@
     font-stretch: 75%;
     line-height: 1.68;
     text-rendering: optimizeLegibility;
+    overflow-x: clip;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
@@ -326,13 +327,34 @@
   }
 
   @media (max-width: 767.98px) {
+	:root {
+	  --page-gutter: 1.15rem;
+	}
+
+	.page-shell {
+	  padding-top: 2.5rem;
+	}
+
+	.page-title {
+	  font-size: clamp(2rem, 10vw, 2.6rem);
+	}
+
     .visual-grid {
       grid-template-columns: 1fr;
+	  gap: 1rem;
     }
 
     .wide-column {
-      width: min(calc(100% - 2rem), var(--wide-measure));
+	  width: min(calc(100% - 1.5rem), var(--wide-measure));
     }
+
+	.visual-card {
+	  padding: 1rem;
+	}
+
+	.chart-frame {
+	  height: 25rem;
+	}
 
     .map-frame {
       height: clamp(54rem, 110svh, 60rem);

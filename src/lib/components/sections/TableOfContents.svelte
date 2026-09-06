@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { X } from '@lucide/svelte';
+	import { Menu, X } from '@lucide/svelte';
 	import { siteRoutes, type SiteRoute } from '$lib/data/routes';
 	import Glossary from '$lib/components/sections/Glossary.svelte';
 	import { language, setLanguage, type Language } from '$lib/i18n';
@@ -13,8 +13,11 @@
 	let innerHeight = $state(0);
 	let navHeight = $state(0);
 	let lexiconOpen = $state(false);
+	let menuOpen = $state(false);
 	let lexiconButton = $state<HTMLButtonElement | null>(null);
 	let lexiconPanel = $state<HTMLDivElement | null>(null);
+	let menuButton = $state<HTMLButtonElement | null>(null);
+	let menuPanel = $state<HTMLDivElement | null>(null);
 	let navList = $state<HTMLUListElement | null>(null);
 
 	// The introduction page opens with a full-screen hero image. There the nav
@@ -31,23 +34,31 @@
 		lexiconOpen = false;
 	}
 
+	function closeMenu() {
+		menuOpen = false;
+	}
+
 	function handleWindowClick(event: MouseEvent) {
-		if (!lexiconOpen) return;
 		const target = event.target as Node;
-		if (lexiconButton?.contains(target) || lexiconPanel?.contains(target)) {
-			return;
+		if (lexiconOpen && !lexiconButton?.contains(target) && !lexiconPanel?.contains(target)) {
+			closeLexicon();
 		}
-		closeLexicon();
+		if (menuOpen && !menuButton?.contains(target) && !menuPanel?.contains(target)) {
+			closeMenu();
+		}
 	}
 
 	function handleWindowKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			closeLexicon();
+			closeMenu();
 		}
 	}
 
 	$effect(() => {
 		routeId;
+		menuOpen = false;
+		lexiconOpen = false;
 		if (!navList || !window.matchMedia('(max-width: 639.98px)').matches) return;
 		requestAnimationFrame(() => {
 			const current = navList?.querySelector<HTMLElement>('[aria-current="page"]');
@@ -73,7 +84,7 @@
 	]}
 	aria-label={$language === 'fr' ? 'Sommaire' : 'Table of contents'}
 >
-	<div class="relative flex w-full items-center gap-1 px-2 sm:block sm:px-6">
+	<div class="relative flex min-h-14 w-full items-center gap-2 px-3 sm:block sm:px-6">
 		<div
 			class={[
 				'grid h-8 w-20 shrink-0 grid-cols-2 items-stretch rounded-full border p-0.5 text-[0.7rem] font-semibold tracking-[0.06em] sm:absolute sm:left-6 sm:top-1/2 sm:-translate-y-1/2',
@@ -104,7 +115,7 @@
 		</div>
 		<ul
 			bind:this={navList}
-			class="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap pr-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-auto sm:max-w-5xl sm:justify-center sm:gap-8 sm:overflow-visible sm:whitespace-normal sm:px-24 [&::-webkit-scrollbar]:hidden"
+			class="hidden min-w-0 flex-1 items-center gap-2 whitespace-nowrap pr-2 sm:mx-auto sm:flex sm:max-w-5xl sm:justify-center sm:gap-8 sm:overflow-visible sm:whitespace-normal sm:px-24"
 		>
 			{#each siteRoutes as section (section.href)}
 				<li class="shrink-0">
@@ -125,6 +136,24 @@
 		</ul>
 
 		<button
+			bind:this={menuButton}
+			type="button"
+			class={[
+				'ml-auto inline-flex h-9 items-center gap-2 rounded-full border px-3 text-sm font-medium sm:hidden',
+				transparent ? 'border-white/70 bg-black/10 text-white' : 'border-gray-900 bg-white text-gray-900'
+			]}
+			aria-expanded={menuOpen}
+			aria-controls="mobile-site-menu"
+			onclick={() => {
+				menuOpen = !menuOpen;
+				lexiconOpen = false;
+			}}
+		>
+			{#if menuOpen}<X size={17} />{:else}<Menu size={17} />{/if}
+			<span>{$language === 'fr' ? 'Menu' : 'Menu'}</span>
+		</button>
+
+		<button
 			bind:this={lexiconButton}
 			type="button"
 			class={[
@@ -136,10 +165,39 @@
 			]}
 			aria-expanded={lexiconOpen}
 			aria-controls="dashboard-lexicon-panel"
-			onclick={() => (lexiconOpen = !lexiconOpen)}
+			onclick={() => {
+				lexiconOpen = !lexiconOpen;
+				menuOpen = false;
+			}}
 		>
 			{$language === 'fr' ? 'Lexique' : 'Lexicon'}
 		</button>
+
+		{#if menuOpen}
+			<div
+				bind:this={menuPanel}
+				id="mobile-site-menu"
+				class="absolute inset-x-0 top-full border-b border-gray-200 bg-white px-3 py-3 text-gray-900 shadow-sm sm:hidden"
+			>
+				<ul class="grid gap-1">
+					{#each siteRoutes as section (section.href)}
+						<li>
+							<a
+								href={resolve(section.href as '/')}
+								aria-current={isActive(section.href) ? 'page' : undefined}
+								class={[
+									'block rounded-lg px-3 py-2.5 text-base leading-tight',
+									isActive(section.href) ? 'bg-gray-100 font-semibold text-gray-950' : 'text-gray-700'
+								]}
+								onclick={closeMenu}
+							>
+								{section.label[$language]}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
 
 		{#if lexiconOpen}
 			<div

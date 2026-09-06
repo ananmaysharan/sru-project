@@ -303,6 +303,9 @@
 			{/each}
 		</div>
 	</div>
+	<p class="list-scroll-hint">
+		{$language === 'fr' ? 'Balayez horizontalement pour lire les communes et les périodes' : 'Swipe horizontally to read communes and periods'}
+	</p>
 	<div class="list-columns-wrap">
 		<div
 			id="noncompliance-list"
@@ -409,6 +412,14 @@
 		padding-bottom: 8px;
 	}
 
+	.list-scroll-hint {
+		display: none;
+		margin: 0 0 0.65rem;
+		color: #666;
+		font-size: 0.78rem;
+		line-height: 1.35;
+	}
+
 	.list-columns {
 		display: grid;
 		grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
@@ -449,6 +460,30 @@
 	.row-rule {
 		stroke: #dadad7;
 		stroke-width: 1.6;
+	}
+
+	@media (max-width: 640px) {
+		.noncompliance-chart-shell {
+			margin-inline: 0.75rem;
+			padding: 0.75rem;
+		}
+
+		.list-scroll-hint {
+			display: block;
+		}
+
+		.list-columns-wrap {
+			overflow-x: auto;
+			overscroll-behavior-inline: contain;
+		}
+
+		.list-columns {
+			min-width: 46rem;
+		}
+
+		.list-columns.single-column .list-column {
+			width: 100%;
+		}
 	}
 
 </style>

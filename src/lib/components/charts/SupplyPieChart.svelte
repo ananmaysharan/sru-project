@@ -12,6 +12,7 @@
 	let chartEl: HTMLDivElement;
 	let drillLabel: string | null = $state(null);
 	let chartInstance: ReturnType<typeof import('echarts')['init']> | null = null;
+	let activeData: { name: string; value: number; rate: number }[] = [];
 
 	const OUTRE_MER_CODES = ['01', '02', '03', '04', '06'];
 
@@ -67,8 +68,21 @@
 	}
 
 	function buildOption(data: { name: string; value: number; rate: number }[]) {
+		const compact = (chartEl?.clientWidth ?? 999) < 520;
 		return {
 			color: [...PIE_TONAL_PALETTE],
+			legend: compact
+				? {
+					type: 'scroll',
+					bottom: 0,
+					left: 'center',
+					width: '92%',
+					itemWidth: 8,
+					itemHeight: 8,
+					textStyle: { fontSize: 9, color: GRAPHICS_COLORS.secondaryText },
+					formatter: (name: string) => name.length > 20 ? `${name.slice(0, 19)}…` : name
+				}
+				: undefined,
 			tooltip: {
 				trigger: 'item',
 				formatter: (params: any) => {
@@ -81,8 +95,8 @@
 			series: [
 				{
 					type: 'pie',
-					radius: ['35%', '70%'],
-					center: ['50%', '50%'],
+					radius: compact ? ['38%', '70%'] : ['35%', '70%'],
+					center: compact ? ['50%', '44%'] : ['50%', '50%'],
 					avoidLabelOverlap: true,
 					itemStyle: {
 						borderRadius: 0,
@@ -90,7 +104,7 @@
 						borderWidth: 2
 					},
 					label: {
-						show: true,
+						show: !compact,
 						formatter: '{b}',
 						fontSize: 10,
 						color: GRAPHICS_COLORS.ink
@@ -122,13 +136,15 @@
 
 	function showMain() {
 		drillLabel = null;
-		chartInstance?.setOption(buildOption(getMainData()), true);
+		activeData = getMainData();
+		chartInstance?.setOption(buildOption(activeData), true);
 	}
 
 	function drillInto(name: string, data: { name: string; value: number; rate: number }[]) {
 		if (data.length === 0) return;
 		drillLabel = name;
-		chartInstance?.setOption(buildOption(data), true);
+		activeData = data;
+		chartInstance?.setOption(buildOption(activeData), true);
 	}
 
 	onMount(() => {
@@ -136,7 +152,8 @@
 
 		import('echarts').then((echarts) => {
 			chartInstance = echarts.init(chartEl);
-			chartInstance.setOption(buildOption(getMainData()));
+			activeData = getMainData();
+			chartInstance.setOption(buildOption(activeData));
 
 			chartInstance.on('click', (params: any) => {
 				if (!drillLabel) {
@@ -149,7 +166,10 @@
 				}
 			});
 
-			ro = new ResizeObserver(() => chartInstance?.resize());
+			ro = new ResizeObserver(() => {
+				chartInstance?.setOption(buildOption(activeData), true);
+				chartInstance?.resize();
+			});
 			ro.observe(chartEl);
 		});
 

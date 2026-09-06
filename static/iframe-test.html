@@ -70,6 +70,11 @@
       const pinned = story?.firstElementChild;
       if (!pinned || !story.querySelector('svg path')) return false;
       const navHeight = parseFloat(win.getComputedStyle(pinned).top);
+      if (!Number.isFinite(navHeight)) {
+        story.scrollIntoView({ behavior: 'instant' });
+        status.textContent = 'Static mobile chart shown. Swipe the law cards to explore the timeline.';
+        return true;
+      }
       win.scrollTo({ top: win.scrollY + story.getBoundingClientRect().top - navHeight
         + 0.48 * (navHeight + story.offsetHeight - win.innerHeight), behavior: 'instant' });
       pinned.scrollTop = pinned.scrollHeight - pinned.clientHeight;

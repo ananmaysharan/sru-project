@@ -1004,7 +1004,11 @@
         </p>
     </div>
 
-    <div class="case-study-index-shell" onscroll={closeProjectCard}>
+    <div class="case-study-index-wrap">
+        <p class="case-study-scroll-hint">
+            {$language === 'fr' ? 'Balayez pour parcourir les études de cas' : 'Swipe to browse the case studies'}
+        </p>
+    <div class="case-study-index-shell" onscroll={closeProjectCard} role="region">
         <nav class="case-study-index" aria-label={$language === 'fr' ? 'Études de cas par région' : 'Case studies by region'}>
             {#each regions as region (region)}
                 <span
@@ -1046,6 +1050,7 @@
                 </button>
             {/each}
         </nav>
+    </div>
     </div>
 
     {#if visibleProjectCard && projectIdCards[visibleProjectCard]}
@@ -1413,6 +1418,15 @@
         scrollbar-width: thin;
         scrollbar-color: #aaa transparent;
     }
+
+	.case-study-scroll-hint {
+		display: none;
+		width: min(100% - 1.5rem, 80rem);
+		margin: 2rem auto 0.55rem;
+		color: #666;
+		font-size: 0.78rem;
+		line-height: 1.35;
+	}
 
     .case-study-index {
         display: grid;
@@ -1964,13 +1978,23 @@
     }
 
     @media (max-width: 640px) {
+		.case-study-scroll-hint {
+			display: block;
+		}
+
         .case-study-index-shell {
-            padding-inline: 0.75rem;
+			margin-top: 0;
+			padding-inline: 0.75rem;
+			scroll-snap-type: x mandatory;
         }
 
         .case-study-index {
             min-width: 49rem;
         }
+
+		.case-study-case-button {
+			scroll-snap-align: start;
+		}
 
         .case-study-compact-index {
             position: fixed;

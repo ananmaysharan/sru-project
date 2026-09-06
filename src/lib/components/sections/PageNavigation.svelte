@@ -19,13 +19,13 @@
 </script>
 
 <nav
-	class="mx-auto mt-16 flex max-w-3xl items-center justify-between gap-3 px-4 py-10 sm:px-6"
+	class="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-3 px-4 py-10 sm:grid-cols-2 sm:px-6"
 	aria-label={$language === 'fr' ? 'Navigation entre les pages' : 'Page navigation'}
 >
 	{#if previousRoute}
 		<a
 			href={resolve(previousRoute.href as '/')}
-			class="border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900"
+			class="border border-gray-300 px-3 py-3 text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900"
 		>
 			<span class="block text-xs text-gray-500">
 				{$language === 'fr' ? 'Page précédente' : 'Previous page'}
@@ -37,7 +37,7 @@
 	{#if nextRoute}
 		<a
 			href={resolve(nextRoute.href as '/')}
-			class="ml-auto border border-gray-300 px-3 py-2 text-right text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900"
+			class="border border-gray-300 px-3 py-3 text-right text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900 sm:ml-auto"
 		>
 			<span class="block text-xs text-gray-500">
 				{$language === 'fr' ? 'Page suivante' : 'Next page'}

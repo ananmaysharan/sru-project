@@ -8,6 +8,7 @@
 	import { GRAPHICS_COLORS } from '$lib/data/charts/chart-colors';
 	import { language } from '$lib/i18n';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import SlidersHorizontalIcon from '@lucide/svelte/icons/sliders-horizontal';
 	import MapSidebar from './MapSidebar.svelte';
 	import {
 		mapState as DEFAULT_MAP_STATE,
@@ -22,6 +23,7 @@
 	let { mapState = DEFAULT_MAP_STATE }: { mapState?: MapState } = $props();
 
 	let mapContainer: HTMLDivElement;
+	let filtersOpen = $state(false);
 	let mapInstance: maplibregl.Map | null = $state(null);
 
 	let hoveredCommuneId: string | number | null = null;
@@ -253,7 +255,18 @@
 </script>
 
 <div class="flex flex-col md:flex-row h-full w-full min-h-100">
-	<MapSidebar {mapState} onflyto={flyTo} />
+	<button
+		type="button"
+		class="flex items-center justify-between border border-gray-200 bg-white px-4 py-3 text-left text-sm font-semibold md:hidden"
+		aria-expanded={filtersOpen}
+		onclick={() => (filtersOpen = !filtersOpen)}
+	>
+		<span class="flex items-center gap-2"><SlidersHorizontalIcon class="size-4" />{$language === 'fr' ? 'Filtres de la carte' : 'Map filters'}</span>
+		<span class="text-xs font-normal text-gray-500">{filtersOpen ? ($language === 'fr' ? 'Masquer' : 'Hide') : ($language === 'fr' ? 'Afficher' : 'Show')}</span>
+	</button>
+	<div class={filtersOpen ? 'block md:contents' : 'hidden md:contents'}>
+		<MapSidebar {mapState} onflyto={flyTo} />
+	</div>
 
 	<div class="flex-1 flex flex-col border-t border-r border-b border-gray-200 relative min-h-100">
 		<div class="border-b border-gray-200 bg-white flex items-center gap-1 p-1.5 shrink-0">

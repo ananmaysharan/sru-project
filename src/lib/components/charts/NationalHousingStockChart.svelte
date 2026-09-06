@@ -6,6 +6,42 @@
 
 	let chartEl: HTMLDivElement;
 
+	function optionFor(width: number) {
+		const compact = width < 520;
+		const shownYears = new Set(['1920', '1940', '1960', '1980', '2000', '2022']);
+		const years = nationalHousingStock.map((d) => String(d.year));
+		const values = nationalHousingStock.map((d) => d.units);
+
+		return {
+			tooltip: {
+				trigger: 'axis',
+				showContent: true,
+				axisPointer: { type: 'line', lineStyle: { color: GRAPHICS_COLORS.secondaryText, width: 1 } },
+				valueFormatter: (v: number) => v.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')
+			},
+			grid: { left: compact ? 48 : 56, right: 12, top: 16, bottom: compact ? 42 : 80 },
+			xAxis: {
+				type: 'category', data: years,
+				axisLine: { show: true, lineStyle: { color: GRAPHICS_COLORS.grid } },
+				axisTick: { show: false },
+				axisLabel: {
+					fontSize: compact ? 9 : 11,
+					color: GRAPHICS_COLORS.secondaryText,
+					interval: 0,
+					rotate: compact ? 0 : 90,
+					formatter: compact ? (value: string) => shownYears.has(value) ? value : '' : undefined
+				}
+			},
+			yAxis: {
+				type: 'value', min: 0, max: 140000, interval: compact ? 40000 : 20000,
+				axisLine: { show: false }, axisTick: { show: false },
+				splitLine: { show: true, lineStyle: { color: GRAPHICS_COLORS.grid, type: 'dashed', width: 0.5 } },
+				axisLabel: { fontSize: compact ? 9 : 11, color: GRAPHICS_COLORS.secondaryText, formatter: (v: number) => v.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US') }
+			},
+			series: [{ type: 'bar', data: values, barWidth: compact ? '72%' : '60%', itemStyle: { color: GRAPHICS_COLORS.primary }, emphasis: { itemStyle: { color: GRAPHICS_COLORS.focus } } }]
+		};
+	}
+
 	onMount(() => {
 		let chart: ReturnType<typeof import('echarts')['init']>;
 		let ro: ResizeObserver;
@@ -13,60 +49,12 @@
 		import('echarts').then((echarts) => {
 			chart = echarts.init(chartEl);
 
-			const years = nationalHousingStock.map((d) => String(d.year));
-			const values = nationalHousingStock.map((d) => d.units);
+			chart.setOption(optionFor(chartEl.clientWidth));
 
-			chart.setOption({
-				tooltip: {
-					trigger: 'axis',
-					showContent: false,
-					axisPointer: {
-						type: 'line',
-						lineStyle: { color: GRAPHICS_COLORS.secondaryText, width: 1 }
-					}
-				},
-				grid: { left: 56, right: 16, top: 16, bottom: 80 },
-				xAxis: {
-					type: 'category',
-					data: years,
-					axisLine: { show: true, lineStyle: { color: GRAPHICS_COLORS.grid } },
-					axisTick: { show: false },
-					axisLabel: {
-						fontSize: 11,
-						color: GRAPHICS_COLORS.secondaryText,
-						interval: 0,
-						rotate: 90
-					}
-				},
-				yAxis: {
-					type: 'value',
-					min: 0,
-					max: 140000,
-					interval: 20000,
-					axisLine: { show: false },
-					axisTick: { show: false },
-					splitLine: {
-						show: true,
-						lineStyle: { color: GRAPHICS_COLORS.grid, type: 'dashed', width: 0.5 }
-					},
-					axisLabel: {
-						fontSize: 11,
-						color: GRAPHICS_COLORS.secondaryText,
-						formatter: (v: number) => v.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')
-					}
-				},
-				series: [
-					{
-						type: 'bar',
-						data: values,
-						barWidth: '60%',
-						itemStyle: { color: GRAPHICS_COLORS.primary },
-						emphasis: { itemStyle: { color: GRAPHICS_COLORS.focus } }
-					}
-				]
+			ro = new ResizeObserver(() => {
+				chart.setOption(optionFor(chartEl.clientWidth), true);
+				chart.resize();
 			});
-
-			ro = new ResizeObserver(() => chart.resize());
 			ro.observe(chartEl);
 		});
 

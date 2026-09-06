@@ -124,7 +124,14 @@
 </script>
 
 <figure class="diagram" aria-labelledby="health-housing-title">
-	<div class="diagram-scroll">
+	<p class="scroll-hint">
+		{$language === 'fr' ? 'Balayez horizontalement pour explorer tout le tableau' : 'Swipe horizontally to explore the full table'}
+	</p>
+	<div
+		class="diagram-scroll"
+		role="region"
+		aria-label={$language === 'fr' ? 'Tableau interactif, défilement horizontal' : 'Interactive table, horizontal scrolling'}
+	>
 		<div class="diagram-board">
 			<header class="skyline-header">
 				<img
@@ -254,6 +261,14 @@
 		overscroll-behavior-inline: contain;
 		border: 1px solid #dadad7;
 		scrollbar-color: #a8a8a5 transparent;
+	}
+
+	.scroll-hint {
+		display: none;
+		margin: 0 0 0.65rem;
+		color: #666;
+		font-size: 0.78rem;
+		line-height: 1.35;
 	}
 
 	.diagram-board {
@@ -525,6 +540,24 @@
 	}
 
 	@media (max-width: 767px) {
+		.scroll-hint {
+			display: block;
+		}
+
+		.diagram-board,
+		.matrix-grid {
+			min-width: 1040px;
+		}
+
+		.matrix-grid {
+			grid-template-columns: 48px 184px repeat(7, minmax(112px, 1fr));
+		}
+
+		.subcategory-label,
+		.factor-label {
+			left: 48px;
+		}
+
 		.skyline-header h2 {
 			padding-left: 20px;
 		}

@@ -14,6 +14,7 @@
     let navHeight = $state(56);
     let scrollY = $state(0);
     let innerHeight = $state(0);
+    let compactStory = $state(false);
 
     // Normalized scroll progress (0 → 1) through the pinned story section. The
     // sticky frame is pinned at top: navHeight, so progress is 0 the moment the
@@ -34,6 +35,7 @@
 
     // The caption crossfades in step with the chart's zoom beat.
     const swapProgress = $derived(phaseProgress(progress, STORY_PHASES.zoom));
+    const chartProgress = $derived(compactStory ? STORY_PHASES.policies[1] : progress);
 
     function measureNav() {
         const nav = document.querySelector(
@@ -42,22 +44,53 @@
         navHeight = nav?.offsetHeight ?? 56;
     }
 
-    onMount(measureNav);
+    onMount(() => {
+        measureNav();
+        const query = window.matchMedia('(max-width: 767.98px)');
+        const update = () => (compactStory = query.matches);
+        update();
+        query.addEventListener('change', update);
+        return () => query.removeEventListener('change', update);
+    });
 </script>
 
 <svelte:window bind:scrollY bind:innerHeight onresize={measureNav} />
 
+<svelte:head>
+    <link
+        rel="preload"
+        as="image"
+        href={asset('/intro-hero-mobile.webp')}
+        type="image/webp"
+        media="(max-width: 767px)"
+        fetchpriority="high"
+    />
+    <link
+        rel="preload"
+        as="image"
+        href={asset('/intro-hero-desktop.webp')}
+        type="image/webp"
+        media="(min-width: 768px)"
+        fetchpriority="high"
+    />
+</svelte:head>
+
 <section class="intro-hero relative isolate w-full min-h-screen">
     <div class="intro-hero__media">
         <div class="intro-hero__media-frame">
-            <img
-                src={asset("/intro-hero.webp")}
-                alt="View from a Parisian balcony"
-                width="5244"
-                height="3870"
-                fetchpriority="high"
-                class="absolute inset-0 h-full w-full object-cover"
-            />
+            <picture>
+                <source media="(max-width: 767px)" srcset={asset('/intro-hero-mobile.webp')} />
+                <img
+                    src={asset('/intro-hero-desktop.webp')}
+                    alt="View from a Parisian balcony"
+                    width="2200"
+                    height="1623"
+                    loading="eager"
+                    decoding="async"
+                    fetchpriority="high"
+                    class="absolute inset-0 h-full w-full object-cover"
+                />
+            </picture>
             <div
                 class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70"
             ></div>
@@ -275,6 +308,43 @@
         max-width: 30ch;
         font-size: clamp(1.75rem, 5.6vw, 4.5rem);
     }
+
+    @media (max-width: 767.98px) {
+        .story-section.story-mobile {
+            height: auto !important;
+            padding-block: 2.5rem 1rem;
+        }
+
+        .story-mobile .story-stage {
+            position: relative;
+            top: auto !important;
+            height: auto !important;
+            overflow: visible;
+        }
+
+        .story-mobile .story-copy-frame {
+            height: auto;
+            padding-top: 0;
+            padding-bottom: 1.25rem;
+        }
+
+        .story-mobile .story-copy-primary {
+            position: relative;
+            inset: auto;
+        }
+
+        .story-mobile .story-copy-secondary {
+            display: none;
+        }
+
+        .story-mobile :global([data-policy-cards]) {
+            scroll-snap-type: x mandatory;
+        }
+
+        .story-mobile :global([data-policy-card]) {
+            scroll-snap-align: start;
+        }
+    }
 </style>
 
 <section class="support-section">
@@ -289,11 +359,12 @@
 <section
     bind:this={storyEl}
     id="story-scroll"
-    class="relative"
-    style="height: 400vh;"
+    class:story-mobile={compactStory}
+    class="story-section relative"
+    style="height: {compactStory ? 'auto' : '400vh'};"
 >
     <div
-        class="sticky flex flex-col overflow-y-auto"
+        class="story-stage sticky flex flex-col overflow-y-auto"
         style="top: {navHeight}px; height: calc(100vh - {navHeight}px);"
     >
         <!-- Crossfading caption — the heading swaps from the data story to the
@@ -302,8 +373,9 @@
             class="story-copy-frame relative shrink-0 max-w-3xl mx-auto px-6 pt-6 w-full"
         >
             <div
+                class:story-copy-primary={true}
                 class="absolute inset-x-6"
-                style="opacity: {1 - swapProgress};"
+                style="opacity: {compactStory ? 1 : 1 - swapProgress};"
             >
                 <h2 class="text-3xl font-bold">
                     {$language === 'fr'
@@ -316,7 +388,7 @@
                         : "France's social housing has grown steadily between 2000-2025 with delivery of new units reaching a historic peak of over 80,000 per year for the first time since the 1970s. Projects built across France's regions have proven to be diverse in design, size, and location."}
                 </p>
             </div>
-            <div class="absolute inset-x-6" style="opacity: {swapProgress};">
+            <div class="story-copy-secondary absolute inset-x-6" style="opacity: {swapProgress};">
                 <h2 class="text-3xl font-bold">{$language === 'fr' ? 'À la une' : 'In the news'}</h2>
                 <p class="mt-4 text-gray-700">
                     {#if $language === 'fr'}
@@ -345,7 +417,7 @@
 
         <!-- Fill the viewport, allowing the frame to scroll in short embeds. -->
         <div class="flex flex-col flex-1 w-full">
-            <SocialHousingStockChart {progress} />
+            <SocialHousingStockChart progress={chartProgress} />
         </div>
     </div>
 </section>
