@@ -109,35 +109,52 @@ test('Escape stays dismissed until a new hover, and keyboard focus opens a profi
     await expect(first).toHaveAttribute('aria-describedby', 'case-study-project-profile');
 });
 
-for (const viewport of [{ width: 390, height: 667 }, { width: 844, height: 390 }]) {
-    for (const language of ['fr', 'en']) {
-        test(`all profile content fits without scrolling at ${viewport.width}x${viewport.height} (${language})`, async ({ page }) => {
-            await page.setViewportSize(viewport);
-            const band = await openProjectBand(page, language);
-            const card = page.getByRole('tooltip');
-            await page.keyboard.press('Tab');
-            for (const name of ['Samaritaine', 'Tour Bois-le-Prêtre', 'Rue Jean-Bart', 'Talgen', 'Les Jasmins · La Réunion']) {
-                await page.keyboard.press('Escape');
-                await page.mouse.move(5, 5);
-                await expect(card).toHaveCount(0);
-                const trigger = band.getByRole('button', { name: new RegExp(name) });
-                await trigger.scrollIntoViewIfNeeded();
-                await page.evaluate(() => new Promise<void>(resolve =>
-                    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-                await trigger.evaluate(el => el.focus({ preventScroll: true }));
-                await expect(card).toBeVisible({ timeout: 500 });
-                // Let the measured height update after switching profiles.
-                await page.evaluate(() => new Promise<void>(resolve =>
-                    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-                const bounds = (await card.boundingBox())!;
-                expect(bounds.x).toBeGreaterThanOrEqual(11);
-                expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width - 11);
-                expect(bounds.y).toBeGreaterThanOrEqual(11);
-                expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height - 11);
-                expect(await card.evaluate(el => el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth)).toBe(true);
-                await expect(card.locator('dl > div')).toHaveCount(8);
-            }
-            await page.screenshot({ path: `test-results/project-profile-${viewport.width}-${language}.png` });
-        });
-    }
+for (const language of ['fr', 'en']) {
+    test(`all profile content fits without scrolling at 844x390 (${language})`, async ({ page }) => {
+        const viewport = { width: 844, height: 390 };
+        await page.setViewportSize(viewport);
+        const band = await openProjectBand(page, language);
+        const card = page.getByRole('tooltip');
+        await page.keyboard.press('Tab');
+        for (const name of ['Samaritaine', 'Tour Bois-le-Prêtre', 'Rue Jean-Bart', 'Talgen', 'Les Jasmins · La Réunion']) {
+            await page.keyboard.press('Escape');
+            await page.mouse.move(5, 5);
+            await expect(card).toHaveCount(0);
+            const trigger = band.getByRole('button', { name: new RegExp(name) });
+            await trigger.scrollIntoViewIfNeeded();
+            await page.evaluate(() => new Promise<void>(resolve =>
+                requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+            await trigger.evaluate(el => el.focus({ preventScroll: true }));
+            await expect(card).toBeVisible({ timeout: 500 });
+            // Let the measured height update after switching profiles.
+            await page.evaluate(() => new Promise<void>(resolve =>
+                requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+            const bounds = (await card.boundingBox())!;
+            expect(bounds.x).toBeGreaterThanOrEqual(11);
+            expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width - 11);
+            expect(bounds.y).toBeGreaterThanOrEqual(11);
+            expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height - 11);
+            expect(await card.evaluate(el => el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth)).toBe(true);
+            await expect(card.locator('dl > div')).toHaveCount(8);
+        }
+        await page.screenshot({ path: `test-results/project-profile-${viewport.width}-${language}.png` });
+    });
+
+    test(`mobile case study navigator selects a project (${language})`, async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 667 });
+        await page.goto(`${process.env.PLAYWRIGHT_SITE_PATH ?? '/sru-project'}/post-occupancy-evaluation?lang=${language}`);
+        await page.evaluate(() => document.fonts.ready);
+
+        await expect(page.locator('.case-study-index-shell')).toBeHidden();
+        const mobileBand = page.locator('.case-study-mobile-index');
+        await expect(mobileBand).toBeVisible();
+        await expect(mobileBand.getByRole('button')).toHaveCount(7);
+
+        const region = language === 'fr' ? 'Bretagne' : 'Brittany';
+        const target = mobileBand.getByRole('button', { name: `${region}: Talgen`, exact: true });
+        await expect(target).not.toHaveAttribute('aria-current', 'true');
+        await target.click();
+        await expect(target).toHaveAttribute('aria-current', 'true');
+        await expect(page.getByRole('tooltip')).toHaveCount(0);
+    });
 }
