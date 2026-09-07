@@ -77,7 +77,7 @@
 	}
 </script>
 
-<div class="flex w-full shrink-0 flex-col gap-5 border border-gray-200 bg-white p-5 md:w-84">
+<div class="flex w-full min-w-0 shrink-0 flex-col gap-4 border-0 border-b border-gray-200 bg-white p-4 md:w-84 md:gap-5 md:border-r md:border-b-0 md:p-5">
 	<!-- <h3 class="text-2xl font-semibold">Supply Map</h3> -->
 	<!-- Tabs -->
 	<Tabs.Root bind:value={mapState.activeTab} onValueChange={handleTabChange}>

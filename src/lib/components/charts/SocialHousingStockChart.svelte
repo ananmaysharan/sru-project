@@ -721,18 +721,19 @@
         {#each milestones as m, i (m.year)}
             {@const mx = xScale(m.year)}
             {@const my = yScale(m.units)}
+			{@const labelX = compact ? Math.max(28, Math.min(width - 28, mx)) : mx}
             {#if tipX >= mx - 0.5 && m.year >= domainLeft - 0.001}
                 <div
-                    class="absolute pointer-events-none select-none -translate-x-1/2 whitespace-nowrap text-center px-1.5 py-1 {i <
+					class="absolute pointer-events-none select-none -translate-x-1/2 whitespace-nowrap text-center px-1 py-1 sm:px-1.5 {i <
                     2 || m.year === 2015 || m.year === 2020
                         ? ''
                         : 'bg-white'}"
-                    style="left: {mx}px; top: {my + 12}px; color: {BLUE};"
+					style="left: {labelX}px; top: {my + (compact ? 10 : 12)}px; color: {BLUE};"
                 >
-                    <div class="text-sm font-semibold leading-none">
+					<div class="text-[11px] font-semibold leading-none sm:text-sm">
                         {formatValue(m.units)}
                     </div>
-                    <div class="text-[10px] opacity-70 leading-none mt-0.5">
+					<div class="mt-0.5 text-[8px] leading-none opacity-70 sm:text-[10px]">
                         {$language === 'fr' ? 'logements' : 'total units'}
                     </div>
                 </div>
@@ -743,14 +744,15 @@
              never doubles up with the permanent milestone label sitting at the
              same point (including the 2000 start). -->
         {#if ready && !milestoneYears.has(tipYear)}
+			{@const currentLabelX = compact ? Math.max(28, Math.min(width - 28, tipX)) : tipX}
             <div
                 class="absolute pointer-events-none select-none -translate-x-1/2 whitespace-nowrap text-center"
-                style="left: {tipX}px; top: {tipY + 14}px; color: {BLUE};"
+				style="left: {currentLabelX}px; top: {tipY + (compact ? 10 : 14)}px; color: {BLUE};"
             >
-                <div class="text-sm font-semibold leading-none">
+				<div class="text-[11px] font-semibold leading-none sm:text-sm">
                     {formatValue(tipValue)}
                 </div>
-                <div class="text-[10px] opacity-70 leading-none mt-0.5">
+				<div class="mt-0.5 text-[8px] leading-none opacity-70 sm:text-[10px]">
                     {$language === 'fr' ? 'logements' : 'total units'}
                 </div>
             </div>

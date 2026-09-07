@@ -357,8 +357,8 @@
 	}
 
     .map-frame {
-      height: clamp(54rem, 110svh, 60rem);
-      min-height: 54rem;
+	  height: auto;
+	  min-height: 36rem;
     }
 
     .story-copy-frame {

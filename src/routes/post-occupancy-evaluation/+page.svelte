@@ -1984,32 +1984,87 @@
     }
 
     @media (max-width: 720px) {
+        .resident-voices {
+            height: auto;
+            min-height: 0;
+            overflow: visible;
+        }
+
         .resident-voices-inner {
             width: calc(100% - 1.5rem);
+            height: auto;
+            padding-block: 2rem;
+            display: block;
         }
 
         .resident-voices-inner > h2 {
             font-size: clamp(1.2rem, 5vw, 1.55rem);
+            margin-bottom: 1.25rem;
+        }
+
+        .resident-sankey,
+        .resident-sankey-body {
+            position: relative;
+            inset: auto;
+            min-height: 0;
+            overflow: visible;
+        }
+
+        .resident-sankey-body {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .resident-sankey-links {
+            display: none;
+        }
+
+        .resident-sankey-topics {
+            position: static;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+            pointer-events: auto;
         }
 
         .resident-topic-button {
-            font-size: clamp(0.46rem, 1.8vw, 0.6rem);
-            line-height: 1.08;
+            position: relative;
+            top: auto !important;
+            left: auto;
+            width: auto;
+            min-height: 3.25rem;
+            transform: none;
+            border: 1px solid #dededb;
+            border-left: 4px solid var(--topic-color);
+            padding: 0.6rem 0.65rem;
+            background: #fff;
+            color: #353535;
+            font-size: 0.72rem;
+            line-height: 1.2;
+        }
+
+        .resident-sankey-quotes {
+            position: static;
+            display: grid;
+            gap: 0.45rem;
         }
 
         .resident-quote {
-            font-size: clamp(0.4rem, 1.55vw, 0.52rem);
-            line-height: 1.06;
+            font-size: 0.78rem;
+            line-height: 1.35;
         }
 
         .resident-quote-item {
-            grid-template-columns: 0.85rem minmax(0, 1fr);
-            gap: 0.15rem;
-            padding-block: 0.03rem;
+            grid-template-columns: 1.5rem minmax(0, 1fr);
+            gap: 0.35rem;
+            border-left: 3px solid var(--topic-color);
+            padding: 0.65rem 0.7rem;
+            background: color-mix(in srgb, var(--topic-color) 5%, white);
         }
 
         .resident-quote-number {
-            font-size: 0.42rem;
+            padding-top: 0.08rem;
+            font-size: 0.62rem;
         }
     }
 
