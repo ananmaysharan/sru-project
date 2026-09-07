@@ -47,6 +47,7 @@
       </div>
       <button id="wix-mobile">Wix mobile · 320 × 600</button>
       <button id="chart">Show main chart</button>
+      <button id="photo-nav">Show photo navigator</button>
       <button id="top">Page top</button>
     </div>
     <p id="status" role="status">Loading the local site…</p>
@@ -79,6 +80,18 @@
         + 0.48 * (navHeight + story.offsetHeight - win.innerHeight), behavior: 'instant' });
       pinned.scrollTop = pinned.scrollHeight - pinned.clientHeight;
       status.textContent = 'Main chart shown. The line should rise from 4 M to 5.37 M at every height.';
+      return true;
+    }
+
+    function showPhotoNavigator() {
+      const nav = frame.contentWindow.document.querySelector('.case-study-mobile-index, .case-study-index');
+      if (!nav) {
+        status.textContent = 'Open the photo case studies page first.';
+        return false;
+      }
+      chartMode = false;
+      nav.scrollIntoView({ behavior: 'instant', block: 'start' });
+      status.textContent = 'Photo navigator shown.';
       return true;
     }
 
@@ -143,6 +156,7 @@
       resize();
     });
     document.querySelector('#chart').addEventListener('click', () => { chartMode = true; showChart(); });
+    document.querySelector('#photo-nav').addEventListener('click', showPhotoNavigator);
     document.querySelector('#top').addEventListener('click', () => {
       chartMode = false;
       frame.contentWindow.scrollTo({ top: 0, behavior: 'instant' });

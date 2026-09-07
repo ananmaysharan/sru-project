@@ -1008,49 +1008,81 @@
         <p class="case-study-scroll-hint">
             {$language === 'fr' ? 'Balayez pour parcourir les études de cas' : 'Swipe to browse the case studies'}
         </p>
-    <div class="case-study-index-shell" onscroll={closeProjectCard} role="region">
-        <nav class="case-study-index" aria-label={$language === 'fr' ? 'Études de cas par région' : 'Case studies by region'}>
-            {#each regions as region (region)}
-                <span
-                    class:case-study-region-label--paris={region === "Paris"}
-                    class="case-study-region-label"
-                >
-                    {regionLabel(region)}
-                </span>
-            {/each}
-            {#each caseStudyNavItems as item (`${item.region}-${item.project.label}`)}
-                <button
-                    type="button"
-                    class:case-study-case-button--active={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex}
-                    class="case-study-case-button"
-                    aria-current={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex ? "true" : undefined}
-                    aria-label={`${regionLabel(item.region)}: ${item.project.label}`}
-                    aria-describedby={visibleProjectCard === item.project.label ? 'case-study-project-profile' : undefined}
-                    onclick={() => selectCaseStudy(item.region, item.projectIndex)}
-                    onpointerenter={(event) => showProjectCard(item.project.label, event)}
-                    onpointermove={(event) => showProjectCard(item.project.label, event)}
-                    onpointerleave={scheduleProjectCardClose}
-                    onfocus={(event) => {
-                        if (event.currentTarget.matches(':focus-visible')) showProjectCard(item.project.label, event);
-                    }}
-                    onblur={() => {
-                        if (projectIdCards[item.project.label]) scheduleProjectCardClose();
-                    }}
-                >
-                    <span class="case-study-thumbnail" aria-hidden="true">
-                        <img
-                            src={asset(item.project.images[item.project.thumbnailIndex ?? 0].src)}
-                            alt=""
-                            loading="eager"
-                        />
+        <div class="case-study-index-shell" onscroll={closeProjectCard} role="region">
+            <nav class="case-study-index" aria-label={$language === 'fr' ? 'Études de cas par région' : 'Case studies by region'}>
+                {#each regions as region (region)}
+                    <span
+                        class:case-study-region-label--paris={region === "Paris"}
+                        class="case-study-region-label"
+                    >
+                        {regionLabel(region)}
                     </span>
-                    <span class="case-study-case-label">
-                        {item.project.label}
-                    </span>
-                </button>
+                {/each}
+                {#each caseStudyNavItems as item (`${item.region}-${item.project.label}`)}
+                    <button
+                        type="button"
+                        class:case-study-case-button--active={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex}
+                        class="case-study-case-button"
+                        aria-current={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex ? "true" : undefined}
+                        aria-label={`${regionLabel(item.region)}: ${item.project.label}`}
+                        aria-describedby={visibleProjectCard === item.project.label ? 'case-study-project-profile' : undefined}
+                        onclick={() => selectCaseStudy(item.region, item.projectIndex)}
+                        onpointerenter={(event) => showProjectCard(item.project.label, event)}
+                        onpointermove={(event) => showProjectCard(item.project.label, event)}
+                        onpointerleave={scheduleProjectCardClose}
+                        onfocus={(event) => {
+                            if (event.currentTarget.matches(':focus-visible')) showProjectCard(item.project.label, event);
+                        }}
+                        onblur={() => {
+                            if (projectIdCards[item.project.label]) scheduleProjectCardClose();
+                        }}
+                    >
+                        <span class="case-study-thumbnail" aria-hidden="true">
+                            <img
+                                src={asset(item.project.images[item.project.thumbnailIndex ?? 0].src)}
+                                alt=""
+                                loading="eager"
+                            />
+                        </span>
+                        <span class="case-study-case-label">
+                            {item.project.label}
+                        </span>
+                    </button>
+                {/each}
+            </nav>
+        </div>
+
+        <nav
+            class="case-study-mobile-index"
+            aria-label={$language === 'fr' ? 'Études de cas par région' : 'Case studies by region'}
+        >
+            {#each regions as region (`mobile-${region}`)}
+                <section class="case-study-mobile-region">
+                    <h2>{regionLabel(region)}</h2>
+                    <div class="case-study-mobile-projects">
+                        {#each caseStudyProjects[region] as project, projectIndex (`mobile-${region}-${project.label}`)}
+                            <button
+                                type="button"
+                                class:case-study-case-button--active={region === activeCaseStudy && projectIndex === activeProjectIndex}
+                                class="case-study-case-button"
+                                aria-current={region === activeCaseStudy && projectIndex === activeProjectIndex ? "true" : undefined}
+                                aria-label={`${regionLabel(region)}: ${project.label}`}
+                                onclick={() => selectCaseStudy(region, projectIndex)}
+                            >
+                                <span class="case-study-thumbnail" aria-hidden="true">
+                                    <img
+                                        src={asset(project.images[project.thumbnailIndex ?? 0].src)}
+                                        alt=""
+                                        loading="lazy"
+                                    />
+                                </span>
+                                <span class="case-study-case-label">{project.label}</span>
+                            </button>
+                        {/each}
+                    </div>
+                </section>
             {/each}
         </nav>
-    </div>
     </div>
 
     {#if visibleProjectCard && projectIdCards[visibleProjectCard]}
@@ -1417,6 +1449,10 @@
         overflow-x: auto;
         scrollbar-width: thin;
         scrollbar-color: #aaa transparent;
+    }
+
+    .case-study-mobile-index {
+        display: none;
     }
 
 	.case-study-scroll-hint {
@@ -1979,22 +2015,55 @@
 
     @media (max-width: 640px) {
 		.case-study-scroll-hint {
-			display: block;
+			display: none;
 		}
 
         .case-study-index-shell {
-			margin-top: 0;
-			padding-inline: 0.75rem;
-			scroll-snap-type: x mandatory;
+			display: none;
         }
 
-        .case-study-index {
-            min-width: 49rem;
+        .case-study-mobile-index {
+            display: grid;
+            width: calc(100% - 1.5rem);
+            margin: 2rem auto 0;
+            border: 1px solid #d6d6d2;
+            background: #fff;
         }
 
-		.case-study-case-button {
-			scroll-snap-align: start;
-		}
+        .case-study-mobile-region + .case-study-mobile-region {
+            border-top: 1px solid #d6d6d2;
+        }
+
+        .case-study-mobile-region h2 {
+            margin: 0;
+            padding: 0.7rem 0.75rem;
+            background: #f3f3f1;
+            color: #262626;
+            font-size: 0.8rem;
+            font-weight: 750;
+            letter-spacing: 0.04em;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .case-study-mobile-projects {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1px;
+            padding: 1px;
+            background: #d6d6d2;
+        }
+
+        .case-study-mobile-projects > .case-study-case-button:only-child {
+            grid-column: 1 / -1;
+        }
+
+        .case-study-mobile-projects .case-study-case-label {
+            min-height: 3.6rem;
+            padding: 0.65rem 0.35rem 0.7rem;
+            font-size: 0.74rem;
+            line-height: 1.2;
+        }
 
         .case-study-compact-index {
             position: fixed;
