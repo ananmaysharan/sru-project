@@ -447,7 +447,7 @@
 				<Button
 					variant="outline"
 					size="sm"
-					class="min-w-0"
+					class="min-w-0 active:translate-y-0"
 					aria-label={$language === 'fr' ? 'Revenir à la vue d’ensemble du territoire' : 'Return to the territory overview'}
 					onclick={showMainland}
 				>
@@ -457,7 +457,7 @@
 					<Button
 						variant="outline"
 						size="sm"
-						class="min-w-0 whitespace-normal text-center"
+						class="min-w-0 active:translate-y-0"
 						onclick={() => { mapState.activeRegion = region.name; flyTo(region.center, region.zoom); }}
 					>
 						{region.name}
@@ -467,7 +467,7 @@
 				<Button
 					variant="outline"
 					size="sm"
-					class="min-w-0 whitespace-normal text-center"
+					class="min-w-0 active:translate-y-0"
 					onclick={showMainland}
 				>
 					{$language === 'fr' ? 'France métropolitaine' : 'Mainland'}
@@ -475,7 +475,7 @@
 				<Button
 					variant="outline"
 					size="sm"
-					class="min-w-0 whitespace-normal text-center"
+					class="min-w-0 active:translate-y-0"
 					onclick={showOverseas}
 				>
 					{$language === 'fr' ? 'Outre-mer' : 'Overseas'}
@@ -548,12 +548,6 @@
 		.supply-map {
 			height: auto;
 			min-height: 36rem;
-		}
-
-		.territory-nav :global(button) {
-			min-height: 2.5rem;
-			height: auto;
-			line-height: 1.15;
 		}
 	}
 </style>
