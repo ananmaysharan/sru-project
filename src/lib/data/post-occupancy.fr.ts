@@ -1,5 +1,10 @@
+import {
+  CASE_STUDY_IMAGE_IDS,
+  type CaseStudyImageId,
+} from './case-study-ids';
+
 // Generated from the approved French master document.
-export const postOccupancyCaptionsFr = [
+const postOccupancyCaptionsFrInImageOrder = [
   "L’îlot de la Samaritaine, place de l’École, où le projet de réaménagement associe commerces de luxe et nouveaux logements sociaux dans le centre historique de Paris.",
   "Derrière la façade de la Samaritaine, un espace de travail en coulisses révèle la vie quotidienne, invisible, qui coexiste avec l’image publique soignée du projet.",
   "Une entrée discrète et éclairée, située dans une rue latérale, permet aux habitants d’accéder aux logements sociaux de la Samaritaine, dissimulés derrière la façade du grand magasin.",
@@ -46,8 +51,20 @@ export const postOccupancyCaptionsFr = [
   "La vue axonométrique présente Cœur de Ville comme un quartier socialement mixte associant logements, commerces, bureaux, services de santé, écoles, jardins et espaces publics partagés. Son aménagement relie l’accès à des logements sociaux et abordables à l’accès aux équipements d’un nouveau centre-ville."
 ] as const;
 
+if (postOccupancyCaptionsFrInImageOrder.length !== CASE_STUDY_IMAGE_IDS.length) {
+  throw new Error('The French case study caption count does not match the permanent image ID list.');
+}
+
+export const postOccupancyCaptionsFr = Object.fromEntries(
+  CASE_STUDY_IMAGE_IDS.map((imageId, index) => [
+    imageId,
+    postOccupancyCaptionsFrInImageOrder[index],
+  ]),
+) as Record<CaseStudyImageId, string>;
+
 export const residentTopicsFr = [
   {
+    "id": "residential-pride",
     "label": "Fierté d’habiter et valeur symbolique du lieu",
     "quotes": [
       "On a tous eu l’impression qu’on gagnait au Loto en ayant une attribution de logement dans ce quartier.",
@@ -58,6 +75,7 @@ export const residentTopicsFr = [
     ]
   },
   {
+    "id": "retail-food-access",
     "label": "Commerces de proximité et accès à l’alimentation",
     "quotes": [
       "Pour mon budget, c’est un peu un désert alimentaire. Il devrait y avoir plus de grandes surfaces. Tout coûte une blinde. Moi je fais mes courses quand je vais chez mes parents. Mes voisins doivent tous prendre le métro pour aller au LidL le plus proche, qui est quand même à cinq stations de métro.",
@@ -68,6 +86,7 @@ export const residentTopicsFr = [
     ]
   },
   {
+    "id": "healthcare-access",
     "label": "Accès aux soins et coût de la santé",
     "quotes": [
       "Dans le coin, le problème, c'est qu'il y a beaucoup de centres de santé qui font des dépassements d'honoraires et après, en fonction de nos mutuelles, on n’est pas couvert à 100 %, même quand on a une mutuelle de fonctionnaire.",
@@ -76,6 +95,7 @@ export const residentTopicsFr = [
     ]
   },
   {
+    "id": "thermal-comfort",
     "label": "Confort thermique et usage des logements",
     "quotes": [
       "Nos logements, ce ne sont pas des passoires thermiques, mais on y meurt de chaud l’été. Ce sont de véritables bouilloires thermiques. J’ai une petite clim, mais même avec ça, j’ai du mal à survivre. Donc si je peux, je fuis chez mes parents hors de Paris.",
@@ -85,12 +105,14 @@ export const residentTopicsFr = [
     ]
   },
   {
+    "id": "cultural-capital",
     "label": "Capital culturel et proximité des équipements",
     "quotes": [
       "J’ai pu prendre des cours d’histoire de l’art au musée du Louvre parce qu’il est juste à côté. Je ne l’aurais pas fait si je n’habitais pas le quartier. Le Louvre, c’est ce qui symbolise mon expérience de ce logement. J’ai passé des heures merveilleuses à y étudier."
     ]
   },
   {
+    "id": "governance-coordination",
     "label": "Gouvernance, coordination et devenir des projets emblématiques",
     "quotes": [
       "Ce sont toutes ces questions sur l’après-inauguration de projet que Paris Habitat et tout bailleur social gestionnaire de ces projets plus récents devrait se poser. Ils ont honoré leur part du contrat. Avec un peu plus de coordination de moyens à l’échelle du quartier, on n’aurait pas ces problèmes en terme d’accès aux services et en termes de bien-être."

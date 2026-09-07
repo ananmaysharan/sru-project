@@ -158,3 +158,15 @@ for (const language of ['fr', 'en']) {
         await expect(page.getByRole('tooltip')).toHaveCount(0);
     });
 }
+
+test('case study captions stay attached to their permanent image IDs', async ({ page }) => {
+    await page.goto(`${process.env.PLAYWRIGHT_SITE_PATH ?? '/sru-project'}/post-occupancy-evaluation?lang=fr`);
+    const captions = page.locator('.story-caption');
+    await expect(captions).toHaveCount(44);
+    await expect(captions.nth(0)).toHaveText(
+        'L’îlot de la Samaritaine, place de l’École, où le projet de réaménagement associe commerces de luxe et nouveaux logements sociaux dans le centre historique de Paris.',
+    );
+    await expect(captions.nth(32)).toContainText('Gignac-la-Nerthe');
+    await expect(captions.nth(36)).toContainText('Le projet Talgen');
+    await expect(captions.nth(43)).toContainText('La vue axonométrique présente Cœur de Ville');
+});

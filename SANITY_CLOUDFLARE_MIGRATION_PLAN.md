@@ -25,6 +25,7 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 9. The public site still passes the type check and production build, and all 19 browser tests pass.
 10. The local Studio origin `http://127.0.0.1:3333` is allowed in Sanity for development.
 11. Case study project cards and navigator items now use permanent project IDs instead of visible English project names.
+12. All 44 case study captions resolve through permanent image IDs, and resident topic and quote keys are independent of editable text.
 
 No page is reading from Sanity yet. The production site has not changed.
 

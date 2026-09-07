@@ -6,7 +6,7 @@
     import ProjectIdCard from "$lib/components/sections/ProjectIdCard.svelte";
     import type { ProjectCardAnchor } from "$lib/components/sections/project-card-position";
     import { projectIdCards } from "$lib/data/project-id-cards";
-    import type { CaseStudyProjectId } from "$lib/data/case-study-ids";
+    import type { CaseStudyImageId, CaseStudyProjectId } from "$lib/data/case-study-ids";
     import { postOccupancyCaptionsFr, residentTopicsFr } from "$lib/data/post-occupancy.fr";
     import { language } from "$lib/i18n";
     import * as Select from "$lib/components/ui/select";
@@ -89,6 +89,7 @@
     ];
 
     type StoryImage = {
+        id: CaseStudyImageId;
         src: string;
         alt: string;
         landscape: boolean;
@@ -319,6 +320,7 @@
                 "DSC02107",
                 "a6a4358f-d0c0-48d5-9c19-bb3ff977df70",
             ].map((id, i) => ({
+                id: id as CaseStudyImageId,
                 src: `/images/optimized/project-1/${id}-full.webp`,
                 alt: "Samaritaine",
                 landscape: landscapeImageIds.has(id),
@@ -355,6 +357,7 @@
                 "DSC01798",
                 "DSC01799",
             ].map((id, i) => ({
+                id: id as CaseStudyImageId,
                 src: `/images/optimized/project-2/${id}-full.webp`,
                 alt: "Maréchal Fayolle",
                 landscape: landscapeImageIds.has(id),
@@ -375,6 +378,7 @@
             label: "Rue Jean-Bart",
             thumbnailIndex: 2,
             images: ["paris-01", "DSC01781", "DSC01783"].map((id, i) => ({
+                id: id as CaseStudyImageId,
                 src: `/images/optimized/project-3/${id}-full.webp`,
                 alt: "Rue Jean-Bart",
                 landscape: landscapeImageIds.has(id),
@@ -395,6 +399,7 @@
                 "laguiole-291",
                 "laguiole-297",
             ].map((id, i) => ({
+                id: id as CaseStudyImageId,
                 src: `/images/optimized/project-4/${id}-full.webp`,
                 alt: "Tour Bois-le-Prêtre",
                 landscape: landscapeImageIds.has(id),
@@ -415,6 +420,7 @@
             label: "Gignac-la-Nerthe",
             images: [
                 {
+                    id: "gignac-la-nerthe-01",
                     src: "/images/optimized/french-riviera/gignac-la-nerthe-01-full.webp",
                     alt: "West façade of the Gignac-la-Nerthe housing project",
                     landscape: true,
@@ -423,6 +429,7 @@
                         "Located in the small suburban middle-income town of Gignac-la-Nerthe, approximately 20 km northwest of Marseille, the project marks the transition between a residential neighborhood and the surrounding open landscape. West façade with a regular rhythm of Douglas-fir balconies set against solid ochre limestone walls, giving each dwelling access to a sheltered private outdoor space while helping buffer traffic noise.",
                 },
                 {
+                    id: "gignac-la-nerthe-02",
                     src: "/images/optimized/french-riviera/gignac-la-nerthe-02-full.webp",
                     alt: "Timber-and-steel access platforms at Gignac-la-Nerthe",
                     landscape: true,
@@ -430,6 +437,7 @@
                         "Open timber-and-steel access platforms connect the apartments while providing shared circulation space, private balconies, daylight and views across the surrounding landscape.",
                 },
                 {
+                    id: "gignac-la-nerthe-03",
                     src: "/images/optimized/french-riviera/gignac-la-nerthe-03-full.webp",
                     alt: "Limestone-clad housing ensemble at Gignac-la-Nerthe",
                     landscape: false,
@@ -437,6 +445,7 @@
                         "The two-volume housing ensemble clad in 32 cm-thick Vers-Pont-du-Gard limestone, with recessed loggias and landscaped outdoor areas that extend residents’ living environment beyond the apartments.",
                 },
                 {
+                    id: "gignac-la-nerthe-04",
                     src: "/images/optimized/french-riviera/gignac-la-nerthe-04-full.webp",
                     alt: "Ground-floor plan of the Gignac-la-Nerthe housing project",
                     landscape: true,
@@ -453,6 +462,7 @@
             label: "Talgen",
             images: [
                 {
+                    id: "talgen-01",
                     src: "/images/optimized/brittany/talgen-01-full.webp",
                     alt: "The Talgen social-housing project in Cesson-Sévigné",
                     landscape: true,
@@ -460,6 +470,7 @@
                         "The Talgen project inserts 24 social-rental homes into ViaSilva, a mixed-use expansion of Cesson-Sévigné, mediating between detached houses and larger collective buildings. The neighborhood connects residents to the metro, the Boudebois park, local services and employment areas.",
                 },
                 {
+                    id: "talgen-02",
                     src: "/images/optimized/brittany/talgen-02-full.webp",
                     alt: "Apartment plan for the Talgen social-housing project",
                     landscape: false,
@@ -467,6 +478,7 @@
                         "The plan brings together a range of apartment types around a compact shared circulation core, while terraces and balconies extend many of the homes into private outdoor space.",
                 },
                 {
+                    id: "talgen-03",
                     src: "/images/optimized/brittany/talgen-03-full.webp",
                     alt: "Bicycle room at the Talgen social-housing project",
                     landscape: false,
@@ -474,6 +486,7 @@
                         "A secure, dedicated bicycle room makes cycle storage convenient and accessible, supporting car-independent connections to nearby public transport, green space and local services.",
                 },
                 {
+                    id: "talgen-04",
                     src: "/images/optimized/brittany/talgen-04-full.webp",
                     alt: "Communal circulation space at the Talgen social-housing project",
                     landscape: false,
@@ -490,6 +503,7 @@
             label: "Les Jasmins · La Réunion",
             images: [
                 {
+                    id: "les-jasmins-01",
                     src: "/images/optimized/overseas-territories/les-jasmins-01-full.webp",
                     alt: "Les Jasmins residence in La Possession, La Réunion",
                     landscape: true,
@@ -497,6 +511,7 @@
                         "The Les Jasmins residence provides 38 homes through a social homeownership scheme within Cœur de Ville, La Possession’s new urban centre. Shaded balconies, deep overhangs and screened openings create comfortable outdoor spaces suited to the tropical climate.",
                 },
                 {
+                    id: "les-jasmins-02",
                     src: "/images/optimized/overseas-territories/les-jasmins-02-full.webp",
                     alt: "Planted pedestrian paths around Les Jasmins",
                     landscape: false,
@@ -504,6 +519,7 @@
                         "Planted paths, palms, shared gardens and porous pedestrian spaces create a shaded setting around the housing. In Cœur de Ville, this “garden-city” approach extends access to cooling, recreation and social interaction beyond the individual dwelling.",
                 },
                 {
+                    id: "les-jasmins-03",
                     src: "/images/optimized/overseas-territories/les-jasmins-03-full.webp",
                     alt: "Site plan of Cœur de Ville in La Possession",
                     landscape: true,
@@ -511,6 +527,7 @@
                         "The site plan situates Les Jasmins within Cœur de Ville, a 34-hectare development combining housing with green spaces, schools, shops, public facilities and pedestrian routes. Conceived in response to La Possession’s rapid demographic growth, the district aims to bring everyday amenities closer to residents.",
                 },
                 {
+                    id: "les-jasmins-04",
                     src: "/images/optimized/overseas-territories/les-jasmins-04-full.webp",
                     alt: "Axonometric view of Cœur de Ville in La Possession",
                     landscape: false,
@@ -530,6 +547,7 @@
 
     const residentTopicsEn = [
         {
+            id: "residential-pride",
             label: "Residential pride and the symbolic value of place",
             quotes: [
                 "We all felt like we’d won the lottery when we were allocated housing in this neighborhood.",
@@ -540,6 +558,7 @@
             ],
         },
         {
+            id: "retail-food-access",
             label: "Everyday retail and food access",
             quotes: [
                 "For my budget, it’s a bit of a food desert. There should be more supermarkets. Everything costs a fortune. I do my grocery shopping when I go to my parents’ place. My neighbors all have to take the metro to get to the nearest Lidl, which is still five metro stops away.",
@@ -550,6 +569,7 @@
             ],
         },
         {
+            id: "healthcare-access",
             label: "Healthcare access and affordability",
             quotes: [
                 "Around here, the problem is that there are a lot of health centers that charge extra fees, and depending on our complementary insurance, we’re not covered 100%, even when we have civil-servant insurance.",
@@ -558,6 +578,7 @@
             ],
         },
         {
+            id: "thermal-comfort",
             label: "Thermal comfort and housing design in use",
             quotes: [
                 "Our homes are not energy sieves, but we die of heat in the summer. They’re real thermal kettles. I have a small AC unit, but even with that, I can barely survive. So if I can, I escape to my parents’ place outside Paris.",
@@ -567,12 +588,14 @@
             ],
         },
         {
+            id: "cultural-capital",
             label: "Cultural capital and proximity to amenities",
             quotes: [
                 "I was able to take art history classes at the Louvre museum because it’s right next door. I wouldn’t have done it if I didn’t live in the neighborhood. The Louvre is what symbolizes my experience of this home. I spent wonderful hours studying there.",
             ],
         },
         {
+            id: "governance-coordination",
             label: "Governance, coordination and the “after” of flagship projects",
             quotes: [
                 "These are all the questions about the post-inauguration phase that Paris Habitat and every social housing provider managing these more recent projects should be asking themselves. They honored their part of the deal. With a bit more coordination of resources at the neighborhood scale, we wouldn’t be having these problems in terms of access to services and well-being.",
@@ -595,6 +618,7 @@
         residentTopics.flatMap((topic, topicIndex) =>
             topic.quotes.map((quote, quoteIndex) => ({
                 quote,
+                quoteId: `${topic.id}-${quoteIndex + 1}`,
                 quoteIndex,
                 topicIndex,
                 topicLabel: topic.label,
@@ -649,16 +673,14 @@
     );
 
     const storyFrames = $derived.by(() => {
-        let captionIndex = 0;
         return caseStudyNavItems.flatMap((item) =>
             item.project.images.map((image, imageIndex) => {
                 const localizedImage = {
                     ...image,
                     caption: $language === 'fr'
-                        ? postOccupancyCaptionsFr[captionIndex]
+                        ? postOccupancyCaptionsFr[image.id]
                         : image.caption,
                 };
-                captionIndex += 1;
                 return {
                     image: localizedImage,
                     imageIndex,
@@ -1127,7 +1149,7 @@
                 </div>
 
                 <div bind:this={storyCardsEl} class="story-cards">
-                    {#each storyFrames as frame, frameIndex (frame.image.src)}
+                    {#each storyFrames as frame, frameIndex (frame.image.id)}
                         <article
                             bind:this={storyCardEls[frameIndex]}
                             data-frame={frameIndex}
@@ -1229,7 +1251,7 @@
                         preserveAspectRatio="none"
                         aria-hidden="true"
                     >
-                        {#each residentTopics as topic, topicIndex (topic.label)}
+                        {#each residentTopics as topic, topicIndex (topic.id)}
                             <rect
                                 class="resident-sankey-node"
                                 class:resident-sankey-node--matched={activeResidentTopic === topicIndex || (activeResidentQuote !== null && residentQuoteList[activeResidentQuote]?.topicIndex === topicIndex)}
@@ -1242,7 +1264,7 @@
                             />
                         {/each}
 
-                        {#each residentQuoteList as item, quoteIndex (`${item.topicIndex}-${item.quoteIndex}`)}
+                        {#each residentQuoteList as item, quoteIndex (item.quoteId)}
                             <path
                                 class="resident-sankey-link"
                                 class:resident-sankey-link--matched={activeResidentQuote === quoteIndex || (activeResidentQuote === null && activeResidentTopic === item.topicIndex)}
@@ -1269,7 +1291,7 @@
                         role="group"
                         aria-label={$language === 'fr' ? 'Catégories de citations des habitants' : 'Resident quote categories'}
                     >
-                        {#each residentTopics as topic, topicIndex (topic.label)}
+                        {#each residentTopics as topic, topicIndex (topic.id)}
                             <button
                                 bind:this={residentTopicEls[topicIndex]}
                                 type="button"
@@ -1306,7 +1328,7 @@
                         id="resident-sankey-quotes"
                         class="resident-sankey-quotes"
                     >
-                        {#each residentQuoteList as item, quoteIndex (`${item.topicIndex}-${item.quoteIndex}`)}
+                        {#each residentQuoteList as item, quoteIndex (item.quoteId)}
                             <button
                                 bind:this={residentQuoteEls[quoteIndex]}
                                 type="button"
