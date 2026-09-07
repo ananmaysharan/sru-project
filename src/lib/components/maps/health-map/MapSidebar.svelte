@@ -87,7 +87,7 @@
 	}
 </script>
 
-<div class="flex min-h-0 w-full shrink-0 flex-col gap-5 overflow-y-auto border border-gray-200 bg-white p-5 md:w-84">
+<div class="flex min-h-0 w-full min-w-0 shrink-0 flex-col gap-5 overflow-visible border-0 border-b border-gray-200 bg-white p-5 md:w-84 md:overflow-y-auto md:border-r md:border-b-0">
 	<div>
 		<p class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-gray-500">{$language === 'fr' ? 'Recherche' : 'Search'}</p>
 		<Combobox.Root

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { asset } from '$app/paths';
 	import maplibregl from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
@@ -45,7 +45,31 @@
 	function localizedValue(value: string) { return $language === 'fr' ? value.replace(/(\d)\.(\d)/g, '$1,$2').replace(/%/g, ' %') : value; }
 
 	function flyTo(center: [number, number], zoom: number) {
-		mapInstance?.flyTo({ center, zoom, duration: 1500 });
+		const compactOffset = mapContainer?.clientWidth < 640 ? 1.2 : 0;
+		mapInstance?.flyTo({
+			center,
+			zoom: Math.max(3.4, zoom - compactOffset),
+			duration: 1500
+		});
+	}
+
+	async function toggleFilters() {
+		filtersOpen = !filtersOpen;
+		await tick();
+		mapInstance?.resize();
+	}
+
+	function showMainland() {
+		mapState.activeTerritory = 'mainland';
+		mapState.activeRegion = null;
+		flyTo(MAINLAND_CENTER, MAINLAND_ZOOM);
+	}
+
+	function showOverseas() {
+		const firstRegion = OVERSEAS_REGIONS[0];
+		mapState.activeTerritory = 'overseas';
+		mapState.activeRegion = firstRegion.name;
+		flyTo(firstRegion.center, firstRegion.zoom);
 	}
 
 	function featureStateSource(source: string, sourceLayer: string, id: string | number) {
@@ -76,16 +100,19 @@
 		protocol.add(communesPmt);
 		maplibregl.addProtocol('pmtiles', protocol.tile);
 
+		const compactMap = mapContainer.clientWidth < 640;
 		const map = new maplibregl.Map({
 			container: mapContainer,
 			style: `https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC&language=${$language}`,
-			center: [2.2, 46.6],
-			zoom: 5,
+			center: MAINLAND_CENTER,
+			zoom: compactMap ? 3.8 : MAINLAND_ZOOM,
 			attributionControl: false
 		});
 		map.addControl(new maplibregl.AttributionControl({ compact: true }));
 		map.addControl(new maplibregl.NavigationControl());
 		mapInstance = map;
+		const resizeObserver = new ResizeObserver(() => map.resize());
+		resizeObserver.observe(mapContainer);
 
 		map.on('load', async () => {
 			try {
@@ -248,34 +275,36 @@
 		});
 
 		return () => {
+			resizeObserver.disconnect();
 			map.remove();
 			maplibregl.removeProtocol('pmtiles');
 		};
 	});
 </script>
 
-<div class="flex flex-col md:flex-row h-full w-full min-h-100">
+<div class="health-map flex h-full min-h-100 w-full min-w-0 flex-col overflow-hidden border border-gray-200 md:flex-row">
 	<button
 		type="button"
-		class="flex items-center justify-between border border-gray-200 bg-white px-4 py-3 text-left text-sm font-semibold md:hidden"
+		class="flex items-center justify-between border-0 border-b border-gray-200 bg-white px-4 py-3 text-left text-sm font-semibold md:hidden"
 		aria-expanded={filtersOpen}
-		onclick={() => (filtersOpen = !filtersOpen)}
+		onclick={toggleFilters}
 	>
 		<span class="flex items-center gap-2"><SlidersHorizontalIcon class="size-4" />{$language === 'fr' ? 'Filtres de la carte' : 'Map filters'}</span>
 		<span class="text-xs font-normal text-gray-500">{filtersOpen ? ($language === 'fr' ? 'Masquer' : 'Hide') : ($language === 'fr' ? 'Afficher' : 'Show')}</span>
 	</button>
-	<div class={filtersOpen ? 'block md:contents' : 'hidden md:contents'}>
+	<div class={filtersOpen ? 'block min-w-0 md:contents' : 'hidden md:contents'}>
 		<MapSidebar {mapState} onflyto={flyTo} />
 	</div>
 
-	<div class="flex-1 flex flex-col border-t border-r border-b border-gray-200 relative min-h-100">
-		<div class="border-b border-gray-200 bg-white flex items-center gap-1 p-1.5 shrink-0">
+	<div class="relative flex min-h-100 min-w-0 flex-1 flex-col">
+		<div class="grid shrink-0 grid-cols-2 gap-1 border-b border-gray-200 bg-white p-1.5">
 			{#if mapState.activeTerritory === 'overseas'}
 				<Button
 					variant="outline"
 					size="sm"
+					class="min-w-0 active:translate-y-0"
 					aria-label={$language === 'fr' ? 'Revenir à la vue d’ensemble du territoire' : 'Return to the territory overview'}
-					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; }}
+					onclick={showMainland}
 				>
 					<ArrowLeftIcon class="size-4" />
 				</Button>
@@ -283,7 +312,7 @@
 					<Button
 						variant="outline"
 						size="sm"
-						class="flex-1"
+						class="min-w-0 active:translate-y-0"
 						onclick={() => { mapState.activeRegion = region.name; flyTo(region.center, region.zoom); }}
 					>
 						{region.name}
@@ -293,22 +322,22 @@
 				<Button
 					variant="outline"
 					size="sm"
-					class="flex-1"
-					onclick={() => { mapState.activeTerritory = null; mapState.activeRegion = null; flyTo(MAINLAND_CENTER, MAINLAND_ZOOM); }}
+					class="min-w-0 active:translate-y-0"
+					onclick={showMainland}
 				>
 					{$language === 'fr' ? 'France métropolitaine' : 'Mainland'}
 				</Button>
 				<Button
 					variant="outline"
 					size="sm"
-					class="flex-1"
-					onclick={() => { mapState.activeTerritory = 'overseas'; mapState.activeRegion = null; }}
+					class="min-w-0 active:translate-y-0"
+					onclick={showOverseas}
 				>
 					{$language === 'fr' ? 'Outre-mer' : 'Overseas'}
 				</Button>
 			{/if}
 		</div>
-		<div bind:this={mapContainer} class="flex-1 w-full"></div>
+		<div bind:this={mapContainer} class="min-h-80 w-full min-w-0 flex-1"></div>
 
 		{#if mapState.tooltip}
 			<div
@@ -330,3 +359,12 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	@media (max-width: 767.98px) {
+		.health-map {
+			height: auto;
+			min-height: 36rem;
+		}
+	}
+</style>
