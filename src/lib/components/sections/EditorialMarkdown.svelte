@@ -2,22 +2,25 @@
     import {
         parseEditorialStory,
         type EditorialSectionKey,
+        type EditorialStory,
     } from "$lib/utils/editorial-markdown";
     import { language } from '$lib/i18n';
 
     let {
         source,
+        content,
         section,
         compact = false,
         render = "all",
     }: {
-        source: string;
+        source?: string;
+        content?: EditorialStory;
         section: EditorialSectionKey;
         compact?: boolean;
         render?: "all" | "content" | "notes";
     } = $props();
 
-    const story = $derived(parseEditorialStory(source, section));
+    const story = $derived(content ?? parseEditorialStory(source ?? '', section));
 
     const sectionLabels: Record<EditorialSectionKey, string> = {
         introduction: "Introduction project essay",

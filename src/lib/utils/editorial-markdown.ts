@@ -5,12 +5,12 @@ export type EditorialSectionKey =
     | "health-method"
     | "post-occupancy";
 
-type EditorialBlock =
+export type EditorialBlock =
     | { type: "heading"; level: 2 | 3; id: string; html: string }
     | { type: "paragraph"; html: string }
     | { type: "list"; ordered: boolean; items: string[] };
 
-type EditorialNote = { number: number; html: string };
+export type EditorialNote = { number: number; html: string };
 
 export type EditorialStory = {
     blocks: EditorialBlock[];

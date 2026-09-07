@@ -1,4 +1,4 @@
-import {defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 import {bilingualRichText, bilingualString, bilingualText, languageGroups} from '../helpers'
 
 export const supplyPage = defineType({
@@ -30,6 +30,30 @@ export const supplyPage = defineType({
     ...bilingualString('europeTitle', 'European context heading'),
     ...bilingualText('europeBody', 'European context description'),
     ...bilingualRichText('methods', 'Methods essay'),
+    defineField({
+      name: 'endnotesEn',
+      title: 'Methods endnotes (English)',
+      type: 'array',
+      group: 'english',
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
+      of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().min(1),
+    }),
+    defineField({
+      name: 'endnotesFr',
+      title: 'Methods endnotes (French)',
+      type: 'array',
+      group: 'french',
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
+      of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().min(1),
+    }),
   ],
   preview: {prepare: () => ({title: 'Supply page'})},
 })

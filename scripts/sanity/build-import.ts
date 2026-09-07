@@ -1,4 +1,4 @@
-import {mkdir, writeFile} from 'node:fs/promises';
+import {mkdir, readFile, writeFile} from 'node:fs/promises';
 import {dirname, resolve} from 'node:path';
 import {
     localizedBibliographySections,
@@ -7,6 +7,9 @@ import {
 } from '../../src/lib/data/bibliography-content';
 import {localizedResourceSections, type ResourceContentSection} from '../../src/lib/data/resource-content';
 import {localSiteSettings} from '../../src/lib/data/site-content';
+import {localSupplyText} from '../../src/lib/data/supply-content';
+import {parseEditorialStory} from '../../src/lib/utils/editorial-markdown';
+import {editorialStoryToPortableText} from './editorial-portable-text';
 
 type SanityResourceItem = {
     _key: string;
@@ -177,7 +180,81 @@ const siteSettingsDocument = {
     glossarySemFr: localSiteSettings.glossary.fr.sem,
 };
 
-const documents = [siteSettingsDocument, resourcesDocument, bibliographyDocument];
+const englishEditorialSource = await readFile(
+    new URL('../../src/lib/data/editorial-content.md', import.meta.url),
+    'utf8',
+);
+const frenchEditorialSource = await readFile(
+    new URL('../../src/lib/data/editorial-content.fr.md', import.meta.url),
+    'utf8',
+);
+const supplyMethods = {
+    en: editorialStoryToPortableText(
+        parseEditorialStory(englishEditorialSource, 'supply'),
+        'en',
+        'supply',
+    ),
+    fr: editorialStoryToPortableText(
+        parseEditorialStory(frenchEditorialSource, 'supply'),
+        'fr',
+        'supply',
+    ),
+};
+
+const supplyDocument = {
+    _id: 'supplyPage',
+    _type: 'supplyPage',
+    titleEn: localSupplyText.en.title,
+    titleFr: localSupplyText.fr.title,
+    deckEn: localSupplyText.en.deck,
+    deckFr: localSupplyText.fr.deck,
+    introductionEn: localSupplyText.en.intro,
+    introductionFr: localSupplyText.fr.intro,
+    nationalTitleEn: localSupplyText.en.nationalTitle,
+    nationalTitleFr: localSupplyText.fr.nationalTitle,
+    nationalSourceEn: localSupplyText.en.source,
+    nationalSourceFr: localSupplyText.fr.source,
+    tenureTitleEn: localSupplyText.en.tenureTitle,
+    tenureTitleFr: localSupplyText.fr.tenureTitle,
+    tenureCaptionEn: localSupplyText.en.tenureCaption,
+    tenureCaptionFr: localSupplyText.fr.tenureCaption,
+    regionalTitleEn: localSupplyText.en.regionalTitle,
+    regionalTitleFr: localSupplyText.fr.regionalTitle,
+    regionalBodyEn: localSupplyText.en.regionalBody,
+    regionalBodyFr: localSupplyText.fr.regionalBody,
+    distributionTitleEn: localSupplyText.en.distributionTitle,
+    distributionTitleFr: localSupplyText.fr.distributionTitle,
+    distributionCaptionEn: localSupplyText.en.distributionCaption,
+    distributionCaptionFr: localSupplyText.fr.distributionCaption,
+    rateTitleEn: localSupplyText.en.rateTitle,
+    rateTitleFr: localSupplyText.fr.rateTitle,
+    rateCaptionEn: localSupplyText.en.rateCaption,
+    rateCaptionFr: localSupplyText.fr.rateCaption,
+    mapTitleEn: localSupplyText.en.mapTitle,
+    mapTitleFr: localSupplyText.fr.mapTitle,
+    mapBodyEn: localSupplyText.en.mapBody,
+    mapBodyFr: localSupplyText.fr.mapBody,
+    noncomplianceTitleEn: localSupplyText.en.noncomplianceTitle,
+    noncomplianceTitleFr: localSupplyText.fr.noncomplianceTitle,
+    noncomplianceDeckEn: localSupplyText.en.noncomplianceDeck,
+    noncomplianceDeckFr: localSupplyText.fr.noncomplianceDeck,
+    noncomplianceBodyEn: localSupplyText.en.noncomplianceBody,
+    noncomplianceBodyFr: localSupplyText.fr.noncomplianceBody,
+    overseasTitleEn: localSupplyText.en.overseasTitle,
+    overseasTitleFr: localSupplyText.fr.overseasTitle,
+    overseasBodyEn: localSupplyText.en.overseasBody,
+    overseasBodyFr: localSupplyText.fr.overseasBody,
+    europeTitleEn: localSupplyText.en.europeTitle,
+    europeTitleFr: localSupplyText.fr.europeTitle,
+    europeBodyEn: localSupplyText.en.europeBody,
+    europeBodyFr: localSupplyText.fr.europeBody,
+    methodsEn: supplyMethods.en.blocks,
+    methodsFr: supplyMethods.fr.blocks,
+    endnotesEn: supplyMethods.en.endnotes,
+    endnotesFr: supplyMethods.fr.endnotes,
+};
+
+const documents = [siteSettingsDocument, supplyDocument, resourcesDocument, bibliographyDocument];
 const errors = compareResourceLanguages();
 const englishItemCount = localizedResourceSections.en.reduce(
     (total, section) => total + section.items.length,
@@ -202,6 +279,8 @@ console.log(`Resource sections: ${localizedResourceSections.en.length} English, 
 console.log(`Resource entries: ${englishItemCount} English, ${frenchItemCount} French`);
 console.log(`Bibliography sections: ${localizedBibliographySections.en.length} English, ${localizedBibliographySections.fr.length} French`);
 console.log(`Bibliography entries: ${englishBibliographyCount} English, ${frenchBibliographyCount} French`);
+console.log(`Supply methods: ${supplyMethods.en.blocks.length} English blocks, ${supplyMethods.fr.blocks.length} French blocks`);
+console.log(`Supply endnotes: ${supplyMethods.en.endnotes.length} English, ${supplyMethods.fr.endnotes.length} French`);
 console.log(`Relationship errors: ${errors.length}`);
 
 if (errors.length > 0) {

@@ -13,6 +13,12 @@ export const endnote = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'number',
+      title: 'Displayed note number',
+      type: 'number',
+      validation: (rule) => rule.required().integer().positive(),
+    }),
+    defineField({
       name: 'body',
       title: 'Note text',
       type: 'restrictedRichText',

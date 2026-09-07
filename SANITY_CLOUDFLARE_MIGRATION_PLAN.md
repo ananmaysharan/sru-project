@@ -40,8 +40,13 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 24. Local and Sanity builds produce identical main content, navigation, browser title, and skip link markup on the introduction, resources, and bibliography pages.
 25. The full Sanity backed browser suite passes all 22 tests, including new English and French checks for the shared navigation and glossary.
 26. The Playwright web server startup limit is now two minutes because the complete static build can take longer than the former 60 second test limit.
+27. The published Sanity dataset contains the `supplyPage` document with 22 fixed text fields, 16 Portable Text blocks, and two endnotes in each language.
+28. Supply essay headings keep permanent IDs, note references keep permanent targets, and the build rejects changed block, list, heading, or endnote structure.
+29. The local refactor and the published Sanity document both produce the same 86,755 character Supply `<main>` HTML and SHA-256 hash as the saved baseline.
+30. The Supply map now catches a WebGL initialization failure so the rest of the page, including language switching, remains usable when the map cannot start.
+31. The full Sanity backed suite passes all 24 tests, including focused English and French Supply content tests. A new dataset backup was saved after the import.
 
-The migration branch can build Resources, Bibliography, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
+The migration branch can build Resources, Bibliography, Supply, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
 
 ## Goal
 

@@ -154,13 +154,20 @@
 		maplibregl.addProtocol('pmtiles', protocol.tile);
 
 		const compactMap = mapContainer.clientWidth < 640;
-		const map = new maplibregl.Map({
-			container: mapContainer,
-			style: `https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC&language=${$language}`,
-			center: MAINLAND_CENTER,
-			zoom: compactMap ? 3.8 : MAINLAND_ZOOM,
-			attributionControl: false
-		});
+		let map: maplibregl.Map;
+		try {
+			map = new maplibregl.Map({
+				container: mapContainer,
+				style: `https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC&language=${$language}`,
+				center: MAINLAND_CENTER,
+				zoom: compactMap ? 3.8 : MAINLAND_ZOOM,
+				attributionControl: false
+			});
+		} catch (error) {
+			console.warn('The supply map could not initialize. The rest of the page remains available.', error);
+			maplibregl.removeProtocol('pmtiles');
+			return;
+		}
 		map.addControl(new maplibregl.AttributionControl({ compact: true }));
 		map.addControl(new maplibregl.NavigationControl());
 		mapInstance = map;
