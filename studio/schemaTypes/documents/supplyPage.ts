@@ -1,0 +1,35 @@
+import {defineType} from 'sanity'
+import {bilingualRichText, bilingualString, bilingualText, languageGroups} from '../helpers'
+
+export const supplyPage = defineType({
+  name: 'supplyPage',
+  title: 'Supply page',
+  type: 'document',
+  groups: languageGroups,
+  fields: [
+    ...bilingualString('title', 'Page title'),
+    ...bilingualString('deck', 'Page subtitle'),
+    ...bilingualText('introduction', 'Introduction'),
+    ...bilingualString('nationalTitle', 'National stock chart heading'),
+    ...bilingualString('nationalSource', 'National stock source line'),
+    ...bilingualString('tenureTitle', 'Tenure chart heading'),
+    ...bilingualString('tenureCaption', 'Tenure chart caption'),
+    ...bilingualString('regionalTitle', 'Regional section heading'),
+    ...bilingualText('regionalBody', 'Regional section description'),
+    ...bilingualString('distributionTitle', 'Distribution chart heading'),
+    ...bilingualString('distributionCaption', 'Distribution chart caption'),
+    ...bilingualString('rateTitle', 'Regional rate chart heading'),
+    ...bilingualString('rateCaption', 'Regional rate chart caption'),
+    ...bilingualString('mapTitle', 'Supply map heading'),
+    ...bilingualText('mapBody', 'Supply map description'),
+    ...bilingualString('noncomplianceTitle', 'Noncompliance heading'),
+    ...bilingualString('noncomplianceDeck', 'Noncompliance subtitle'),
+    ...bilingualText('noncomplianceBody', 'Noncompliance description'),
+    ...bilingualString('overseasTitle', 'Overseas territories heading'),
+    ...bilingualText('overseasBody', 'Overseas territories description'),
+    ...bilingualString('europeTitle', 'European context heading'),
+    ...bilingualText('europeBody', 'European context description'),
+    ...bilingualRichText('methods', 'Methods essay'),
+  ],
+  preview: {prepare: () => ({title: 'Supply page'})},
+})

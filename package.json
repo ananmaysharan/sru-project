@@ -3,6 +3,9 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"engines": {
+		"node": ">=22.13.0"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -13,7 +16,9 @@
 		"test:e2e": "playwright test",
 		"test": "npm run test:e2e",
 		"optimize-images": "node scripts/optimize-images.js",
-		"optimize-headlines": "node scripts/optimize-headlines.js"
+		"optimize-headlines": "node scripts/optimize-headlines.js",
+		"studio:dev": "npm --prefix studio run dev",
+		"studio:build": "npm --prefix studio run build"
 	},
 	"devDependencies": {
 		"@lucide/svelte": "^1.6.0",
