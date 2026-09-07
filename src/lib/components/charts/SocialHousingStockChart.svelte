@@ -363,6 +363,13 @@
         return !compact || year % 5 === 0;
     }
 
+    function headlineDate(date: Date): string {
+        return new Intl.DateTimeFormat($language === 'fr' ? 'fr-FR' : 'en-US', {
+            month: 'long',
+            year: 'numeric',
+        }).format(date);
+    }
+
     // The animated line runs 2000 → 2025. The flat 2024 → 2025 carry is part of
     // the same path, so it gets drawn as a continuation of the scroll-driven
     // reveal rather than appearing all at once.
@@ -846,43 +853,9 @@
             {/each}
         </div>
 
-        <!-- News headline screenshots: use a swipeable strip on phone-sized
-             embeds. The desktop grid and hover connectors need more width. -->
-        {#if compact}
-            <div
-                data-mobile-headlines
-                class="absolute flex gap-3 overflow-x-auto pb-2"
-                style="left: {CARD_INSET}px; right: {CARD_INSET}px; top: {axisY +
-                    GRID_OFFSET}px; opacity: {newsVisible
-                    ? 1
-                    : 0}; pointer-events: {newsVisible ? 'auto' : 'none'};"
-                role="region"
-                aria-label={$language === 'fr'
-                    ? 'Titres de presse, faire défiler horizontalement'
-                    : 'News headlines, scroll horizontally'}
-            >
-                {#each decoratedHeadlines as h, i (h.id)}
-                    {#if h.frac >= domainLeft - 0.001}
-                        <div
-                            class="h-[40px] w-[140px] shrink-0 border border-gray-300 bg-white select-none"
-                            style="opacity: {newsVisible
-                                ? 1
-                                : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {newsVisible
-                                ? i * HL_STAGGER_MS
-                                : 0}ms;"
-                        >
-                            <img
-                                src={asset(h.full)}
-                                alt={h.caption}
-                                loading="lazy"
-                                draggable="false"
-                                class="block h-full w-full object-contain pointer-events-none"
-                            />
-                        </div>
-                    {/if}
-                {/each}
-            </div>
-        {:else}
+        <!-- The desktop news beat replaces the policy cards as the reader
+             scrolls. On mobile, both chapters are laid out sequentially below. -->
+        {#if !compact}
             {#each decoratedHeadlines as h, i (h.id)}
                 {#if h.frac >= domainLeft - 0.001}
                     {@const pos = getHeadlinePos(h)}
@@ -918,3 +891,59 @@
         {/if}
     {/if}
 </div>
+
+{#if compact}
+    <section
+        data-mobile-headlines
+        class="relative isolate mx-4 mb-8 overflow-hidden border border-gray-300 bg-white"
+        aria-labelledby="mobile-news-title"
+    >
+        <div
+            class="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center opacity-[0.12]"
+            style="background-image: url({asset('/images/newspaper-bg.webp')});"
+        ></div>
+        <div class="p-4">
+            <h2 id="mobile-news-title" class="text-2xl font-bold">
+                {$language === 'fr' ? 'À la une' : 'In the news'}
+            </h2>
+            <p class="mt-3 text-sm leading-relaxed text-gray-700">
+                {#if $language === 'fr'}
+                    Ensemble, ces titres de presse retracent la manière dont, au fil des années,
+                    la loi SRU a poursuivi sa mission en tant qu’instrument de lutte contre
+                    l’apartheid territorial et social. En parallèle, des acteurs locaux et
+                    nationaux ont cherché à affaiblir ou à contourner ses obligations en matière
+                    de logements sociaux.
+                {:else}
+                    Together, these media headlines trace how the SRU law has been upheld as an
+                    instrument against territorial and social apartheid, even as local and
+                    national actors have sought to weaken or bypass its social-housing obligations.
+                {/if}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 px-4 pb-4">
+            {#each decoratedHeadlines as h (h.id)}
+                <figure class="overflow-hidden border border-gray-300 bg-white">
+                    <a
+                        href={asset(h.full)}
+                        target="_blank"
+                        rel="noreferrer"
+                        class="block p-2"
+                        aria-label={`${$language === 'fr' ? 'Ouvrir le titre de presse' : 'Open news headline'}: ${headlineDate(h.date)}`}
+                    >
+                        <img
+                            src={asset(h.full)}
+                            alt={h.caption}
+                            loading="lazy"
+                            draggable="false"
+                            class="block h-auto w-full object-contain"
+                        />
+                    </a>
+                    <figcaption class="border-t border-gray-200 px-3 py-2 text-xs capitalize text-gray-600">
+                        {headlineDate(h.date)}
+                    </figcaption>
+                </figure>
+            {/each}
+        </div>
+    </section>
+{/if}
