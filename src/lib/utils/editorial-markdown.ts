@@ -52,6 +52,7 @@ const renderInline = (value: string, scope: string, linkNotes = true) => {
         /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
         '<a href="$2" target="_blank" rel="noreferrer">$1</a>',
     );
+    html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
     if (linkNotes) {
         html = html.replace(/\[(\d+)\]/g, (_match, number: string) => {
