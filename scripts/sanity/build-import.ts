@@ -8,6 +8,7 @@ import {
 import {localizedResourceSections, type ResourceContentSection} from '../../src/lib/data/resource-content';
 import {localSiteSettings} from '../../src/lib/data/site-content';
 import {localSupplyText} from '../../src/lib/data/supply-content';
+import {localHealthMetricDefinitions, localHealthText} from '../../src/lib/data/health-content';
 import {parseEditorialStory} from '../../src/lib/utils/editorial-markdown';
 import {editorialStoryToPortableText} from './editorial-portable-text';
 
@@ -254,7 +255,61 @@ const supplyDocument = {
     endnotesFr: supplyMethods.fr.endnotes,
 };
 
-const documents = [siteSettingsDocument, supplyDocument, resourcesDocument, bibliographyDocument];
+const healthMethods = {
+    en: editorialStoryToPortableText(
+        parseEditorialStory(englishEditorialSource, 'health-method'),
+        'en',
+        'health-method',
+    ),
+    fr: editorialStoryToPortableText(
+        parseEditorialStory(frenchEditorialSource, 'health-method'),
+        'fr',
+        'health-method',
+    ),
+};
+
+function toSanityMetricDefinitions(language: 'en' | 'fr') {
+    return localHealthMetricDefinitions[language].map((definition) => ({
+        _key: definition.id,
+        _type: 'metricDefinition',
+        metricId: definition.id,
+        label: definition.label,
+        description: definition.description,
+    }));
+}
+
+const healthDocument = {
+    _id: 'healthOutcomesPage',
+    _type: 'healthOutcomesPage',
+    titleEn: localHealthText.en.title,
+    titleFr: localHealthText.fr.title,
+    deckEn: localHealthText.en.deck,
+    deckFr: localHealthText.fr.deck,
+    introductionEn: localHealthText.en.intro,
+    introductionFr: localHealthText.fr.intro,
+    cornerTitleEn: localHealthText.en.cornerTitle,
+    cornerTitleFr: localHealthText.fr.cornerTitle,
+    chartTitleEn: localHealthText.en.chartTitle,
+    chartTitleFr: localHealthText.fr.chartTitle,
+    chartBodyEn: localHealthText.en.chartBody,
+    chartBodyFr: localHealthText.fr.chartBody,
+    definitionsTitleEn: localHealthText.en.definitions,
+    definitionsTitleFr: localHealthText.fr.definitions,
+    metricDefinitionsEn: toSanityMetricDefinitions('en'),
+    metricDefinitionsFr: toSanityMetricDefinitions('fr'),
+    methodsEn: healthMethods.en.blocks,
+    methodsFr: healthMethods.fr.blocks,
+    endnotesEn: healthMethods.en.endnotes,
+    endnotesFr: healthMethods.fr.endnotes,
+};
+
+const documents = [
+    siteSettingsDocument,
+    supplyDocument,
+    healthDocument,
+    resourcesDocument,
+    bibliographyDocument,
+];
 const errors = compareResourceLanguages();
 const englishItemCount = localizedResourceSections.en.reduce(
     (total, section) => total + section.items.length,
@@ -281,6 +336,9 @@ console.log(`Bibliography sections: ${localizedBibliographySections.en.length} E
 console.log(`Bibliography entries: ${englishBibliographyCount} English, ${frenchBibliographyCount} French`);
 console.log(`Supply methods: ${supplyMethods.en.blocks.length} English blocks, ${supplyMethods.fr.blocks.length} French blocks`);
 console.log(`Supply endnotes: ${supplyMethods.en.endnotes.length} English, ${supplyMethods.fr.endnotes.length} French`);
+console.log(`Health metric definitions: ${localHealthMetricDefinitions.en.length} English, ${localHealthMetricDefinitions.fr.length} French`);
+console.log(`Health methods: ${healthMethods.en.blocks.length} English blocks, ${healthMethods.fr.blocks.length} French blocks`);
+console.log(`Health endnotes: ${healthMethods.en.endnotes.length} English, ${healthMethods.fr.endnotes.length} French`);
 console.log(`Relationship errors: ${errors.length}`);
 
 if (errors.length > 0) {

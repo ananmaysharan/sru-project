@@ -41,6 +41,30 @@ export const healthOutcomesPage = defineType({
       validation: (rule) => rule.required().length(9),
     }),
     ...bilingualRichText('methods', 'Methods text'),
+    defineField({
+      name: 'endnotesEn',
+      title: 'Methods endnotes (English)',
+      type: 'array',
+      group: 'english',
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
+      of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().length(1),
+    }),
+    defineField({
+      name: 'endnotesFr',
+      title: 'Methods endnotes (French)',
+      type: 'array',
+      group: 'french',
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
+      of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().length(1),
+    }),
   ],
   preview: {prepare: () => ({title: 'Health outcomes page'})},
 })

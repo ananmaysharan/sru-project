@@ -45,8 +45,13 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 29. The local refactor and the published Sanity document both produce the same 86,755 character Supply `<main>` HTML and SHA-256 hash as the saved baseline.
 30. The Supply map now catches a WebGL initialization failure so the rest of the page, including language switching, remains usable when the map cannot start.
 31. The full Sanity backed suite passes all 24 tests, including focused English and French Supply content tests. A new dataset backup was saved after the import.
+32. The published Sanity dataset contains the `healthOutcomesPage` document with seven fixed text fields, nine metric definitions, the methods text, and one endnote in each language.
+33. Health metric definitions use permanent IDs and fixed order. The build rejects missing, reordered, or changed metric IDs and unsupported methods structure.
+34. The local refactor and published Sanity document both produce the same 463,784 character Health Outcomes `<main>` HTML and SHA-256 hash as the saved baseline.
+35. Both Health maps now catch WebGL initialization failures so the rest of the page remains usable if a map cannot start.
+36. The full Sanity backed suite passes all 26 tests, including focused English and French Health Outcomes tests. A new dataset backup was saved after the import.
 
-The migration branch can build Resources, Bibliography, Supply, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
+The migration branch can build Resources, Bibliography, Supply, Health Outcomes, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
 
 ## Goal
 
