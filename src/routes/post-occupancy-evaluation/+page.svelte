@@ -6,6 +6,7 @@
     import ProjectIdCard from "$lib/components/sections/ProjectIdCard.svelte";
     import type { ProjectCardAnchor } from "$lib/components/sections/project-card-position";
     import { projectIdCards } from "$lib/data/project-id-cards";
+    import type { CaseStudyProjectId } from "$lib/data/case-study-ids";
     import { postOccupancyCaptionsFr, residentTopicsFr } from "$lib/data/post-occupancy.fr";
     import { language } from "$lib/i18n";
     import * as Select from "$lib/components/ui/select";
@@ -96,6 +97,7 @@
     };
 
     type StoryProject = {
+        id: CaseStudyProjectId;
         label: string;
         images: StoryImage[];
         thumbnailIndex?: number;
@@ -112,8 +114,11 @@
     let storyCardsEl = $state<HTMLDivElement | null>(null);
     let storyEl = $state<HTMLDivElement | null>(null);
     let caseStudyNavCompact = $state(false);
-    let visibleProjectCard = $state<string | null>(null);
-    let dismissedProjectCard: string | null = null;
+    let visibleProjectCard = $state<CaseStudyProjectId | null>(null);
+    let dismissedProjectCard: CaseStudyProjectId | null = null;
+    const visibleProjectCardContent = $derived(
+        visibleProjectCard ? projectIdCards[visibleProjectCard] : undefined,
+    );
     let projectCardAnchor = $state<ProjectCardAnchor>({ x: 0, y: 0 });
     let projectCardCloseTimer: ReturnType<typeof setTimeout> | null = null;
     let scrollFrame = 0;
@@ -154,12 +159,12 @@
         projectCardCloseTimer = null;
     }
 
-    function showProjectCard(projectLabel: string, event: PointerEvent | FocusEvent) {
+    function showProjectCard(projectId: CaseStudyProjectId, event: PointerEvent | FocusEvent) {
         if ('pointerType' in event && event.pointerType === 'touch') return;
         if (event.type === 'pointerenter' || event.type === 'focus') dismissedProjectCard = null;
-        if (dismissedProjectCard === projectLabel) return;
+        if (dismissedProjectCard === projectId) return;
         cancelProjectCardClose();
-        if (!projectIdCards[projectLabel]) {
+        if (!projectIdCards[projectId]) {
             visibleProjectCard = null;
             return;
         }
@@ -169,7 +174,7 @@
             x: 'clientX' in event ? event.clientX : bounds.left + bounds.width / 2,
             y: 'clientY' in event ? event.clientY : bounds.bottom,
         };
-        visibleProjectCard = projectLabel;
+        visibleProjectCard = projectId;
     }
 
     function scheduleProjectCardClose() {
@@ -294,6 +299,7 @@
 
     const parisProjects: StoryProject[] = [
         {
+            id: "samaritaine",
             label: "Samaritaine",
             images: [
                 "000016390005",
@@ -337,6 +343,7 @@
             })),
         },
         {
+            id: "marechal-fayolle",
             label: "Maréchal Fayolle",
             images: [
                 "DSC01776",
@@ -364,6 +371,7 @@
             })),
         },
         {
+            id: "rue-jean-bart",
             label: "Rue Jean-Bart",
             thumbnailIndex: 2,
             images: ["paris-01", "DSC01781", "DSC01783"].map((id, i) => ({
@@ -378,6 +386,7 @@
             })),
         },
         {
+            id: "tour-bois-le-pretre",
             label: "Tour Bois-le-Prêtre",
             images: [
                 "7685ce4e-bef7-419c-8d9e-68536a49e292",
@@ -402,6 +411,7 @@
 
     const frenchRivieraProjects: StoryProject[] = [
         {
+            id: "gignac-la-nerthe",
             label: "Gignac-la-Nerthe",
             images: [
                 {
@@ -439,6 +449,7 @@
 
     const brittanyProjects: StoryProject[] = [
         {
+            id: "talgen",
             label: "Talgen",
             images: [
                 {
@@ -475,6 +486,7 @@
 
     const overseasTerritoriesProjects: StoryProject[] = [
         {
+            id: "les-jasmins",
             label: "Les Jasmins · La Réunion",
             images: [
                 {
@@ -987,23 +999,23 @@
                         {regionLabel(region)}
                     </span>
                 {/each}
-                {#each caseStudyNavItems as item (`${item.region}-${item.project.label}`)}
+                {#each caseStudyNavItems as item (`${item.region}-${item.project.id}`)}
                     <button
                         type="button"
                         class:case-study-case-button--active={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex}
                         class="case-study-case-button"
                         aria-current={item.region === activeCaseStudy && item.projectIndex === activeProjectIndex ? "true" : undefined}
                         aria-label={`${regionLabel(item.region)}: ${item.project.label}`}
-                        aria-describedby={visibleProjectCard === item.project.label ? 'case-study-project-profile' : undefined}
+                        aria-describedby={visibleProjectCard === item.project.id ? 'case-study-project-profile' : undefined}
                         onclick={() => selectCaseStudy(item.region, item.projectIndex)}
-                        onpointerenter={(event) => showProjectCard(item.project.label, event)}
-                        onpointermove={(event) => showProjectCard(item.project.label, event)}
+                        onpointerenter={(event) => showProjectCard(item.project.id, event)}
+                        onpointermove={(event) => showProjectCard(item.project.id, event)}
                         onpointerleave={scheduleProjectCardClose}
                         onfocus={(event) => {
-                            if (event.currentTarget.matches(':focus-visible')) showProjectCard(item.project.label, event);
+                            if (event.currentTarget.matches(':focus-visible')) showProjectCard(item.project.id, event);
                         }}
                         onblur={() => {
-                            if (projectIdCards[item.project.label]) scheduleProjectCardClose();
+                            if (projectIdCards[item.project.id]) scheduleProjectCardClose();
                         }}
                     >
                         <span class="case-study-thumbnail" aria-hidden="true">
@@ -1029,7 +1041,7 @@
                 <section class="case-study-mobile-region">
                     <h2>{regionLabel(region)}</h2>
                     <div class="case-study-mobile-projects">
-                        {#each caseStudyProjects[region] as project, projectIndex (`mobile-${region}-${project.label}`)}
+                        {#each caseStudyProjects[region] as project, projectIndex (`mobile-${region}-${project.id}`)}
                             <button
                                 type="button"
                                 class:case-study-case-button--active={region === activeCaseStudy && projectIndex === activeProjectIndex}
@@ -1054,9 +1066,9 @@
         </nav>
     </div>
 
-    {#if visibleProjectCard && projectIdCards[visibleProjectCard]}
+    {#if visibleProjectCardContent}
         <ProjectIdCard
-            card={projectIdCards[visibleProjectCard]}
+            card={visibleProjectCardContent}
             anchor={projectCardAnchor}
             onmouseenter={cancelProjectCardClose}
             onmouseleave={scheduleProjectCardClose}
@@ -1099,7 +1111,7 @@
                                             >
                                                 {regionLabel(region)}
                                             </Select.GroupHeading>
-                                            {#each caseStudyProjects[region] as project, projectIndex (`compact-${region}-${project.label}`)}
+                                            {#each caseStudyProjects[region] as project, projectIndex (`compact-${region}-${project.id}`)}
                                                 <Select.Item
                                                     class="justify-start rounded-none text-left data-[highlighted]:bg-white/55"
                                                     value={caseStudyValue(region, projectIndex)}

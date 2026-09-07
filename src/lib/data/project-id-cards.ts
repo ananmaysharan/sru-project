@@ -1,4 +1,5 @@
 import type { Language } from '$lib/i18n';
+import type { CaseStudyProjectId } from './case-study-ids';
 
 type Localized = Record<Language, string>;
 export type ProjectIdCard = {
@@ -17,8 +18,8 @@ const labels = {
     notes: { fr: 'Remarques', en: 'Notes' },
 } satisfies Record<string, Localized>;
 
-export const projectIdCards: Record<string, ProjectIdCard> = {
-    Samaritaine: {
+export const projectIdCards: Partial<Record<CaseStudyProjectId, ProjectIdCard>> = {
+    samaritaine: {
         title: { fr: 'La Samaritaine', en: 'La Samaritaine' },
         fields: [
             { label: labels.place, value: { fr: '1er arrondissement, Paris, Île-de-France', en: '1st arrondissement, Paris, Île-de-France' } },
@@ -31,7 +32,7 @@ export const projectIdCards: Record<string, ProjectIdCard> = {
             { label: labels.notes, value: { fr: 'Logements sociaux intégrés à une opération de réaménagement mixte comprenant des activités de luxe.', en: 'Social housing within a luxury mixed-use redevelopment.' } },
         ],
     },
-    'Tour Bois-le-Prêtre': {
+    'tour-bois-le-pretre': {
         title: { fr: 'Tour Bois-le-Prêtre', en: 'Tour Bois-le-Prêtre' },
         fields: [
             { label: labels.place, value: { fr: '17e arrondissement, Paris, Île-de-France', en: '17th arrondissement, Paris, Île-de-France' } },
@@ -44,7 +45,7 @@ export const projectIdCards: Record<string, ProjectIdCard> = {
             { label: labels.notes, value: { fr: 'Réhabilitation fondée sur la transformation de l’existant.', en: 'Adaptive reuse rehabilitation.' } },
         ],
     },
-    'Rue Jean-Bart': {
+    'rue-jean-bart': {
         title: { fr: '12, rue Jean-Bart', en: '12 Rue Jean-Bart' },
         fields: [
             { label: labels.place, value: { fr: '6e arrondissement, Paris, Île-de-France', en: '6th arrondissement, Paris, Île-de-France' } },
@@ -57,7 +58,7 @@ export const projectIdCards: Record<string, ProjectIdCard> = {
             { label: labels.notes, value: { fr: 'Le rez-de-chaussée comprend une structure d’accueil pour jeunes enfants.', en: 'Includes ground-floor childcare center.' } },
         ],
     },
-    Talgen: {
+    talgen: {
         title: { fr: 'Talgen', en: 'Talgen' },
         fields: [
             { label: labels.place, value: { fr: 'Cesson-Sévigné, Bretagne', en: 'Cesson-Sévigné, Brittany' } },
@@ -70,7 +71,7 @@ export const projectIdCards: Record<string, ProjectIdCard> = {
             { label: labels.notes, value: { fr: 'Situé au sein de la ZAC des Pierrins.', en: 'Within ZAC des Pierrins.' } },
         ],
     },
-    'Les Jasmins · La Réunion': {
+    'les-jasmins': {
         title: { fr: 'Les Jasmins, écoquartier Cœur de Ville', en: 'Les Jasmins, Cœur de Ville Eco-District' },
         fields: [
             { label: labels.place, value: { fr: 'La Possession, La Réunion, DROM', en: 'La Possession, La Réunion, DROM' } },
