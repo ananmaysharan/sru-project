@@ -26,7 +26,10 @@ export const introductionPage = defineType({
       title: 'Introduction notes (English)',
       type: 'array',
       group: 'english',
-      options: {sortable: false},
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
       of: [defineArrayMember({type: 'endnote'})],
     }),
     defineField({
@@ -34,7 +37,10 @@ export const introductionPage = defineType({
       title: 'Introduction notes (French)',
       type: 'array',
       group: 'french',
-      options: {sortable: false},
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
       of: [defineArrayMember({type: 'endnote'})],
     }),
   ],

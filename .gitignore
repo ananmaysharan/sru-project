@@ -27,3 +27,6 @@ test-results
 # Python
 __pycache__/
 *.py[cod]
+
+# Generated Sanity import files and exports
+.sanity-import/

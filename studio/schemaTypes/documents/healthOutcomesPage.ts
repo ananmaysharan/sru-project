@@ -20,7 +20,10 @@ export const healthOutcomesPage = defineType({
       type: 'array',
       group: 'english',
       description: 'Metric order and IDs are fixed by the chart.',
-      options: {sortable: false},
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
       of: [defineArrayMember({type: 'metricDefinition'})],
       validation: (rule) => rule.required().length(9),
     }),
@@ -30,7 +33,10 @@ export const healthOutcomesPage = defineType({
       type: 'array',
       group: 'french',
       description: 'Metric order and IDs are fixed by the chart.',
-      options: {sortable: false},
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
       of: [defineArrayMember({type: 'metricDefinition'})],
       validation: (rule) => rule.required().length(9),
     }),

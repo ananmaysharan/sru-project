@@ -1,22 +1,26 @@
 <script lang="ts">
-	import { resourceSections } from '$lib/data/resources/sru-news-index';
-	import { resourceSectionsFr } from '$lib/data/resources-fr';
 	import { language } from '$lib/i18n';
+	import type { PageData } from './$types';
 
-	const sections = $derived($language === 'fr' ? resourceSectionsFr : resourceSections);
+	let { data }: { data: PageData } = $props();
+	const text = $derived({
+		title: data.content.title[$language],
+		sourceLinkLabel: data.content.sourceLinkLabel[$language],
+		sections: data.content.sections[$language],
+	});
 </script>
 
 
 <section id="resources" class="page-shell">
 	<div class="prose-column">
-		<h1 class="page-title">{$language === 'fr' ? 'Revue de presse' : 'News Sources'}</h1>
+		<h1 class="page-title">{text.title}</h1>
 		
 		<div class="index-groups text-gray-700">
-			{#each sections as section (section.title)}
+			{#each text.sections as section (section.id)}
 				<section class="index-group">
 					<h2>{section.title}</h2>
 					<ul>
-						{#each section.items as item}
+					{#each section.items as item (item.id)}
 							<li>
 								{item.text}
 								{#if item.url}
@@ -26,7 +30,7 @@
 										rel="noreferrer"
 										class="ml-1 text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900"
 									>
-									{$language === 'fr' ? 'Source' : 'Source'}
+					{text.sourceLinkLabel}
 									</a>
 								{/if}
 							</li>

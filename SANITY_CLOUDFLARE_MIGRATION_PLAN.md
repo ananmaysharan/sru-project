@@ -26,6 +26,11 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 10. The local Studio origin `http://127.0.0.1:3333` is allowed in Sanity for development.
 11. Case study project cards and navigator items now use permanent project IDs instead of visible English project names.
 12. All 44 case study captions resolve through permanent image IDs, and resident topic and quote keys are independent of editable text.
+13. Fixed Studio arrays now hide add, insert, remove, duplicate, copy, and reorder controls while keeping their text fields editable.
+14. The repeatable import report validates the 180 English and 180 French news source entries, IDs, counts, and links.
+15. The published Sanity dataset now contains the verified `resourcesPage` document. Backups were saved before and after the import.
+16. The resources route has a build-time `local` or `sanity` source setting. Local remains the default.
+17. Local and Sanity builds produce byte-for-byte identical `<main>` markup for the resources page.
 
 No page is reading from Sanity yet. The production site has not changed.
 

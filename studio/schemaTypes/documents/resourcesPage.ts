@@ -15,7 +15,10 @@ export const resourcesPage = defineType({
       type: 'array',
       group: 'english',
       description: 'Section and entry order are fixed. Sorting is disabled.',
-      options: {sortable: false},
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
       of: [defineArrayMember({type: 'resourceSection'})],
       validation: (rule) => rule.required().min(1),
     }),
@@ -25,7 +28,10 @@ export const resourcesPage = defineType({
       type: 'array',
       group: 'french',
       description: 'Section and entry order are fixed. Sorting is disabled.',
-      options: {sortable: false},
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
       of: [defineArrayMember({type: 'resourceSection'})],
       validation: (rule) => rule.required().min(1),
     }),
