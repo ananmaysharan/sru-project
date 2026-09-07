@@ -3,9 +3,10 @@
 	import { Menu, X } from '@lucide/svelte';
 	import { siteRoutes, type SiteRoute } from '$lib/data/routes';
 	import Glossary from '$lib/components/sections/Glossary.svelte';
+	import type { SiteSettingsContent } from '$lib/data/site-content';
 	import { language, setLanguage, type Language } from '$lib/i18n';
 
-	let { routeId }: { routeId: string | null } = $props();
+	let { routeId, settings }: { routeId: string | null; settings: SiteSettingsContent } = $props();
 
 	// Reactive viewport/layout measurements (see <svelte:window> and the nav's
 	// bind:clientHeight below) — no manual listeners or hardcoded heights.
@@ -129,7 +130,7 @@
 								: 'border-transparent hover:underline'
 						]}
 					>
-						{section.label[$language]}
+						{settings.navigation[$language][section.href]}
 					</a>
 				</li>
 			{/each}
@@ -191,7 +192,7 @@
 								]}
 								onclick={closeMenu}
 							>
-								{section.label[$language]}
+								{settings.navigation[$language][section.href]}
 							</a>
 						</li>
 					{/each}
@@ -214,7 +215,7 @@
 					<X size={16} strokeWidth={1.75} />
 				</button>
 				<div class="pr-7">
-					<Glossary />
+					<Glossary content={settings.glossary[$language]} />
 				</div>
 			</div>
 		{/if}

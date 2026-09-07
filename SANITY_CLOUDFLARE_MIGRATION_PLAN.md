@@ -4,7 +4,7 @@ Status: implementation in progress on September 7, 2026.
 
 Last reviewed: September 7, 2026.
 
-This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and production build pass, and all 19 browser tests pass.
+This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and production build pass. The current migration branch has 22 passing browser tests.
 
 This version of the plan does not include section or item reordering. All page and list structure will remain fixed in code.
 
@@ -35,8 +35,13 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 19. The published Sanity dataset contains the verified `bibliographyPage` document, with a new dataset backup saved after import.
 20. The bibliography route uses the same build-time content source setting and converts Portable Text back into the existing inline renderer.
 21. The local bibliography markup matches the baseline exactly after ignoring internal Svelte hydration comments. Local and Sanity modes both pass the English and French bibliography tests.
+22. The published Sanity dataset contains the `siteSettings` document for the browser title, skip link, navigation labels, previous and next labels, and glossary text. A new dataset backup was saved after this import.
+23. The root layout and shared navigation components now receive global text through a validated content layer. Interactive control labels remain fixed in code.
+24. Local and Sanity builds produce identical main content, navigation, browser title, and skip link markup on the introduction, resources, and bibliography pages.
+25. The full Sanity backed browser suite passes all 22 tests, including new English and French checks for the shared navigation and glossary.
+26. The Playwright web server startup limit is now two minutes because the complete static build can take longer than the former 60 second test limit.
 
-No page is reading from Sanity yet. The production site has not changed.
+The migration branch can build Resources, Bibliography, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
 
 ## Goal
 

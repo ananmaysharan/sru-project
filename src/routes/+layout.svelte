@@ -7,8 +7,9 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { initializeLanguage, language } from '$lib/i18n';
+	import type { LayoutData } from './$types';
 
-	let { children } = $props();
+	let { children, data }: { children: import('svelte').Snippet; data: LayoutData } = $props();
 
 	onMount(initializeLanguage);
 
@@ -81,15 +82,15 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<meta name="theme-color" content="#ffffff" />
-	<title>{$language === 'fr' ? 'La Loi SRU : bilan après 25 ans' : 'The Loi SRU French social housing program, 25 years later'}</title>
+	<title>{data.siteSettings.siteTitle[$language]}</title>
 </svelte:head>
 <div class="flex min-h-screen flex-col">
 	<a class="skip-link" href="#main-content">
-		{$language === 'fr' ? 'Aller au contenu principal' : 'Skip to main content'}
+		{data.siteSettings.skipLink[$language]}
 	</a>
-	<TableOfContents routeId={page.route.id} />
+	<TableOfContents routeId={page.route.id} settings={data.siteSettings} />
 	<main id="main-content" class="flex-1" tabindex="-1">
 		{@render children()}
-		<PageNavigation routeId={page.route.id} />
+		<PageNavigation routeId={page.route.id} settings={data.siteSettings} />
 	</main>
 </div>

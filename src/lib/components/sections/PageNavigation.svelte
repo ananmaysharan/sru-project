@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { siteRoutes, type SiteRoute } from '$lib/data/routes';
+	import type { SiteSettingsContent } from '$lib/data/site-content';
 	import { language } from '$lib/i18n';
 
-	let { routeId }: { routeId: string | null } = $props();
+	let { routeId, settings }: { routeId: string | null; settings: SiteSettingsContent } = $props();
 
 	const isActive = (route: SiteRoute) => routeId === route;
 
@@ -28,9 +29,9 @@
 			class="border border-gray-300 px-3 py-3 text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900"
 		>
 			<span class="block text-xs text-gray-500">
-				{$language === 'fr' ? 'Page précédente' : 'Previous page'}
+				{settings.previousPage[$language]}
 			</span>
-			{previousRoute.label[$language]}
+			{settings.navigation[$language][previousRoute.href]}
 		</a>
 	{/if}
 
@@ -40,9 +41,9 @@
 			class="border border-gray-300 px-3 py-3 text-right text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900 sm:ml-auto"
 		>
 			<span class="block text-xs text-gray-500">
-				{$language === 'fr' ? 'Page suivante' : 'Next page'}
+				{settings.nextPage[$language]}
 			</span>
-			{nextRoute.label[$language]}
+			{settings.navigation[$language][nextRoute.href]}
 		</a>
 	{/if}
 </nav>

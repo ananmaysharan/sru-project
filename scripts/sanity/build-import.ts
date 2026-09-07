@@ -6,6 +6,7 @@ import {
     type BibliographyContentSection,
 } from '../../src/lib/data/bibliography-content';
 import {localizedResourceSections, type ResourceContentSection} from '../../src/lib/data/resource-content';
+import {localSiteSettings} from '../../src/lib/data/site-content';
 
 type SanityResourceItem = {
     _key: string;
@@ -123,7 +124,60 @@ const bibliographyDocument = {
     sectionsFr: toSanityBibliographySections(localizedBibliographySections.fr),
 };
 
-const documents = [resourcesDocument, bibliographyDocument];
+const siteSettingsDocument = {
+    _id: 'siteSettings',
+    _type: 'siteSettings',
+    siteTitleEn: localSiteSettings.siteTitle.en,
+    siteTitleFr: localSiteSettings.siteTitle.fr,
+    skipLinkEn: localSiteSettings.skipLink.en,
+    skipLinkFr: localSiteSettings.skipLink.fr,
+    introductionNavEn: localSiteSettings.navigation.en['/'],
+    introductionNavFr: localSiteSettings.navigation.fr['/'],
+    supplyNavEn: localSiteSettings.navigation.en['/supply'],
+    supplyNavFr: localSiteSettings.navigation.fr['/supply'],
+    healthNavEn: localSiteSettings.navigation.en['/health-outcomes'],
+    healthNavFr: localSiteSettings.navigation.fr['/health-outcomes'],
+    postOccupancyNavEn: localSiteSettings.navigation.en['/post-occupancy-evaluation'],
+    postOccupancyNavFr: localSiteSettings.navigation.fr['/post-occupancy-evaluation'],
+    resourcesNavEn: localSiteSettings.navigation.en['/resources'],
+    resourcesNavFr: localSiteSettings.navigation.fr['/resources'],
+    bibliographyNavEn: localSiteSettings.navigation.en['/bibliography'],
+    bibliographyNavFr: localSiteSettings.navigation.fr['/bibliography'],
+    previousPageEn: localSiteSettings.previousPage.en,
+    previousPageFr: localSiteSettings.previousPage.fr,
+    nextPageEn: localSiteSettings.nextPage.en,
+    nextPageFr: localSiteSettings.nextPage.fr,
+    glossaryTitleEn: localSiteSettings.glossary.en.title,
+    glossaryTitleFr: localSiteSettings.glossary.fr.title,
+    glossarySocialStockTermEn: localSiteSettings.glossary.en.socialStockTerm,
+    glossarySocialStockTermFr: localSiteSettings.glossary.fr.socialStockTerm,
+    glossarySocialStockDefinitionEn: localSiteSettings.glossary.en.socialStockDefinition,
+    glossarySocialStockDefinitionFr: localSiteSettings.glossary.fr.socialStockDefinition,
+    glossaryQpvTermEn: localSiteSettings.glossary.en.qpvTerm,
+    glossaryQpvTermFr: localSiteSettings.glossary.fr.qpvTerm,
+    glossaryQpvDefinitionEn: localSiteSettings.glossary.en.qpvDefinition,
+    glossaryQpvDefinitionFr: localSiteSettings.glossary.fr.qpvDefinition,
+    glossaryFinancingTitleEn: localSiteSettings.glossary.en.financingTitle,
+    glossaryFinancingTitleFr: localSiteSettings.glossary.fr.financingTitle,
+    glossaryPlaiEn: localSiteSettings.glossary.en.plai,
+    glossaryPlaiFr: localSiteSettings.glossary.fr.plai,
+    glossaryPlusEn: localSiteSettings.glossary.en.plus,
+    glossaryPlusFr: localSiteSettings.glossary.fr.plus,
+    glossaryPlsEn: localSiteSettings.glossary.en.pls,
+    glossaryPlsFr: localSiteSettings.glossary.fr.pls,
+    glossaryPliEn: localSiteSettings.glossary.en.pli,
+    glossaryPliFr: localSiteSettings.glossary.fr.pli,
+    glossaryProvidersTitleEn: localSiteSettings.glossary.en.providersTitle,
+    glossaryProvidersTitleFr: localSiteSettings.glossary.fr.providersTitle,
+    glossaryOphEn: localSiteSettings.glossary.en.oph,
+    glossaryOphFr: localSiteSettings.glossary.fr.oph,
+    glossaryEshEn: localSiteSettings.glossary.en.esh,
+    glossaryEshFr: localSiteSettings.glossary.fr.esh,
+    glossarySemEn: localSiteSettings.glossary.en.sem,
+    glossarySemFr: localSiteSettings.glossary.fr.sem,
+};
+
+const documents = [siteSettingsDocument, resourcesDocument, bibliographyDocument];
 const errors = compareResourceLanguages();
 const englishItemCount = localizedResourceSections.en.reduce(
     (total, section) => total + section.items.length,

@@ -1,5 +1,5 @@
 import {defineType} from 'sanity'
-import {bilingualString, languageGroups} from '../helpers'
+import {bilingualString, bilingualText, languageGroups} from '../helpers'
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -17,6 +17,20 @@ export const siteSettings = defineType({
     ...bilingualString('bibliographyNav', 'Bibliography navigation label'),
     ...bilingualString('previousPage', 'Previous page label'),
     ...bilingualString('nextPage', 'Next page label'),
+    ...bilingualString('glossaryTitle', 'Glossary heading'),
+    ...bilingualString('glossarySocialStockTerm', 'Social rental housing stock term'),
+    ...bilingualText('glossarySocialStockDefinition', 'Social rental housing stock definition'),
+    ...bilingualString('glossaryQpvTerm', 'Priority urban policy neighborhood term'),
+    ...bilingualText('glossaryQpvDefinition', 'Priority urban policy neighborhood definition'),
+    ...bilingualString('glossaryFinancingTitle', 'Financing instruments heading'),
+    ...bilingualString('glossaryPlai', 'PLAI definition'),
+    ...bilingualString('glossaryPlus', 'PLUS definition'),
+    ...bilingualString('glossaryPls', 'PLS definition'),
+    ...bilingualString('glossaryPli', 'PLI definition'),
+    ...bilingualString('glossaryProvidersTitle', 'Social housing providers heading'),
+    ...bilingualString('glossaryOph', 'OPH definition'),
+    ...bilingualString('glossaryEsh', 'ESH definition'),
+    ...bilingualString('glossarySem', 'SEM definition'),
   ],
   preview: {prepare: () => ({title: 'Site settings'})},
 })
