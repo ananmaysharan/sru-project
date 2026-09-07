@@ -31,6 +31,10 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 15. The published Sanity dataset now contains the verified `resourcesPage` document. Backups were saved before and after the import.
 16. The resources route has a build-time `local` or `sanity` source setting. Local remains the default.
 17. Local and Sanity builds produce byte-for-byte identical `<main>` markup for the resources page.
+18. The English bibliography was extracted into the same segment model as the French bibliography. All seven section counts, 40 entry counts, and corresponding links match.
+19. The published Sanity dataset contains the verified `bibliographyPage` document, with a new dataset backup saved after import.
+20. The bibliography route uses the same build-time content source setting and converts Portable Text back into the existing inline renderer.
+21. The local bibliography markup matches the baseline exactly after ignoring internal Svelte hydration comments. Local and Sanity modes both pass the English and French bibliography tests.
 
 No page is reading from Sanity yet. The production site has not changed.
 

@@ -20,7 +20,8 @@
 		"studio:dev": "npm --prefix studio run dev",
 		"studio:build": "npm --prefix studio run build",
 		"content:report": "tsx scripts/sanity/build-import.ts --report",
-		"content:export": "tsx scripts/sanity/build-import.ts --output .sanity-import/website.ndjson"
+		"content:export": "tsx scripts/sanity/build-import.ts --output .sanity-import/website.ndjson",
+		"content:extract-bibliography": "tsx scripts/sanity/extract-english-bibliography.ts"
 	},
 	"devDependencies": {
 		"@lucide/svelte": "^1.6.0",
@@ -31,6 +32,7 @@
 		"@tailwindcss/vite": "^4.1.18",
 		"bits-ui": "^2.16.3",
 		"clsx": "^2.1.1",
+		"parse5": "^8.0.1",
 		"sharp": "^0.34.5",
 		"svelte": "^5.49.2",
 		"svelte-check": "^4.3.6",
