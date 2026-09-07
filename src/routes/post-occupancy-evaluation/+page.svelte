@@ -8,7 +8,6 @@
     import { projectIdCards } from "$lib/data/project-id-cards";
     import { postOccupancyCaptionsFr, residentTopicsFr } from "$lib/data/post-occupancy.fr";
     import { language } from "$lib/i18n";
-    import AutoCarousel from "$lib/components/gallery/AutoCarousel.svelte";
     import * as Select from "$lib/components/ui/select";
     import { onMount } from "svelte";
     import {
@@ -107,15 +106,6 @@
         | "Brittany"
         | "Provence"
         | "Overseas Territories";
-
-    // Keep the previous carousel presentation available while the new
-    // scrollytelling direction is being evaluated.
-    const useLegacyCarousel = false;
-
-    let activeRegion = $state("Paris");
-    let activeLabel = $state("Samaritaine");
-    let activeDark = $state(true);
-    let panelEls = $state<HTMLElement[]>([]);
 
     let activeFrame = $state(0);
     let storyCardEls = $state<HTMLElement[]>([]);
@@ -634,8 +624,6 @@
         "Overseas Territories",
     ];
 
-    const galleryAspect = "h-[95vh]";
-
     const caseStudyNavItems = $derived(
         regions.flatMap((region) =>
             caseStudyProjects[region].map(
@@ -917,25 +905,6 @@
         }
     });
 
-    $effect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                for (const entry of entries) {
-                    if (entry.isIntersecting) {
-                        const el = entry.target as HTMLElement;
-                        activeRegion = el.dataset.region ?? "";
-                        activeLabel = el.dataset.label ?? "";
-                        activeDark = el.dataset.dark === "true";
-                    }
-                }
-            },
-            { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
-        );
-        for (const el of panelEls) {
-            if (el) observer.observe(el);
-        }
-        return () => observer.disconnect();
-    });
 </script>
 
 <svelte:window
@@ -1095,46 +1064,11 @@
     {/if}
 
     <div class="relative mt-6">
-        {#if useLegacyCarousel}
-            <!-- Legacy carousel: intentionally retained so this direction can
-                 be restored without rebuilding the galleries. -->
-            <div class="pointer-events-none sticky top-16 z-30 h-0">
-                <div
-                    class="px-4 py-4 sm:px-6 transition-colors duration-300 {activeDark
-                        ? 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]'
-                        : 'text-gray-900'}"
-                >
-                    <h2 class="text-4xl font-bold leading-tight">
-                        {activeRegion}{#if activeLabel}<br /><span
-                                class="font-normal">{activeLabel}</span
-                            >{/if}
-                    </h2>
-                </div>
-            </div>
-
-            <div id={slug("Paris")} class="scroll-mt-24">
-                {#each parisProjects as project, i (project.label)}
-                    <section
-                        bind:this={panelEls[i]}
-                        data-region="Paris"
-                        data-label={project.label}
-                        data-dark="true"
-                        class="relative"
-                    >
-                        <AutoCarousel
-                            images={project.images}
-                            aspect={galleryAspect}
-                            interval={6000}
-                        />
-                    </section>
-                {/each}
-            </div>
-        {:else}
-            <div
-                bind:this={storyEl}
-                id="case-study-gallery"
-                class="story scroll-mt-24"
-            >
+        <div
+            bind:this={storyEl}
+            id="case-study-gallery"
+            class="story scroll-mt-24"
+        >
                 <div class="case-study-compact-anchor">
                     {#if caseStudyNavCompact}
                         <nav
@@ -1236,54 +1170,22 @@
                         </article>
                     {/each}
                 </div>
-            </div>
-
-            {#if captionDebugMode}
-                <aside class="caption-debug-toolbar">
-                    <button
-                        type="button"
-                        onclick={copyCaptionPositions}
-                        disabled={adjustedCaptionCount === 0}
-                    >
-                        Copy positions ({adjustedCaptionCount})
-                    </button>
-                    {#if captionCopyState}
-                        <output aria-live="polite">{captionCopyState}</output>
-                    {/if}
-                </aside>
-            {/if}
-        {/if}
-
-        <!-- Temporarily hidden: Brittany, Provence, Overseas Territories
-        <div
-            id={slug("Brittany")}
-            bind:this={panelEls[4]}
-            data-region="Brittany"
-            data-label=""
-            data-dark="true"
-            class="relative mt-16 min-h-screen scroll-mt-24 py-8"
-        >
-            <AutoCarousel images={brittanyImages} aspect={galleryAspect} />
         </div>
 
-        <div
-            id={slug("Provence")}
-            bind:this={panelEls[5]}
-            data-region="Provence"
-            data-label=""
-            data-dark="false"
-            class="mt-16 min-h-screen scroll-mt-24"
-        ></div>
-
-        <div
-            id={slug("Overseas Territories")}
-            bind:this={panelEls[6]}
-            data-region="Overseas Territories"
-            data-label=""
-            data-dark="false"
-            class="mt-16 min-h-screen scroll-mt-24"
-        ></div>
-        -->
+        {#if captionDebugMode}
+            <aside class="caption-debug-toolbar">
+                <button
+                    type="button"
+                    onclick={copyCaptionPositions}
+                    disabled={adjustedCaptionCount === 0}
+                >
+                    Copy positions ({adjustedCaptionCount})
+                </button>
+                {#if captionCopyState}
+                    <output aria-live="polite">{captionCopyState}</output>
+                {/if}
+            </aside>
+        {/if}
     </div>
 
     <section

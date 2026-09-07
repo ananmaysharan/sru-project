@@ -3,7 +3,6 @@ export type EditorialSectionKey =
     | "dashboard-guide"
     | "supply"
     | "health-method"
-    | "health-chart"
     | "post-occupancy";
 
 type EditorialBlock =
@@ -24,9 +23,6 @@ const markerToKey = (line: string): EditorialSectionKey | null => {
     if (line.includes("INTRODUCTION PAGE")) return "introduction";
     if (line.includes("NYMBERS PAGE")) return "supply";
     if (line.includes("POST-OCCUPANCY EVALUATION PAGE")) return "post-occupancy";
-    if (line.includes("HEALTH OUTCOMES PAGE") && line.includes("before the quadrant")) {
-        return "health-chart";
-    }
     if (line.includes("HEALTH OUTCOMES PAGE")) return "health-method";
     return null;
 };

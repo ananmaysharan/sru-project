@@ -62,8 +62,6 @@
     const HL_OFFSET = 16;
     const HL_STAGGER_MS = 40;
 
-    const SHOW_GRIDLINES = false;
-
     const DESKTOP_TOP_MARGIN = 40;
     const DESKTOP_SIDE_MARGIN = 100;
     const MOBILE_TOP_MARGIN = 28;
@@ -182,7 +180,7 @@
         12: 528 / 408, 13: 1037 / 752, 14: 521 / 359, 15: 527 / 960,
         16: 446 / 323,
     };
-    // Placement hand-arranged in /skyline-editor, normalized to the line ends:
+    // Hand-arranged placement, normalized to the line ends:
     //   x    — center position along the line span (0 = 2000 end, 1 = 2025 end)
     //   w    — width as a fraction of the line span
     //   lift — base offset from the line (0 = on the line, + = lifted above)
@@ -564,23 +562,6 @@
                                 : 0}; transition: opacity {CARDS_DUR_MS}ms ease-out {cardsVisible
                                 ? i * 40
                                 : 0}ms, transform 180ms ease-out; transform-box: fill-box; transform-origin: center bottom; transform: scale({skyScale});"
-                        />
-                    {/each}
-                </g>
-            {/if}
-
-            {#if SHOW_GRIDLINES}
-                <g>
-                    {#each extendedStock as d (d.year)}
-                        {@const x = xScale(d.year)}
-                        <line
-                            x1={x}
-                            y1={topMargin}
-                            x2={x}
-                            y2={axisY}
-                            stroke={GRAPHICS_COLORS.grid}
-                            stroke-width="1"
-                            stroke-dasharray="3 4"
                         />
                     {/each}
                 </g>

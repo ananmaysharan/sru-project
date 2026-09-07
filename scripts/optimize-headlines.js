@@ -8,8 +8,6 @@ const ROOT = join(__dirname, '..');
 const SRC_DIR = join(ROOT, 'static/headlines');
 const OUT_DIR = join(ROOT, 'static/headlines/optimized');
 
-const THUMB_WIDTH = 600;
-const THUMB_QUALITY = 82;
 const FULL_WIDTH = 1800;
 const FULL_QUALITY = 88;
 
@@ -26,13 +24,7 @@ async function main() {
 		const { name } = parse(file);
 		const src = join(SRC_DIR, file);
 
-		const thumbPath = `${name}-thumb.webp`;
 		const fullPath = `${name}-full.webp`;
-
-		await sharp(src)
-			.resize({ width: THUMB_WIDTH, withoutEnlargement: true })
-			.webp({ quality: THUMB_QUALITY })
-			.toFile(join(OUT_DIR, thumbPath));
 
 		await sharp(src)
 			.resize({ width: FULL_WIDTH, withoutEnlargement: true })

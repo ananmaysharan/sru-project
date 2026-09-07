@@ -1,6 +1,5 @@
 export type Headline = {
 	id: string;
-	thumb: string;
 	full: string;
 	caption: string;
 	date: Date;
@@ -68,7 +67,6 @@ export const headlines: Headline[] = headlineFiles.map((file) => {
 	const date = parseFilename(file);
 	return {
 		id: file,
-		thumb: `/headlines/optimized/${file}-thumb.webp`,
 		full: `/headlines/optimized/${file}-full.webp`,
 		caption: file.trim().split(/\s+/).slice(0, 2).join(' '),
 		date,

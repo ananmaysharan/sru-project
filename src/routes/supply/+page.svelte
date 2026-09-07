@@ -1,6 +1,5 @@
 <script lang="ts">
     import Map from "$lib/components/maps/main-map/Map.svelte";
-    import EuropeanMap from "$lib/components/maps/european-map/EuropeanMap.svelte";
     import ResidencesStackedChart from "$lib/components/charts/ResidencesStackedChart.svelte";
     import SupplyPieChart from "$lib/components/charts/SupplyPieChart.svelte";
     import SupplyRegionalChart from "$lib/components/charts/SupplyRegionalChart.svelte";
@@ -12,8 +11,6 @@
     import editorialContent from "$lib/data/editorial-content.md?raw";
     import editorialContentFr from "$lib/data/editorial-content.fr.md?raw";
     import { language } from "$lib/i18n";
-
-    const showOriginalEuropeanMap = false;
 
     const copy = {
         fr: {
@@ -129,9 +126,6 @@
         <h2 class="section-title">{text.europeTitle}</h2>
         <p class="section-body">{text.europeBody}</p>
     </div>
-    {#if showOriginalEuropeanMap}
-        <div class="wide-column visual-block"><div class="map-frame"><EuropeanMap /></div></div>
-    {/if}
     <div class="wide-column atlas-block"><EuropeanAtlas /></div>
 
     <EditorialMarkdown source={$language === 'fr' ? editorialContentFr : editorialContent} section="supply" />

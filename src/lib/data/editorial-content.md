@@ -112,10 +112,6 @@ To link SRU implementation to broader questions of territorial justice and “mo
 
 Technically, the index is computed from a consolidated commune‑level master table that brings together SRU data, INSEE socio‑demographic indicators, environmental metrics and health‑access measures. The goal is to offer a transparent, configurable lens on the question: are we actually locating social housing in places that expand, rather than constrain, the life chances of its residents?
 
-**<u>THIS TEXT PORTION BELOW GOES IN HEALTH OUTCOMES PAGE \[before the quadrant cloud chart of communes\]</u>**
-
-This chart shows how far each commune has gone in building social housing versus the conditions it offers to its residents. Each dot is a commune. The horizontal axis shows the cumulative change in its share of social housing between 2005 and 2022, while the vertical axis shows either the weighted health-and-amenities index or one selected outcome (income, poverty, older adults, heat, energy performance, green space, healthcare access). Use the menu to switch outcomes, the search bar to find a specific commune, and the region legend to filter the cloud. Reading the quadrants from left to right, you can see which communes have increased social housing the most, and, higher or lower on the y‑axis, whether they have done so in places that offer better or worse conditions for “moving to opportunity.”
-
 **<u>THIS TEXT PORTION BELOW GOES IN POST-OCCUPANCY EVALUATION PAGE \[after what will be the interactive display of resident quotes\]</u>**
 
 **<u>Four housing regimes: reading SRU through territorial typologies</u>**

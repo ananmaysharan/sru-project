@@ -12,8 +12,6 @@
 
 	onMount(initializeLanguage);
 
-	// The skyline editor is a full-screen tool — hide the site chrome on it.
-	const bare = $derived(page.route.id === '/skyline-editor');
 	let routeScrollBehavior: string | null = null;
 	const scrollPositions = new Map<string, number>();
 	const scrollPositionKey = (pathname: string) => `sru-scroll:${pathname}`;
@@ -85,17 +83,13 @@
 	<meta name="theme-color" content="#ffffff" />
 	<title>{$language === 'fr' ? 'La Loi SRU : bilan après 25 ans' : 'The Loi SRU French social housing program, 25 years later'}</title>
 </svelte:head>
-{#if bare}
-	{@render children()}
-{:else}
-	<div class="flex min-h-screen flex-col">
-		<a class="skip-link" href="#main-content">
-			{$language === 'fr' ? 'Aller au contenu principal' : 'Skip to main content'}
-		</a>
-		<TableOfContents routeId={page.route.id} />
-		<main id="main-content" class="flex-1" tabindex="-1">
-			{@render children()}
-			<PageNavigation routeId={page.route.id} />
-		</main>
-	</div>
-{/if}
+<div class="flex min-h-screen flex-col">
+	<a class="skip-link" href="#main-content">
+		{$language === 'fr' ? 'Aller au contenu principal' : 'Skip to main content'}
+	</a>
+	<TableOfContents routeId={page.route.id} />
+	<main id="main-content" class="flex-1" tabindex="-1">
+		{@render children()}
+		<PageNavigation routeId={page.route.id} />
+	</main>
+</div>

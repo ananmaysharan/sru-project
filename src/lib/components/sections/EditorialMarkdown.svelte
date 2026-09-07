@@ -23,7 +23,6 @@
         introduction: "Introduction project essay",
         "dashboard-guide": "Using the dashboard",
         supply: "Methods and stance project essay",
-        "health-chart": "Health chart guidance",
         "health-method": "Health methods note",
         "post-occupancy": "Housing regimes project essay",
     };
@@ -32,7 +31,6 @@
 		introduction: 'Essai d’introduction au projet',
 		'dashboard-guide': 'Utiliser le tableau de bord',
 		supply: 'Méthodes et positionnement du projet',
-		'health-chart': 'Guide du graphique de santé',
 		'health-method': 'Note méthodologique sur la santé',
 		'post-occupancy': 'Essai sur les typologies de logement'
 	};
