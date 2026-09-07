@@ -123,10 +123,10 @@
 	}
 </script>
 
-<figure class="diagram" aria-labelledby="health-housing-title">
-	<p class="scroll-hint">
-		{$language === 'fr' ? 'Balayez horizontalement pour explorer tout le tableau' : 'Swipe horizontally to explore the full table'}
-	</p>
+<figure
+	class="diagram"
+	aria-label={$language === 'fr' ? 'Le logement, un déterminant de la santé' : 'How housing impacts health'}
+>
 	<div
 		class="diagram-scroll"
 		role="region"
@@ -141,7 +141,7 @@
 					width="2800"
 					height="406"
 				/>
-				<h2 id="health-housing-title">{#if $language === 'fr'}Le logement,<br /> un déterminant de la santé{:else}How Housing<br /> Impacts Health{/if}</h2>
+				<h2>{#if $language === 'fr'}Le logement,<br /> un déterminant de la santé{:else}How Housing<br /> Impacts Health{/if}</h2>
 			</header>
 
 			<div class="matrix-grid">
@@ -233,6 +233,51 @@
 		</div>
 	</div>
 
+	<div class="mobile-diagram">
+		<header class="mobile-header">
+			<h2>{#if $language === 'fr'}Le logement,<br />un déterminant de la santé{:else}How Housing<br />Impacts Health{/if}</h2>
+			<p>
+				{$language === 'fr'
+					? 'Ouvrez un résultat de santé pour consulter l’étude associée.'
+					: 'Open a health outcome to view its supporting study.'}
+			</p>
+		</header>
+
+		{#each subcategories as subcategory, subcategoryIndex (subcategory.key)}
+			{#if subcategoryIndex === 0 || subcategoryIndex === 2}
+				<h3 class="mobile-domain-title">
+					{label(subcategoryIndex === 0 ? 'Housing' : 'Environment')}
+				</h3>
+			{/if}
+			<section class="mobile-group" style={`--group-color:${groupColors[subcategory.key]};`}>
+				<h4>{label(subcategory.label)}</h4>
+				<div class="mobile-factor-list">
+					{#each HEALTH_HOUSING_ROWS.filter((row) => row.group === subcategory.key) as row (`mobile-${row.group}-${row.label}`)}
+						<article class="mobile-factor">
+							<h5>{label(row.label)}</h5>
+							<div class="mobile-outcomes">
+								{#each row.studies as study, outcomeIndex (`mobile-${row.label}-${outcomeIndex}`)}
+									{#if study}
+										<details>
+											<summary>
+												<span class="mobile-study-dot" aria-hidden="true"></span>
+												<span>{label(HEALTH_OUTCOMES[outcomeIndex])}</span>
+											</summary>
+											<div class="mobile-study">
+												<a href={study.url} target="_blank" rel="noreferrer">{study.title}</a>
+												<p>{HEALTH_HOUSING_CITATIONS[study.url]}</p>
+											</div>
+										</details>
+									{/if}
+								{/each}
+							</div>
+						</article>
+					{/each}
+				</div>
+			</section>
+		{/each}
+	</div>
+
 	{#if tooltip}
 		<div
 			id="health-housing-study-tooltip"
@@ -263,12 +308,8 @@
 		scrollbar-color: #a8a8a5 transparent;
 	}
 
-	.scroll-hint {
+	.mobile-diagram {
 		display: none;
-		margin: 0 0 0.65rem;
-		color: #666;
-		font-size: 0.78rem;
-		line-height: 1.35;
 	}
 
 	.diagram-board {
@@ -540,26 +581,130 @@
 	}
 
 	@media (max-width: 767px) {
-		.scroll-hint {
+		.diagram-scroll {
+			display: none;
+		}
+
+		.mobile-diagram {
 			display: block;
+			border: 1px solid #dadad7;
+			background: #fff;
 		}
 
-		.diagram-board,
-		.matrix-grid {
-			min-width: 1040px;
+		.mobile-header {
+			padding: 1.4rem 1.15rem 1.2rem;
+			border-bottom: 1px solid #dadad7;
 		}
 
-		.matrix-grid {
-			grid-template-columns: 48px 184px repeat(7, minmax(112px, 1fr));
+		.mobile-header h2 {
+			margin: 0;
+			font-size: clamp(1.8rem, 9vw, 2.35rem);
+			font-weight: 750;
+			letter-spacing: -0.04em;
+			line-height: 0.98;
 		}
 
-		.subcategory-label,
-		.factor-label {
-			left: 48px;
+		.mobile-header p {
+			margin: 0.85rem 0 0;
+			color: #666;
+			font-size: 0.86rem;
+			line-height: 1.45;
 		}
 
-		.skyline-header h2 {
-			padding-left: 20px;
+		.mobile-domain-title {
+			margin: 0;
+			padding: 1.35rem 1.15rem 0.7rem;
+			font-size: 1.15rem;
+			font-weight: 750;
+			letter-spacing: -0.02em;
+		}
+
+		.mobile-group {
+			border-top: 1px solid var(--group-color);
+		}
+
+		.mobile-group > h4 {
+			margin: 0;
+			padding: 0.7rem 1.15rem;
+			background: color-mix(in srgb, var(--group-color) 8%, white);
+			color: var(--group-color);
+			font-size: 0.8rem;
+			font-weight: 750;
+			letter-spacing: 0.015em;
+			line-height: 1.25;
+			text-transform: uppercase;
+		}
+
+		.mobile-factor-list {
+			display: grid;
+			gap: 0;
+		}
+
+		.mobile-factor {
+			padding: 1rem 1.15rem;
+			border-top: 1px solid #e6e6e3;
+		}
+
+		.mobile-factor h5 {
+			margin: 0 0 0.65rem;
+			font-size: 1rem;
+			font-weight: 700;
+			line-height: 1.25;
+		}
+
+		.mobile-outcomes {
+			display: grid;
+			gap: 0.45rem;
+		}
+
+		.mobile-outcomes details {
+			border: 1px solid #dadad7;
+			background: #fff;
+		}
+
+		.mobile-outcomes summary {
+			display: grid;
+			grid-template-columns: 0.65rem minmax(0, 1fr);
+			gap: 0.55rem;
+			align-items: start;
+			padding: 0.7rem 0.75rem;
+			font-size: 0.82rem;
+			font-weight: 600;
+			line-height: 1.35;
+			cursor: pointer;
+			list-style: none;
+		}
+
+		.mobile-outcomes summary::-webkit-details-marker {
+			display: none;
+		}
+
+		.mobile-study-dot {
+			display: block;
+			width: 0.55rem;
+			height: 0.55rem;
+			margin-top: 0.22rem;
+			border-radius: 999px;
+			background: var(--group-color);
+		}
+
+		.mobile-study {
+			padding: 0 0.75rem 0.8rem 1.95rem;
+			font-size: 0.76rem;
+			line-height: 1.45;
+		}
+
+		.mobile-study a {
+			color: #202020;
+			font-weight: 650;
+			text-decoration: underline;
+			text-decoration-color: var(--group-color);
+			text-underline-offset: 3px;
+		}
+
+		.mobile-study p {
+			margin: 0.45rem 0 0;
+			color: #666;
 		}
 	}
 
