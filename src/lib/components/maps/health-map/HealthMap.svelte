@@ -152,7 +152,7 @@
 				});
 				map.addSource('communes', {
 					type: 'geojson',
-					data: asset('/communes_2022_outre_mer.geojson'),
+					data: asset('/communes_2022_sru.geojson'),
 					promoteId: 'code'
 				});
 			}

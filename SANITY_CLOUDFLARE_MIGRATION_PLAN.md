@@ -2,9 +2,9 @@
 
 Status: implementation in progress on September 7, 2026.
 
-Last reviewed: September 7, 2026.
+Last reviewed: September 8, 2026.
 
-This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and production build pass. The current migration branch has 30 passing browser tests.
+This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and Sanity-backed production build pass. The current migration branch has 31 passing browser tests.
 
 This version of the plan does not include section or item reordering. All page and list structure will remain fixed in code.
 
@@ -60,6 +60,7 @@ The content migration is complete on branch `codex/sanity-text-migration`. Cloud
 44. The local refactor and published Sanity document both produce the same 122,668-byte canonical Post-Occupancy DOM as the saved baseline, including the same elements, classes, attributes, captions, quotes, and formatted essay.
 45. The final seven-document Studio schema and both website content modes build successfully. The six earlier Sanity documents retained their original timestamps after the missing-only import.
 46. The full Sanity backed suite passes all 30 tests, including bilingual Post-Occupancy content, caption attachment, project profiles, resident interactions, and mobile case-study navigation. A final seven-document dataset backup was saved.
+47. The 57 MiB commune fallback was replaced by a 2,180-feature SRU-only fallback of roughly 3 MiB, and the missing nationwide department fallback was restored at roughly 2.6 MiB. The Sanity-backed production build contains no file above Cloudflare Pages' 25 MiB limit, and all 31 tests pass, including the new fallback asset integrity check.
 
 All seven fixed documents and every page in the editing scope can now build from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed. The next implementation phase is Cloudflare Pages setup, followed by the publish webhook, final review, and ownership handoff.
 
@@ -266,12 +267,9 @@ The maps currently use:
 
 These sources are not Sanity content. They should remain under code control.
 
-There are two issues to resolve before a Cloudflare cutover:
+The Cloudflare map-file blockers are resolved on the migration branch. The former 59,760,696-byte commune file was only a runtime fallback for the normal remote PMTiles source. It has been replaced by a roughly 3 MiB file containing the 2,180 commune boundaries used by the SRU data. The missing nationwide department fallback has also been restored from the official 2022 Etalab boundary source. Both files can be regenerated with `npm run build-map-fallbacks`.
 
-1. `static/communes_2022_outre_mer.geojson` is 59,760,696 bytes. Cloudflare Pages has a 25 MiB limit for one static file. The file cannot be deployed to Pages in its current form. See the [Cloudflare Pages limits](https://developers.cloudflare.com/pages/platform/limits/).
-2. The main map still requests `/departments_2022_outre_mer_100m.geojson` in its fallback path, but that file is not present. This does not affect the main PMTiles path, but it can break the fallback when PMTiles fail.
-
-The recommended fix for the large GeoJSON file is to split the same features into several files under the Pages limit and combine them in the map code. This can preserve the exact geometry. Simplifying the geometry should only be considered if visual comparison proves that the map does not change. Another option is to host the large file outside Pages, but that adds another service to the handoff.
+The mainland and overseas views still need to be checked on the first Cloudflare deployment.
 
 ## What Sanity should control
 
@@ -600,6 +598,6 @@ The first implementation uses these decisions.
 3. Resource and bibliography items keep their current count and order. The editor may change their text and links.
 4. Cloudflare will first publish to a `pages.dev` address. A custom domain can be connected after the owner approves the site.
 5. Professor Magda Maaoui will own the GitHub repository, Sanity organization, and Cloudflare account after handoff.
-6. The large overseas commune file will be split into several local files without simplifying its geometry.
+6. The commune fallback contains only the 2,180 boundaries referenced by the SRU data. It retains their official 2022 geometry and remains under Cloudflare Pages' per-file limit.
 7. A normal content update may take a few minutes because Cloudflare must rebuild the static site after each Sanity publication.
 8. The local content will remain in the repository during the rollback period. It can be removed only after the owner accepts the editing system and a final Sanity export has been saved.
