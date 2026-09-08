@@ -1,13 +1,9 @@
 <script lang="ts">
     import { asset } from "$app/paths";
     import EditorialMarkdown from "$lib/components/sections/EditorialMarkdown.svelte";
-    import editorialContent from "$lib/data/editorial-content.md?raw";
-    import editorialContentFr from "$lib/data/editorial-content.fr.md?raw";
     import ProjectIdCard from "$lib/components/sections/ProjectIdCard.svelte";
     import type { ProjectCardAnchor } from "$lib/components/sections/project-card-position";
-    import { projectIdCards } from "$lib/data/project-id-cards";
     import type { CaseStudyImageId, CaseStudyProjectId } from "$lib/data/case-study-ids";
-    import { postOccupancyCaptionsFr, residentTopicsFr } from "$lib/data/post-occupancy.fr";
     import { language } from "$lib/i18n";
     import * as Select from "$lib/components/ui/select";
     import { onMount } from "svelte";
@@ -15,6 +11,10 @@
         COMPARISON_PALETTE,
         GRAPHICS_COLORS,
     } from "$lib/data/charts/chart-colors";
+    import type {PageData} from './$types';
+
+    let {data}: {data: PageData} = $props();
+    const text = $derived(data.content.text[$language]);
 
     type CaptionGridPosition =
         | "top-left"
@@ -118,7 +118,7 @@
     let visibleProjectCard = $state<CaseStudyProjectId | null>(null);
     let dismissedProjectCard: CaseStudyProjectId | null = null;
     const visibleProjectCardContent = $derived(
-        visibleProjectCard ? projectIdCards[visibleProjectCard] : undefined,
+        visibleProjectCard ? data.content.projectIdCards[visibleProjectCard] : undefined,
     );
     let projectCardAnchor = $state<ProjectCardAnchor>({ x: 0, y: 0 });
     let projectCardCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -165,7 +165,7 @@
         if (event.type === 'pointerenter' || event.type === 'focus') dismissedProjectCard = null;
         if (dismissedProjectCard === projectId) return;
         cancelProjectCardClose();
-        if (!projectIdCards[projectId]) {
+        if (!data.content.projectIdCards[projectId]) {
             visibleProjectCard = null;
             return;
         }
@@ -545,65 +545,8 @@
         "Overseas Territories": overseasTerritoriesProjects,
     };
 
-    const residentTopicsEn = [
-        {
-            id: "residential-pride",
-            label: "Residential pride and the symbolic value of place",
-            quotes: [
-                "We all felt like we’d won the lottery when we were allocated housing in this neighborhood.",
-                "I cried the day I saw how beautiful the apartment was and the view from my balcony. It opened up the field of possibilities.",
-                "I have a large studio, with an incredible view and a small balcony. I can see the Eiffel Tower, the Louvre, the Sacré Cœur, the Montparnasse Tower, and a bit of the Seine.",
-                "It nourishes the soul. I’m very proud to live here.",
-                "My daughter was even able to find a job at La Samaritaine, and it made her very proud. It’s also a source of pride for my daughters to live at La Samaritaine.",
-            ],
-        },
-        {
-            id: "retail-food-access",
-            label: "Everyday retail and food access",
-            quotes: [
-                "For my budget, it’s a bit of a food desert. There should be more supermarkets. Everything costs a fortune. I do my grocery shopping when I go to my parents’ place. My neighbors all have to take the metro to get to the nearest Lidl, which is still five metro stops away.",
-                "Sometimes the crowds are a bit much, but being in the heart of the city is priceless. We’re close to everything—except large supermarkets.",
-                "I’ve always done my shopping at the Aligre market. That suits me perfectly. It’s still a bit far and I have to take the metro, so we have to be two people if I’m heavily loaded with the shopping cart.",
-                "There’s a market on Sunday mornings on Rue de Montmartre, but the prices are prohibitive.",
-                "It’s a showcase neighborhood. So, there are a huge number of tourists. It’s really geared toward a tourist clientele.",
-            ],
-        },
-        {
-            id: "healthcare-access",
-            label: "Healthcare access and affordability",
-            quotes: [
-                "Around here, the problem is that there are a lot of health centers that charge extra fees, and depending on our complementary insurance, we’re not covered 100%, even when we have civil-servant insurance.",
-                "I’m in favor of local medicine, but it’s impossible to find a new primary care doctor in the neighborhood. So I see my doctor where I used to live before. Here, doctors all refuse to take new patients.",
-                "On the other hand, for all other care, I go nearby. I found a great dentist. Same for the ophthalmologist. Same for the imaging center. There are a huge number of care centers that are not necessarily cheap, that I find very luxurious, but for now they help me out.",
-            ],
-        },
-        {
-            id: "thermal-comfort",
-            label: "Thermal comfort and housing design in use",
-            quotes: [
-                "Our homes are not energy sieves, but we die of heat in the summer. They’re real thermal kettles. I have a small AC unit, but even with that, I can barely survive. So if I can, I escape to my parents’ place outside Paris.",
-                "At the Tour Bois-le-Prêtre, when the balconies were added by the architects, for a long time the neighbors were afraid to go out there to cool off and enjoy the view; it made them dizzy.",
-                "They installed these nice thermal curtains for us, which require a minimum of know-how for everyday maintenance. Many of my neighbors forget to open them and air out the whole apartment for at least ten minutes a day.",
-                "Here, this must have been the storage floor. So our apartment is attic-style, with a sloping ceiling. We’re right under the zinc roof. So, yes, in the summer, the whole envelope is hot, sometimes burning.",
-            ],
-        },
-        {
-            id: "cultural-capital",
-            label: "Cultural capital and proximity to amenities",
-            quotes: [
-                "I was able to take art history classes at the Louvre museum because it’s right next door. I wouldn’t have done it if I didn’t live in the neighborhood. The Louvre is what symbolizes my experience of this home. I spent wonderful hours studying there.",
-            ],
-        },
-        {
-            id: "governance-coordination",
-            label: "Governance, coordination and the “after” of flagship projects",
-            quotes: [
-                "These are all the questions about the post-inauguration phase that Paris Habitat and every social housing provider managing these more recent projects should be asking themselves. They honored their part of the deal. With a bit more coordination of resources at the neighborhood scale, we wouldn’t be having these problems in terms of access to services and well-being.",
-            ],
-        },
-    ];
+    const residentTopics = $derived(data.content.residentTopics[$language]);
 
-    const residentTopics = $derived($language === 'fr' ? residentTopicsFr : residentTopicsEn);
 
     const residentTopicColors = [
         GRAPHICS_COLORS.primary,
@@ -627,11 +570,18 @@
         ),
     );
 
-    let residentTopicPositions = $state(residentTopicsEn.map(
-        (_, topicIndex) => ((topicIndex + 0.5) / residentTopicsEn.length) * 100,
-    ));
+    function initialResidentTopicPositions() {
+        return data.content.residentTopics.en.map(
+            (_, topicIndex) => ((topicIndex + 0.5) / data.content.residentTopics.en.length) * 100,
+        );
+    }
 
-    const residentQuoteCount = residentTopicsEn.reduce((sum, topic) => sum + topic.quotes.length, 0);
+    function initialResidentQuoteCount() {
+        return data.content.residentTopics.en.reduce((sum, topic) => sum + topic.quotes.length, 0);
+    }
+
+    let residentTopicPositions = $state(initialResidentTopicPositions());
+    const residentQuoteCount = initialResidentQuoteCount();
     let residentQuotePositions = $state(Array.from({ length: residentQuoteCount },
         (_, quoteIndex) =>
             ((quoteIndex + 0.5) / residentQuoteCount) * 100,
@@ -677,9 +627,7 @@
             item.project.images.map((image, imageIndex) => {
                 const localizedImage = {
                     ...image,
-                    caption: $language === 'fr'
-                        ? postOccupancyCaptionsFr[image.id]
-                        : image.caption,
+                    caption: data.content.imageCaptions[$language][image.id],
                 };
                 return {
                     image: localizedImage,
@@ -949,62 +897,12 @@
 
 <section id="socio-econometrics" class="page-shell" lang={$language}>
     <div class="prose-column">
-        <h1 class="page-title">
-            {$language === 'fr'
-                ? 'Appel à développer plus d’évaluations de l’usage des bâtiments de logements sociaux'
-                : 'A call for more post‑occupancy evaluations'}
-        </h1>
-        <p class="page-intro-body">
-            {#if $language === 'fr'}
-                Cet appel propose de déplacer l’attention du nombre de logements sociaux produits
-                vers la manière dont ils sont effectivement habités. Dans le cadre de dispositifs
-                tels que la loi SRU, plus de vingt ans de projets ont désormais été réalisés, mais
-                très peu d’évaluations post-occupationnelles systématiques ont été menées en plaçant
-                au centre l’expérience des habitants, la performance des bâtiments et les effets à
-                l’échelle des quartiers. Ce projet appelle les urbanistes, architectes, bailleurs
-                sociaux, chercheurs et organisations de résidents à élaborer des méthodes communes,
-                rigoureuses et reproductibles pour évaluer la vie dans ces opérations. Ces méthodes
-                devraient combiner des indicateurs quantitatifs (confort, santé, entretien et
-                performance environnementale) avec des données qualitatives portant sur la dignité,
-                les usages quotidiens et le lien social.
-            {:else}
-            This call proposes to shift attention from how many social housing
-            units are delivered to how they are actually lived in. Under
-            frameworks such as the Loi SRU, we now have twenty‑plus years of
-            built projects, yet very few systematic post-occupancy evaluations
-            that center residents’ experiences, building performance, and
-            neighborhood effects. I am calling for planners, architects, housing
-            providers, researchers, and resident organizations to develop
-            shared, rigorous, and repeatable ways of assessing life in these
-            developments—combining quantitative indicators (comfort, health,
-            maintenance, environmental performance) with qualitative insights on
-            dignity, everyday use, and social relations.
+        <h1 class="page-title">{text.title}</h1>
+        {#each data.content.introduction[$language].blocks as block, blockIndex}
+            {#if block.type === 'paragraph'}
+                <p class:mt-5={blockIndex > 0} class="page-intro-body">{@html block.html}</p>
             {/if}
-        </p>
-        <p class="page-intro-body mt-5">
-            {#if $language === 'fr'}
-                L’objectif est d’aller au-delà des quotas de logements sociaux et des intentions
-                architecturales, afin de constituer une base de connaissances permettant
-                d’identifier ce qui fonctionne réellement, ce qui échoue et la manière dont les
-                futurs projets et politiques devraient être repensés. Cette page servira de
-                plateforme évolutive pour rassembler des outils, des études de cas et des
-                collaborations autour des évaluations post-occupationnelles dans le logement social,
-                et pour inviter d’autres acteurs à rejoindre cette démarche.
-            {:else}
-            The goal is to move beyond compliance metrics and architectural
-            intentions, and to build an evidence base that allows us to identify
-            what actually works, what fails, and how future projects and
-            policies should be revised. This page will serve as a living
-            platform to gather tools, case
-            studies, and collaborations around post-occupancy evaluations in
-            social housing, and to invite others to join this agenda.
-            {/if}
-        </p>
-        <p class="page-intro-body mt-5">
-            {$language === 'fr'
-                ? 'Cet appel s’appuie sur sept études de cas post-occupationnelles, de Paris à la Bretagne, de la Provence aux départements et territoires d’outre-mer. Les sept zooms ancrent ces questions dans des lieux concrets et des expériences vécues.'
-                : 'This call is grounded in seven post-occupancy case studies, from Paris to Brittany, Provence, and the overseas territories, that anchor these questions in concrete places and lived experiences.'}
-        </p>
+        {/each}
     </div>
 
     <div class="case-study-index-wrap">
@@ -1037,7 +935,7 @@
                             if (event.currentTarget.matches(':focus-visible')) showProjectCard(item.project.id, event);
                         }}
                         onblur={() => {
-                            if (projectIdCards[item.project.id]) scheduleProjectCardClose();
+                            if (data.content.projectIdCards[item.project.id]) scheduleProjectCardClose();
                         }}
                     >
                         <span class="case-study-thumbnail" aria-hidden="true">
@@ -1228,9 +1126,7 @@
     >
         <div class="resident-voices-inner">
             <h2 id="resident-voices-title" class="text-3xl font-bold">
-                {$language === 'fr'
-                    ? 'Les habitants évaluent les projets de logements'
-                    : 'Residents assess the housing projects'}
+                {text.residentVoicesTitle}
             </h2>
             <p id="resident-sankey-instructions" class="sr-only">
                 {$language === 'fr'
@@ -1367,7 +1263,7 @@
 </section>
 
 <EditorialMarkdown
-    source={$language === 'fr' ? editorialContentFr : editorialContent}
+    content={data.content.conclusion[$language]}
     section="post-occupancy"
 />
 

@@ -4,7 +4,7 @@ Status: implementation in progress on September 7, 2026.
 
 Last reviewed: September 7, 2026.
 
-This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and production build pass. The current migration branch has 28 passing browser tests.
+This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and production build pass. The current migration branch has 30 passing browser tests.
 
 This version of the plan does not include section or item reordering. All page and list structure will remain fixed in code.
 
@@ -12,7 +12,7 @@ The repository code does not need to remain frozen during the migration. We may 
 
 ## Implementation progress
 
-The first implementation checkpoint is complete on branch `codex/sanity-text-migration`.
+The content migration is complete on branch `codex/sanity-text-migration`. Cloudflare deployment and handoff remain.
 
 1. The approved baseline is commits `0a319d9` and `978efe3`.
 2. Sanity Studio is installed in `studio` with its own package and lock file.
@@ -55,8 +55,13 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 39. The local refactor and published Sanity document both produce the same 44,997-byte canonical Introduction DOM as the saved baseline, including the same elements, classes, attributes, links, and normalized text.
 40. The Studio schema and both website content modes build successfully. The five earlier Sanity documents retained their original timestamps after the missing-only import.
 41. The full Sanity backed suite passes all 28 tests, including focused English and French Introduction tests. A new dataset backup was saved after the import.
+42. The published Sanity dataset contains the `postOccupancyPage` document with three opening paragraphs, 44 image captions, five project cards, 40 card fields per language, six resident topics, 19 quotes, the final essay, and nine endnotes in each language.
+43. Image, project, card-field, topic, quote, heading, and endnote IDs are permanent. The build rejects missing, reordered, or changed relationships and rejects different project links between languages.
+44. The local refactor and published Sanity document both produce the same 122,668-byte canonical Post-Occupancy DOM as the saved baseline, including the same elements, classes, attributes, captions, quotes, and formatted essay.
+45. The final seven-document Studio schema and both website content modes build successfully. The six earlier Sanity documents retained their original timestamps after the missing-only import.
+46. The full Sanity backed suite passes all 30 tests, including bilingual Post-Occupancy content, caption attachment, project profiles, resident interactions, and mobile case-study navigation. A final seven-document dataset backup was saved.
 
-The migration branch can build Introduction, Resources, Bibliography, Supply, Health Outcomes, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
+All seven fixed documents and every page in the editing scope can now build from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed. The next implementation phase is Cloudflare Pages setup, followed by the publish webhook, final review, and ownership handoff.
 
 ## Goal
 

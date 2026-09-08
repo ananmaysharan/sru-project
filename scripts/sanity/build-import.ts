@@ -14,6 +14,18 @@ import {
     localHeroIntroduction,
     localIntroductionText,
 } from '../../src/lib/data/introduction-content';
+import {CASE_STUDY_IMAGE_IDS} from '../../src/lib/data/case-study-ids';
+import {
+    localPostOccupancyCaptions,
+    localPostOccupancyIntroduction,
+    localPostOccupancyText,
+    localResidentTopics,
+} from '../../src/lib/data/post-occupancy-content';
+import {
+    PROJECT_CARD_FIELD_IDS,
+    PROJECT_CARD_IDS,
+    projectIdCards,
+} from '../../src/lib/data/project-id-cards';
 import {parseEditorialStory} from '../../src/lib/utils/editorial-markdown';
 import {editorialStoryToPortableText} from './editorial-portable-text';
 
@@ -372,11 +384,106 @@ const introductionDocument = {
     endnotesFr: introductionStories.fr.introduction.endnotes,
 };
 
+const postOccupancyStories = {
+    en: {
+        introduction: editorialStoryToPortableText(
+            localPostOccupancyIntroduction.en,
+            'en',
+            'post-occupancy-introduction',
+        ),
+        conclusion: editorialStoryToPortableText(
+            parseEditorialStory(englishEditorialSource, 'post-occupancy'),
+            'en',
+            'post-occupancy',
+        ),
+    },
+    fr: {
+        introduction: editorialStoryToPortableText(
+            localPostOccupancyIntroduction.fr,
+            'fr',
+            'post-occupancy-introduction',
+        ),
+        conclusion: editorialStoryToPortableText(
+            parseEditorialStory(frenchEditorialSource, 'post-occupancy'),
+            'fr',
+            'post-occupancy',
+        ),
+    },
+};
+
+function toSanityImageCaptions(language: 'en' | 'fr') {
+    return CASE_STUDY_IMAGE_IDS.map((imageId) => ({
+        _key: imageId,
+        _type: 'imageCaption',
+        imageId,
+        caption: localPostOccupancyCaptions[language][imageId],
+    }));
+}
+
+function toSanityProjectCards(language: 'en' | 'fr') {
+    return PROJECT_CARD_IDS.map((projectId) => {
+        const card = projectIdCards[projectId];
+        if (!card) throw new Error(`Missing local project information card ${projectId}.`);
+        if (card.fields.length !== PROJECT_CARD_FIELD_IDS.length) {
+            throw new Error(`Unexpected local project information field count for ${projectId}.`);
+        }
+        return {
+            _key: projectId,
+            _type: 'projectCard',
+            projectId,
+            title: card.title[language],
+            fields: card.fields.map((field, fieldIndex) => ({
+                _key: PROJECT_CARD_FIELD_IDS[fieldIndex],
+                _type: 'projectCardField',
+                fieldId: PROJECT_CARD_FIELD_IDS[fieldIndex],
+                label: field.label[language],
+                value: field.value[language],
+                ...(field.href ? {url: field.href} : {}),
+            })),
+        };
+    });
+}
+
+function toSanityResidentTopics(language: 'en' | 'fr') {
+    return localResidentTopics[language].map((topic) => ({
+        _key: topic.id,
+        _type: 'residentTopic',
+        topicId: topic.id,
+        label: topic.label,
+        quotes: topic.quotes.map((text, quoteIndex) => {
+            const quoteId = `${topic.id}-${quoteIndex + 1}`;
+            return {_key: quoteId, _type: 'residentQuote', quoteId, text};
+        }),
+    }));
+}
+
+const postOccupancyDocument = {
+    _id: 'postOccupancyPage',
+    _type: 'postOccupancyPage',
+    titleEn: localPostOccupancyText.en.title,
+    titleFr: localPostOccupancyText.fr.title,
+    introductionEn: postOccupancyStories.en.introduction.blocks,
+    introductionFr: postOccupancyStories.fr.introduction.blocks,
+    residentVoicesTitleEn: localPostOccupancyText.en.residentVoicesTitle,
+    residentVoicesTitleFr: localPostOccupancyText.fr.residentVoicesTitle,
+    imageCaptionsEn: toSanityImageCaptions('en'),
+    imageCaptionsFr: toSanityImageCaptions('fr'),
+    projectCardsEn: toSanityProjectCards('en'),
+    projectCardsFr: toSanityProjectCards('fr'),
+    residentTopicsEn: toSanityResidentTopics('en'),
+    residentTopicsFr: toSanityResidentTopics('fr'),
+    conclusionEn: postOccupancyStories.en.conclusion.blocks,
+    conclusionFr: postOccupancyStories.fr.conclusion.blocks,
+    endnotesEn: postOccupancyStories.en.conclusion.endnotes,
+    endnotesFr: postOccupancyStories.fr.conclusion.endnotes,
+};
+
 const documents = [
     siteSettingsDocument,
     introductionDocument,
     supplyDocument,
     healthDocument,
+    postOccupancyDocument,
     resourcesDocument,
     bibliographyDocument,
 ];
@@ -414,6 +521,13 @@ console.log(`Introduction essay: ${introductionStories.en.introduction.blocks.le
 console.log(`Dashboard guide: ${introductionStories.en.dashboardGuide.blocks.length} English blocks, ${introductionStories.fr.dashboardGuide.blocks.length} French blocks`);
 console.log(`Introduction endnotes: ${introductionStories.en.introduction.endnotes.length} English, ${introductionStories.fr.introduction.endnotes.length} French`);
 console.log(`Acknowledgements: ${introductionStories.en.acknowledgements.blocks.length} English blocks, ${introductionStories.fr.acknowledgements.blocks.length} French blocks`);
+console.log(`Post-occupancy introduction: ${postOccupancyStories.en.introduction.blocks.length} English blocks, ${postOccupancyStories.fr.introduction.blocks.length} French blocks`);
+console.log(`Post-occupancy image captions: ${CASE_STUDY_IMAGE_IDS.length} English, ${CASE_STUDY_IMAGE_IDS.length} French`);
+console.log(`Post-occupancy project cards: ${PROJECT_CARD_IDS.length} English, ${PROJECT_CARD_IDS.length} French`);
+console.log(`Post-occupancy resident topics: ${localResidentTopics.en.length} English, ${localResidentTopics.fr.length} French`);
+console.log(`Post-occupancy resident quotes: ${localResidentTopics.en.reduce((total, topic) => total + topic.quotes.length, 0)} English, ${localResidentTopics.fr.reduce((total, topic) => total + topic.quotes.length, 0)} French`);
+console.log(`Post-occupancy conclusion: ${postOccupancyStories.en.conclusion.blocks.length} English blocks, ${postOccupancyStories.fr.conclusion.blocks.length} French blocks`);
+console.log(`Post-occupancy endnotes: ${postOccupancyStories.en.conclusion.endnotes.length} English, ${postOccupancyStories.fr.conclusion.endnotes.length} French`);
 console.log(`Relationship errors: ${errors.length}`);
 
 if (errors.length > 0) {

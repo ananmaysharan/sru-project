@@ -1,5 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {bilingualRichText, bilingualString, bilingualText, languageGroups} from '../helpers'
+import {bilingualRichText, bilingualString, languageGroups} from '../helpers'
 
 export const postOccupancyPage = defineType({
   name: 'postOccupancyPage',
@@ -8,11 +8,12 @@ export const postOccupancyPage = defineType({
   groups: languageGroups,
   fields: [
     ...bilingualString('title', 'Page title'),
-    ...bilingualString('deck', 'Page subtitle'),
-    ...bilingualText('introduction', 'Introduction'),
-    ...bilingualString('caseStudiesTitle', 'Case studies heading'),
+    ...bilingualRichText(
+      'introduction',
+      'Introduction',
+      'Keep the three existing paragraphs in their current order.',
+    ),
     ...bilingualString('residentVoicesTitle', 'Resident voices heading'),
-    ...bilingualText('residentVoicesIntroduction', 'Resident voices introduction'),
     defineField({
       name: 'imageCaptionsEn',
       title: 'Case study image captions (English)',
@@ -24,7 +25,7 @@ export const postOccupancyPage = defineType({
         disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
       },
       of: [defineArrayMember({type: 'imageCaption'})],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) => rule.required().length(44),
     }),
     defineField({
       name: 'imageCaptionsFr',
@@ -37,7 +38,7 @@ export const postOccupancyPage = defineType({
         disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
       },
       of: [defineArrayMember({type: 'imageCaption'})],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) => rule.required().length(44),
     }),
     defineField({
       name: 'projectCardsEn',
@@ -92,6 +93,30 @@ export const postOccupancyPage = defineType({
       validation: (rule) => rule.required().length(6),
     }),
     ...bilingualRichText('conclusion', 'Final essay'),
+    defineField({
+      name: 'endnotesEn',
+      title: 'Final essay notes (English)',
+      type: 'array',
+      group: 'english',
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
+      of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().length(9),
+    }),
+    defineField({
+      name: 'endnotesFr',
+      title: 'Final essay notes (French)',
+      type: 'array',
+      group: 'french',
+      options: {
+        sortable: false,
+        disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
+      },
+      of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().length(9),
+    }),
   ],
   preview: {prepare: () => ({title: 'Post occupancy evaluation page'})},
 })

@@ -7,6 +7,25 @@ export type ProjectIdCard = {
     fields: { label: Localized; value: Localized; href?: string }[];
 };
 
+export const PROJECT_CARD_IDS = [
+    'samaritaine',
+    'tour-bois-le-pretre',
+    'rue-jean-bart',
+    'talgen',
+    'les-jasmins',
+] as const satisfies readonly CaseStudyProjectId[];
+
+export const PROJECT_CARD_FIELD_IDS = [
+    'place',
+    'year',
+    'units',
+    'architect',
+    'cost',
+    'period',
+    'finance',
+    'notes',
+] as const;
+
 const labels = {
     place: { fr: 'Quartier, ville, région', en: 'Neighborhood, City, Region' },
     year: { fr: 'Année d’achèvement', en: 'Year Completed' },
