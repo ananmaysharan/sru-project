@@ -9,6 +9,11 @@ import {localizedResourceSections, type ResourceContentSection} from '../../src/
 import {localSiteSettings} from '../../src/lib/data/site-content';
 import {localSupplyText} from '../../src/lib/data/supply-content';
 import {localHealthMetricDefinitions, localHealthText} from '../../src/lib/data/health-content';
+import {
+    localAcknowledgements,
+    localHeroIntroduction,
+    localIntroductionText,
+} from '../../src/lib/data/introduction-content';
 import {parseEditorialStory} from '../../src/lib/utils/editorial-markdown';
 import {editorialStoryToPortableText} from './editorial-portable-text';
 
@@ -303,8 +308,73 @@ const healthDocument = {
     endnotesFr: healthMethods.fr.endnotes,
 };
 
+const introductionStories = {
+    en: {
+        hero: editorialStoryToPortableText(localHeroIntroduction.en, 'en', 'introduction-hero'),
+        introduction: editorialStoryToPortableText(
+            parseEditorialStory(englishEditorialSource, 'introduction'),
+            'en',
+            'introduction',
+        ),
+        dashboardGuide: editorialStoryToPortableText(
+            parseEditorialStory(englishEditorialSource, 'dashboard-guide'),
+            'en',
+            'dashboard-guide',
+        ),
+        acknowledgements: editorialStoryToPortableText(localAcknowledgements.en, 'en', 'acknowledgements'),
+    },
+    fr: {
+        hero: editorialStoryToPortableText(localHeroIntroduction.fr, 'fr', 'introduction-hero'),
+        introduction: editorialStoryToPortableText(
+            parseEditorialStory(frenchEditorialSource, 'introduction'),
+            'fr',
+            'introduction',
+        ),
+        dashboardGuide: editorialStoryToPortableText(
+            parseEditorialStory(frenchEditorialSource, 'dashboard-guide'),
+            'fr',
+            'dashboard-guide',
+        ),
+        acknowledgements: editorialStoryToPortableText(localAcknowledgements.fr, 'fr', 'acknowledgements'),
+    },
+};
+
+const introductionDocument = {
+    _id: 'introductionPage',
+    _type: 'introductionPage',
+    heroTitleEn: localIntroductionText.en.heroTitle,
+    heroTitleFr: localIntroductionText.fr.heroTitle,
+    bylineEn: localIntroductionText.en.byline,
+    bylineFr: localIntroductionText.fr.byline,
+    heroIntroductionEn: introductionStories.en.hero.blocks,
+    heroIntroductionFr: introductionStories.fr.hero.blocks,
+    supportersTitleEn: localIntroductionText.en.supportersTitle,
+    supportersTitleFr: localIntroductionText.fr.supportersTitle,
+    storyHousingTitleEn: localIntroductionText.en.storyHousingTitle,
+    storyHousingTitleFr: localIntroductionText.fr.storyHousingTitle,
+    storyHousingBodyEn: localIntroductionText.en.storyHousingBody,
+    storyHousingBodyFr: localIntroductionText.fr.storyHousingBody,
+    storyNewsTitleEn: localIntroductionText.en.storyNewsTitle,
+    storyNewsTitleFr: localIntroductionText.fr.storyNewsTitle,
+    storyNewsBodyEn: localIntroductionText.en.storyNewsBody,
+    storyNewsBodyFr: localIntroductionText.fr.storyNewsBody,
+    pageContentEn: [
+        ...introductionStories.en.introduction.blocks,
+        ...introductionStories.en.dashboardGuide.blocks,
+    ],
+    pageContentFr: [
+        ...introductionStories.fr.introduction.blocks,
+        ...introductionStories.fr.dashboardGuide.blocks,
+    ],
+    acknowledgementsEn: introductionStories.en.acknowledgements.blocks,
+    acknowledgementsFr: introductionStories.fr.acknowledgements.blocks,
+    endnotesEn: introductionStories.en.introduction.endnotes,
+    endnotesFr: introductionStories.fr.introduction.endnotes,
+};
+
 const documents = [
     siteSettingsDocument,
+    introductionDocument,
     supplyDocument,
     healthDocument,
     resourcesDocument,
@@ -339,6 +409,11 @@ console.log(`Supply endnotes: ${supplyMethods.en.endnotes.length} English, ${sup
 console.log(`Health metric definitions: ${localHealthMetricDefinitions.en.length} English, ${localHealthMetricDefinitions.fr.length} French`);
 console.log(`Health methods: ${healthMethods.en.blocks.length} English blocks, ${healthMethods.fr.blocks.length} French blocks`);
 console.log(`Health endnotes: ${healthMethods.en.endnotes.length} English, ${healthMethods.fr.endnotes.length} French`);
+console.log(`Introduction hero: ${introductionStories.en.hero.blocks.length} English blocks, ${introductionStories.fr.hero.blocks.length} French blocks`);
+console.log(`Introduction essay: ${introductionStories.en.introduction.blocks.length} English blocks, ${introductionStories.fr.introduction.blocks.length} French blocks`);
+console.log(`Dashboard guide: ${introductionStories.en.dashboardGuide.blocks.length} English blocks, ${introductionStories.fr.dashboardGuide.blocks.length} French blocks`);
+console.log(`Introduction endnotes: ${introductionStories.en.introduction.endnotes.length} English, ${introductionStories.fr.introduction.endnotes.length} French`);
+console.log(`Acknowledgements: ${introductionStories.en.acknowledgements.blocks.length} English blocks, ${introductionStories.fr.acknowledgements.blocks.length} French blocks`);
 console.log(`Relationship errors: ${errors.length}`);
 
 if (errors.length > 0) {

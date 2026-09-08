@@ -1,5 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {bilingualRichText, bilingualString, languageGroups} from '../helpers'
+import {bilingualRichText, bilingualString, bilingualText, languageGroups} from '../helpers'
 
 export const introductionPage = defineType({
   name: 'introductionPage',
@@ -15,6 +15,10 @@ export const introductionPage = defineType({
       'The paragraphs and links shown over the hero image.',
     ),
     ...bilingualString('supportersTitle', 'Supporters heading'),
+    ...bilingualString('storyHousingTitle', 'Housing story heading'),
+    ...bilingualText('storyHousingBody', 'Housing story description'),
+    ...bilingualString('storyNewsTitle', 'News story heading'),
+    ...bilingualText('storyNewsBody', 'News story description'),
     ...bilingualRichText(
       'pageContent',
       'Introduction and dashboard guide',
@@ -31,6 +35,7 @@ export const introductionPage = defineType({
         disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
       },
       of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().length(8),
     }),
     defineField({
       name: 'endnotesFr',
@@ -42,6 +47,7 @@ export const introductionPage = defineType({
         disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
       },
       of: [defineArrayMember({type: 'endnote'})],
+      validation: (rule) => rule.required().length(8),
     }),
   ],
   preview: {prepare: () => ({title: 'Introduction page'})},

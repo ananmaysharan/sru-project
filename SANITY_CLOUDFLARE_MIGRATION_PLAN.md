@@ -4,7 +4,7 @@ Status: implementation in progress on September 7, 2026.
 
 Last reviewed: September 7, 2026.
 
-This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and production build pass. The current migration branch has 22 passing browser tests.
+This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and production build pass. The current migration branch has 28 passing browser tests.
 
 This version of the plan does not include section or item reordering. All page and list structure will remain fixed in code.
 
@@ -50,8 +50,13 @@ The first implementation checkpoint is complete on branch `codex/sanity-text-mig
 34. The local refactor and published Sanity document both produce the same 463,784 character Health Outcomes `<main>` HTML and SHA-256 hash as the saved baseline.
 35. Both Health maps now catch WebGL initialization failures so the rest of the page remains usable if a map cannot start.
 36. The full Sanity backed suite passes all 26 tests, including focused English and French Health Outcomes tests. A new dataset backup was saved after the import.
+37. The published Sanity dataset contains the `introductionPage` document with seven fixed text fields, six hero paragraphs, both long-form sections, four acknowledgement groups, and eight endnotes in each language.
+38. Introduction rich text keeps permanent heading and note IDs. The build rejects missing fields, unsupported formatting, changed block structure, changed acknowledgement groups, and invalid endnote relationships.
+39. The local refactor and published Sanity document both produce the same 44,997-byte canonical Introduction DOM as the saved baseline, including the same elements, classes, attributes, links, and normalized text.
+40. The Studio schema and both website content modes build successfully. The five earlier Sanity documents retained their original timestamps after the missing-only import.
+41. The full Sanity backed suite passes all 28 tests, including focused English and French Introduction tests. A new dataset backup was saved after the import.
 
-The migration branch can build Resources, Bibliography, Supply, Health Outcomes, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
+The migration branch can build Introduction, Resources, Bibliography, Supply, Health Outcomes, and global site text from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed.
 
 ## Goal
 
