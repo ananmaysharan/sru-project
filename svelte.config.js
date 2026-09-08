@@ -1,5 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 
+const productionBasePath = process.env.DEPLOY_TARGET === 'cloudflare' ? '' : '/sru-project';
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
@@ -7,7 +9,7 @@ const config = {
 			fallback: '404.html'
 		}),
 		paths: {
-			base: process.argv.includes('dev') ? '' : '/sru-project'
+			base: process.argv.includes('dev') ? '' : productionBasePath
 		}
 	}
 };

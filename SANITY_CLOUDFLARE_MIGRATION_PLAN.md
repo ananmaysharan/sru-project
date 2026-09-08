@@ -61,6 +61,7 @@ The content migration is complete on branch `codex/sanity-text-migration`. Cloud
 45. The final seven-document Studio schema and both website content modes build successfully. The six earlier Sanity documents retained their original timestamps after the missing-only import.
 46. The full Sanity backed suite passes all 30 tests, including bilingual Post-Occupancy content, caption attachment, project profiles, resident interactions, and mobile case-study navigation. A final seven-document dataset backup was saved.
 47. The 57 MiB commune fallback was replaced by a 2,180-feature SRU-only fallback of roughly 3 MiB, and the missing nationwide department fallback was restored at roughly 2.6 MiB. The Sanity-backed production build contains no file above Cloudflare Pages' 25 MiB limit, and all 31 tests pass, including the new fallback asset integrity check.
+48. Production base paths are deployment-aware: GitHub Pages retains `/sru-project`, while `DEPLOY_TARGET=cloudflare` builds the site at `/`. The complete 31-test suite passes against live Sanity content in the Cloudflare root-path configuration.
 
 All seven fixed documents and every page in the editing scope can now build from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed. The next implementation phase is Cloudflare Pages setup, followed by the publish webhook, final review, and ownership handoff.
 
@@ -465,13 +466,15 @@ Connect the GitHub repository to Cloudflare Pages with these settings:
 * Build command: `npm run build`.
 * Output directory: `build`.
 * Node version: 22.
+* Production environment variable `CONTENT_SOURCE`: `sanity`.
+* Production environment variable `DEPLOY_TARGET`: `cloudflare`.
 
 Cloudflare supports Git builds, build settings, and environment variables. See the [Cloudflare Git integration guide](https://developers.cloudflare.com/pages/get-started/git-integration/).
 
 Make the SvelteKit base path depend on the hosting environment:
 
 * GitHub Pages keeps `/sru-project` during the review period.
-* Cloudflare Pages uses an empty base path.
+* Cloudflare Pages uses an empty base path when `DEPLOY_TARGET=cloudflare`.
 
 Keep GitHub Pages available while the Cloudflare version is tested. Do not change the public domain yet.
 

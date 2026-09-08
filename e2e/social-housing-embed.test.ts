@@ -2,10 +2,12 @@ import { expect, test } from '@playwright/test';
 
 test.use({ viewport: { width: 1500, height: 1000 } });
 
+const siteUrl = process.env.PLAYWRIGHT_SITE_URL
+    ?? `http://localhost:4173${process.env.PLAYWRIGHT_SITE_PATH ?? '/sru-project'}`;
+
 for (const language of ['en', 'fr']) {
     test(`housing growth stays visible when an iframe becomes shorter (${language})`, async ({ page }) => {
-        const site = process.env.PLAYWRIGHT_SITE_URL ?? 'http://localhost:4173/sru-project';
-        await page.setContent(`<iframe title="Housing story" src="${site}/?lang=${language}" style="width:1440px;height:900px;border:0"></iframe>`);
+        await page.setContent(`<iframe title="Housing story" src="${siteUrl}/?lang=${language}" style="width:1440px;height:900px;border:0"></iframe>`);
         const iframe = page.locator('iframe');
         const frame = page.frameLocator('iframe');
         const story = frame.locator('#story-scroll');
@@ -53,8 +55,7 @@ for (const language of ['en', 'fr']) {
 
 for (const embedWidth of [320, 280]) {
     test(`housing chart uses its full width in a ${embedWidth}px mobile embed`, async ({ page }) => {
-        const site = process.env.PLAYWRIGHT_SITE_URL ?? 'http://localhost:4173/sru-project';
-        await page.setContent(`<iframe title="Housing story" src="${site}/?lang=en" style="width:${embedWidth}px;height:600px;border:0"></iframe>`);
+        await page.setContent(`<iframe title="Housing story" src="${siteUrl}/?lang=en" style="width:${embedWidth}px;height:600px;border:0"></iframe>`);
         const frame = page.frameLocator('iframe');
         const story = frame.locator('#story-scroll');
         const path = story.locator('svg path');
