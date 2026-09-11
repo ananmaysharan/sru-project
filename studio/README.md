@@ -4,6 +4,8 @@ This folder contains the Sanity Studio used to edit the English and French text 
 
 The Studio connects to Sanity project `c5o3dddy` and the `production` dataset. It lists seven fixed documents. The editor can change text and links, but the website code controls page structure, item order, images, charts, maps, styles, and interactions.
 
+The hosted editor is available at <https://loi-sru-25.sanity.studio/>. Sign in with a Sanity account that belongs to the project.
+
 ## Local setup
 
 Use Node 22.13 or newer. From the repository root, run:
@@ -24,4 +26,4 @@ Build the editor with:
 npm run studio:build
 ```
 
-The public website does not read Sanity content yet. Keep the current local website content until the import and comparison checks pass.
+The Cloudflare Pages production site reads published content from Sanity. Publishing one of the seven documents triggers a production rebuild through the configured webhook.
