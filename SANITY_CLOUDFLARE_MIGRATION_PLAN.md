@@ -1,8 +1,8 @@
 # Sanity text editing and Cloudflare Pages migration plan
 
-Status: implementation in progress on September 7, 2026.
+Status: implementation in progress on September 11, 2026.
 
-Last reviewed: September 8, 2026.
+Last reviewed: September 11, 2026.
 
 This plan reflects the approved site after the recent cleanup. Commit `0a319d9` records the cleanup baseline. Commit `978efe3` updates the browser tests to match the current mobile case study navigator. The type check and Sanity-backed production build pass. The current migration branch has 31 passing browser tests.
 
@@ -12,7 +12,7 @@ The repository code does not need to remain frozen during the migration. We may 
 
 ## Implementation progress
 
-The content migration is complete on branch `codex/sanity-text-migration`. Cloudflare deployment and handoff remain.
+The content migration is complete on branch `codex/sanity-text-migration`. The first Cloudflare Pages deployment is live; the publish webhook, final review, and handoff remain.
 
 1. The approved baseline is commits `0a319d9` and `978efe3`.
 2. Sanity Studio is installed in `studio` with its own package and lock file.
@@ -62,8 +62,9 @@ The content migration is complete on branch `codex/sanity-text-migration`. Cloud
 46. The full Sanity backed suite passes all 30 tests, including bilingual Post-Occupancy content, caption attachment, project profiles, resident interactions, and mobile case-study navigation. A final seven-document dataset backup was saved.
 47. The 57 MiB commune fallback was replaced by a 2,180-feature SRU-only fallback of roughly 3 MiB, and the missing nationwide department fallback was restored at roughly 2.6 MiB. The Sanity-backed production build contains no file above Cloudflare Pages' 25 MiB limit, and all 31 tests pass, including the new fallback asset integrity check.
 48. Production base paths are deployment-aware: GitHub Pages retains `/sru-project`, while `DEPLOY_TARGET=cloudflare` builds the site at `/`. The complete 31-test suite passes against live Sanity content in the Cloudflare root-path configuration.
+49. The professor-owned `magdamaaoui/loi-sru-25` repository is connected to a Git-integrated Cloudflare Pages project. Its first production deployment of commit `d5702c6` succeeded at `https://loi-sru-25.pages.dev/` with live Sanity content. French and English switching, root-relative navigation, the Supply page, and the interactive Supply map were checked on the deployed site.
 
-All seven fixed documents and every page in the editing scope can now build from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the deployed production site has not changed. The next implementation phase is Cloudflare Pages setup, followed by the publish webhook, final review, and ownership handoff.
+All seven fixed documents and every page in the editing scope can now build from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the existing public domain has not been changed. The next implementation phase is the Sanity publish webhook, followed by final review and ownership handoff.
 
 ## Goal
 
