@@ -12,7 +12,7 @@ The repository code does not need to remain frozen during the migration. We may 
 
 ## Implementation progress
 
-The content migration is complete on branch `codex/sanity-text-migration`. The first Cloudflare Pages deployment is live; the publish webhook, final review, and handoff remain.
+The content migration is complete on branch `codex/sanity-text-migration`. The Cloudflare Pages deployment and Sanity publish webhook are live; the final review, domain decision, and ownership handoff remain.
 
 1. The approved baseline is commits `0a319d9` and `978efe3`.
 2. Sanity Studio is installed in `studio` with its own package and lock file.
@@ -63,8 +63,9 @@ The content migration is complete on branch `codex/sanity-text-migration`. The f
 47. The 57 MiB commune fallback was replaced by a 2,180-feature SRU-only fallback of roughly 3 MiB, and the missing nationwide department fallback was restored at roughly 2.6 MiB. The Sanity-backed production build contains no file above Cloudflare Pages' 25 MiB limit, and all 31 tests pass, including the new fallback asset integrity check.
 48. Production base paths are deployment-aware: GitHub Pages retains `/sru-project`, while `DEPLOY_TARGET=cloudflare` builds the site at `/`. The complete 31-test suite passes against live Sanity content in the Cloudflare root-path configuration.
 49. The professor-owned `magdamaaoui/loi-sru-25` repository is connected to a Git-integrated Cloudflare Pages project. Its first production deployment of commit `d5702c6` succeeded at `https://loi-sru-25.pages.dev/` with live Sanity content. French and English switching, root-relative navigation, the Supply page, and the interactive Supply map were checked on the deployed site.
+50. Sanity has an enabled `Rebuild Cloudflare Pages` webhook for the `production` dataset. It watches only the seven editable document types, sends `POST` requests for published create, update, and delete events, and ignores drafts and versions. Its private Cloudflare deploy-hook URL is stored only in Sanity and Cloudflare. A direct test request created production deployment `44b03fa2-d91c-4416-b8d3-6ed0912afd81`, which completed successfully in 2m19s; the live Supply page and map were rechecked afterward.
 
-All seven fixed documents and every page in the editing scope can now build from Sanity by setting `CONTENT_SOURCE=sanity`. Local content remains the default, and the existing public domain has not been changed. The next implementation phase is the Sanity publish webhook, followed by final review and ownership handoff.
+All seven fixed documents and every page in the editing scope now build from Sanity in production. Local content remains the default for local and GitHub Pages builds, and the existing public domain has not been changed. The next implementation phase is final review and ownership handoff.
 
 ## Goal
 
