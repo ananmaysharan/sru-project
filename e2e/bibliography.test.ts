@@ -29,9 +29,9 @@ test('French bibliography retains document text, inline links, and emphasis', as
     const reports = groups.nth(2);
     expect(await reports.innerText()).not.toMatch(/\(,|" , Paris|Clément Boisseuil|Emilie Moreau/);
     await expect(groups.first().locator('li').nth(2)).toContainText('Lance Freeman et Magda Maaoui');
-    // Existing source typography is intentional, not silently normalized.
-    await expect(groups.first().locator('li').first()).toContainText('Octobre 2025');
-    await expect(groups.nth(6).locator('li').nth(5)).toContainText('Libération(publié');
+    // Approved French typography corrections retain links and emphasis.
+    await expect(groups.first().locator('li').first()).toContainText('octobre 2025');
+    await expect(groups.nth(6).locator('li').nth(5)).toContainText('Libération (publié');
     await page.screenshot({ path: 'test-results/bibliography-fr-top.png' });
     await reports.scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'test-results/bibliography-fr-reports.png' });

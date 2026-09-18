@@ -42,6 +42,8 @@
 		return $language === 'fr' ? value.replace(/(\d)\.(\d)/g, '$1,$2').replace(/%/g, ' %') : value;
 	}
 	const timelineAccent = GRAPHICS_COLORS.primary;
+	const compactZoomOffset = () => mapContainer.clientWidth < 640 ? 1.2 : 0;
+	const minimumZoom = () => MAINLAND_ZOOM - compactZoomOffset();
 
 	function choroplethWithHover() {
 		return [
@@ -53,10 +55,9 @@
 	}
 
 	function flyTo(center: [number, number], zoom: number) {
-		const compactOffset = mapContainer?.clientWidth < 640 ? 1.2 : 0;
 		mapInstance?.flyTo({
 			center,
-			zoom: Math.max(3.4, zoom - compactOffset),
+			zoom: Math.max(minimumZoom(), zoom - compactZoomOffset()),
 			duration: 1500
 		});
 	}
@@ -153,14 +154,14 @@
 		protocol.add(departementsPmt);
 		maplibregl.addProtocol('pmtiles', protocol.tile);
 
-		const compactMap = mapContainer.clientWidth < 640;
 		let map: maplibregl.Map;
 		try {
 			map = new maplibregl.Map({
 				container: mapContainer,
 				style: `https://api.maptiler.com/maps/019c9bab-38a8-7ebc-bf4f-b90831ca3b2c/style.json?key=m3VGXFgqJJ3wGAftMEUC&language=${$language}`,
 				center: MAINLAND_CENTER,
-				zoom: compactMap ? 3.8 : MAINLAND_ZOOM,
+				zoom: minimumZoom(),
+				minZoom: minimumZoom(),
 				attributionControl: false
 			});
 		} catch (error) {
@@ -171,7 +172,15 @@
 		map.addControl(new maplibregl.AttributionControl({ compact: true }));
 		map.addControl(new maplibregl.NavigationControl());
 		mapInstance = map;
-		const resizeObserver = new ResizeObserver(() => map.resize());
+		const resizeObserver = new ResizeObserver(() => {
+			const wasAtMinimum = Math.abs(map.getZoom() - map.getMinZoom()) < 0.001;
+			map.resize();
+			const nextMinimum = minimumZoom();
+			if (map.getMinZoom() !== nextMinimum) {
+				map.setMinZoom(nextMinimum);
+				if (wasAtMinimum) map.setZoom(nextMinimum);
+			}
+		});
 		resizeObserver.observe(mapContainer);
 
 		map.on('load', async () => {

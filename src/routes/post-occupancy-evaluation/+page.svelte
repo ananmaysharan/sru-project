@@ -1244,8 +1244,8 @@
                                 }}
                             >
                                 <span class="sr-only">
-                                    {$language === 'fr' ? 'Catégorie' : 'Category'}: {item.topicLabel}.
-                                    {$language === 'fr' ? 'Citation' : 'Quote'} {quoteIndex + 1}:
+                                    {$language === 'fr' ? 'Catégorie\u00a0:' : 'Category:'} {item.topicLabel}.
+                                    {$language === 'fr' ? 'Citation' : 'Quote'} {quoteIndex + 1}{$language === 'fr' ? '\u00a0:' : ':'}
                                 </span>
                                 <span class="resident-quote-number" aria-hidden="true">
                                     {String(quoteIndex + 1).padStart(2, "0")}
@@ -1937,7 +1937,7 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 1px;
-            padding: 1px;
+            border-top: 1px solid #d6d6d2;
             background: #d6d6d2;
         }
 

@@ -9,7 +9,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/societe/article/2024/06/06/logements-sociaux-en-commission-le-senat-assouplit-encore-les-obligations-des-maires_6237625_3224.html"
             },
             {
-                "text": "Ané, Claire and Véronique Chocron. “Logements sociaux : un nombre record de communes « hors la loi ».” Le Monde, 7 décembre 2023.",
+                "text": "Ané, Claire et Véronique Chocron. “Logements sociaux : un nombre record de communes « hors la loi ».” Le Monde, 7 décembre 2023.",
                 "url": "https://www.lemonde.fr/societe/article/2023/12/06/creation-de-logements-sociaux-un-nombre-record-de-communes-sont-hors-la-loi_6204190_3224.html"
             },
             {
@@ -17,7 +17,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/societe/article/2024/06/20/legislatives-2024-quelles-solutions-a-la-crise-du-logement_6241561_3224.html"
             },
             {
-                "text": "Ané, Claire and Véronique Chocron. “Quotas de HLM : une réforme contestée.” Le Monde, 3 mai 2024.",
+                "text": "Ané, Claire et Véronique Chocron. “Quotas de HLM : une réforme contestée.” Le Monde, 3 mai 2024.",
                 "url": "https://www.lemonde.fr/societe/article/2024/05/03/pourquoi-le-gouvernement-veut-alleger-la-loi-sru-qui-a-permis-de-creer-1-million-de-logements-sociaux_6231397_3224.html"
             },
             {
@@ -33,7 +33,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/societe/article/2023/08/08/la-renovation-urbaine-a-t-elle-ameliore-la-mixite-sociale_6184813_3224.html"
             },
             {
-                "text": "Ané, Claire and Véronique Chocron. “Logement social : un nombre croissant de communes ne comblent pas leur retard.” Le Monde, 17 juin 2023.",
+                "text": "Ané, Claire et Véronique Chocron. “Logement social : un nombre croissant de communes ne comblent pas leur retard.” Le Monde, 17 juin 2023.",
                 "url": "https://www.lemonde.fr/societe/article/2023/06/17/logement-social-explosion-du-nombre-de-communes-qui-ne-respectent-pas-leurs-objectifs_6178061_3224.html"
             },
             {
@@ -77,7 +77,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/archives/article/2000/06/09/les-demolitions-nouveau-remede-miracle-a-la-deprime-des-cites-ghettos_3717083_1819218.html"
             },
             {
-                "text": "Chambon, Frédéric, and Gaëlle Dupont. “Quatre Volets d’intervention Pour Réaménager Le Tissu Urbain.” Le Monde, 8 mars 2000.",
+                "text": "Chambon, Frédéric et Gaëlle Dupont. “Quatre Volets d’intervention Pour Réaménager Le Tissu Urbain.” Le Monde, 8 mars 2000.",
                 "url": "https://www.lemonde.fr/archives/article/2000/03/08/quatre-volets-d-intervention-pour-reamenager-le-tissu-urbain_3684990_1819218.html"
             },
             {
@@ -105,7 +105,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.leparisien.fr/hauts-de-seine-92/logement-social-sept-villes-des-hauts-de-seine-n-ont-pas-assez-construit-et-vont-devoir-payer-09-12-2020-8413319.php"
             },
             {
-                "text": "Damecour, Anne-Sophie . “Logements sociaux : Asnières sort du rouge.” Le Parisien, 2 décembre 2018.",
+                "text": "Damecour, Anne-Sophie. “Logements sociaux : Asnières sort du rouge.” Le Parisien, 2 décembre 2018.",
                 "url": "https://www.leparisien.fr/hauts-de-seine-92/logement-social-asnieres-sort-de-la-liste-noire-02-12-2018-7959243.php"
             },
             {
@@ -153,11 +153,11 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.leparisien.fr/essonne-91/morigny-champigny-91150/morigny-champigny-trois-projets-pour-redynamiser-la-ville-15-10-2018-7919337.php"
             },
             {
-                "text": "Fieschi, Maxime. “Logement social dans les Yvelines : l’Etat relâche la pression sur six communes .” Le Parisien, 28 janvier 2020.",
+                "text": "Fieschi, Maxime. “Logement social dans les Yvelines : l’État relâche la pression sur six communes.” Le Parisien, 28 janvier 2020.",
                 "url": "https://www.leparisien.fr/yvelines-78/logement-social-dans-les-yvelines-l-etat-relache-la-pression-sur-six-communes-28-01-2020-8246934.php"
             },
             {
-                "text": "Frachet, Stéphane. “Logement social : l’Etat épingle sévèrement sept communes du Rhône défaillantes.” Les Échos, 4 janvier 2024.",
+                "text": "Frachet, Stéphane. “Logement social : l’État épingle sévèrement sept communes du Rhône défaillantes.” Les Échos, 4 janvier 2024.",
                 "url": "https://www.lesechos.fr/pme-regions/auvergne-rhone-alpes/logement-social-letat-epingle-severement-sept-communes-du-rhone-defaillantes-2044266"
             },
             {
@@ -165,7 +165,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/archives/article/1999/12/22/les-communes-se-verront-imposer-des-logements-hlm_3602046_1819218.html"
             },
             {
-                "text": "Giblin, Béatrice and Simon Ronai. “Politique de la ville : « Nous mesurons aujourd’hui combien il est plus facile d’agir sur le “bâti” que sur le peuplement et les pratiques sociales »” Le Monde, 8 août 2023.",
+                "text": "Giblin, Béatrice et Simon Ronai. “Politique de la ville : « Nous mesurons aujourd’hui combien il est plus facile d’agir sur le “bâti” que sur le peuplement et les pratiques sociales »” Le Monde, 8 août 2023.",
                 "url": "https://www.lemonde.fr/idees/article/2023/08/08/politique-de-la-ville-nous-mesurons-aujourd-hui-combien-il-est-plus-facile-d-agir-sur-le-bati-que-sur-le-peuplement-et-les-pratiques-sociales_6184825_3232.html"
             },
             {
@@ -229,7 +229,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/archives/article/2003/02/03/les-deputes-accordent-plus-de-libertes-aux-communes_307822_1819218.html"
             },
             {
-                "text": "Lefèvre, Christophe. “HLM : « Nous ne pourrons pas répondre aux demandes de l’Etat ».” Le Parisien, 15 décembre 2020.",
+                "text": "Lefèvre, Christophe. “HLM : « Nous ne pourrons pas répondre aux demandes de l’État ».” Le Parisien, 15 décembre 2020.",
                 "url": "https://www.leparisien.fr/val-d-oise-95/inapplicable-racket-26-maires-du-val-d-oise-reclament-la-revision-de-la-loi-sur-les-hlm-14-12-2020-8414258.php"
             },
             {
@@ -241,7 +241,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.leparisien.fr/hauts-de-seine-92/logements-sociaux-courbevoie-comble-son-manque-06-03-2019-8025804.php"
             },
             {
-                "text": "M., A. “Logement social : Emerainville devra payer plus de 30000 € d’amende.” Le Parisien, 9 janvier 2018.",
+                "text": "M., A. “Logement social : Emerainville devra payer plus de 30 000 € d’amende.” Le Parisien, 9 janvier 2018.",
                 "url": "https://www.leparisien.fr/seine-et-marne-77/logement-social-emerainville-devra-payer-plus-de-30000-eur-d-amende-08-01-2018-7489503.php"
             },
             {
@@ -249,7 +249,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.leparisien.fr/yvelines-78/le-manque-de-logements-sociaux-va-couter-5-millions-d-euros-au-chesnay-10-12-2020-8413591.php"
             },
             {
-                "text": "Mayer, Claire. “A Bordeaux , un retard de logements sociaux à rattraper.” Le Monde, 22 février 2020.",
+                "text": "Mayer, Claire. “À Bordeaux, un retard de logements sociaux à rattraper.” Le Monde, 22 février 2020.",
                 "url": "https://www.lemonde.fr/societe/article/2020/02/21/municipales-a-bordeaux-un-retard-de-logements-sociaux-a-rattraper_6030334_3224.html"
             },
             {
@@ -265,7 +265,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.leparisien.fr/seine-et-marne-77/emerainville-croissy-l-agglo-rejette-la-demande-d-exemption-de-logements-sociaux-02-07-2019-8108106.php"
             },
             {
-                "text": "Olagnol, Julie . “Émerainville : le maire s’explique sur la pénalité due au déficit de logements sociaux.” Le Parisien, 23 janvier 2018.",
+                "text": "Olagnol, Julie. “Émerainville : le maire s’explique sur la pénalité due au déficit de logements sociaux.” Le Parisien, 23 janvier 2018.",
                 "url": "https://www.leparisien.fr/seine-et-marne-77/emerainville-le-maire-s-explique-sur-la-penalite-due-au-deficit-de-logements-sociaux-22-01-2018-7516185.php"
             },
             {
@@ -273,47 +273,47 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.leparisien.fr/val-d-oise-95/auvers-sur-oise-pointe-du-doigt-pour-les-logements-sociaux-14-12-2020-8414234.php"
             },
             {
-                "text": "Persidat, Marie . “Auvers-sur-Oise : préserver le cadre de vie ou construire ?” Le Parisien, 26 novembre 2019.",
+                "text": "Persidat, Marie. “Auvers-sur-Oise : préserver le cadre de vie ou construire ?” Le Parisien, 26 novembre 2019.",
                 "url": "https://www.leparisien.fr/val-d-oise-95/municipales-a-auvers-sur-oise-le-dilemme-des-logements-sociaux-25-11-2019-8201298.php"
             },
             {
-                "text": "Persidat, Marie . “Parmain : les projets urbains inquiètent toujours les habitants .” Le Parisien, 1er octobre 2018.",
+                "text": "Persidat, Marie. “Parmain : les projets urbains inquiètent toujours les habitants.” Le Parisien, 1er octobre 2018.",
                 "url": "https://www.leparisien.fr/val-d-oise-95/parmain-les-projets-urbains-inquietent-toujours-les-habitants-30-09-2018-7907052.php"
             },
             {
-                "text": "Persidat, Marie . “Logements sociaux : la maire veut aller en justice.” Le Parisien, 12 janvier 2018.",
+                "text": "Persidat, Marie. “Logements sociaux : la maire veut aller en justice.” Le Parisien, 12 janvier 2018.",
                 "url": "https://www.leparisien.fr/val-d-oise-95/auvers-sur-oise-l-avenir-des-logements-sociaux-pourrait-se-regler-en-justice-11-01-2018-7496013.php"
             },
             {
-                "text": "Persidat, Marie . “Manque de logements sociaux : la ville va devoir payer plus de 1 M€.” Le Parisien, 12 février 2018.",
+                "text": "Persidat, Marie. “Manque de logements sociaux : la ville va devoir payer plus de 1 M€.” Le Parisien, 12 février 2018.",
                 "url": "https://www.leparisien.fr/val-d-oise-95/manque-de-logements-sociaux-a-auvers-sur-oise-la-ville-va-devoir-payer-plus-d-un-million-d-euros-11-02-2018-7553541.php"
             },
             {
-                "text": "Piffaretti , Alain. “Logements sociaux : sanction adoucie pour l’Etang-la-Ville, pénalisée par sa forêt.” Les Échos, 12 janvier 2024.",
+                "text": "Piffaretti, Alain. “Logements sociaux : sanction adoucie pour l’Etang-la-Ville, pénalisée par sa forêt.” Les Échos, 12 janvier 2024.",
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/logements-sociaux-sanction-adoucie-pour-letang-la-ville-penalisee-par-sa-foret-2045960"
             },
             {
-                "text": "Piffaretti , Alain. “Versailles augmente son taux de logements sociaux grâce à la loi 3DS.” Les Échos, 27 février 2022.",
+                "text": "Piffaretti, Alain. “Versailles augmente son taux de logements sociaux grâce à la loi 3DS.” Les Échos, 27 février 2022.",
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/versailles-augmente-son-taux-de-logements-sociaux-grace-a-la-loi-3ds-1389973"
             },
             {
-                "text": "Piffaretti , Alain. “Yvelines : 600 nouveaux logements programmés à Andrésy.” Les Échos, 2 juin 2022.",
+                "text": "Piffaretti, Alain. “Yvelines : 600 nouveaux logements programmés à Andrésy.” Les Échos, 2 juin 2022.",
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/yvelines-600-nouveaux-logements-programmes-a-andresy-1410877"
             },
             {
-                "text": "Piffaretti , Alain. “Yvelines : de nouvelles aides départementales en faveur du logement social.” Les Échos, 7 octobre 2021.",
+                "text": "Piffaretti, Alain. “Yvelines : de nouvelles aides départementales en faveur du logement social.” Les Échos, 7 octobre 2021.",
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/yvelines-de-nouvelles-aides-departementales-en-faveur-du-logement-social-1352806"
             },
             {
-                "text": "Piffaretti , Alain. “Logements sociaux : en Essonne, le cri d’alarme d’un maire de petite ville sur la mise en oeuvre de la loi.” Les Échos, 28 juin 2024.",
+                "text": "Piffaretti, Alain. “Logements sociaux : en Essonne, le cri d’alarme d’un maire de petite ville sur la mise en œuvre de la loi.” Les Échos, 28 juin 2024.",
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/logements-sociaux-en-essonne-le-cri-dalarme-dun-maire-de-petite-ville-sur-la-mise-en-oeuvre-de-la-loi-2104679"
             },
             {
-                "text": "Piffaretti , Alain. “Le Pecq réalise 90 nouveaux logements sociaux.” Les Échos, 2 mars 2022.",
+                "text": "Piffaretti, Alain. “Le Pecq réalise 90 nouveaux logements sociaux.” Les Échos, 2 mars 2022.",
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/le-pecq-realise-90-nouveaux-logements-sociaux-1390866"
             },
             {
-                "text": "Piffaretti , Alain. “Le département des Yvelines suspend ses aides pour les communes carencées en logements sociaux.” Les Échos, 13 octobre 2024.",
+                "text": "Piffaretti, Alain. “Le département des Yvelines suspend ses aides pour les communes carencées en logements sociaux.” Les Échos, 13 octobre 2024.",
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/le-departement-des-yvelines-suspend-ses-aides-pour-les-communes-carencees-en-logements-sociaux-2124896"
             },
             {
@@ -329,11 +329,11 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/les-decodeurs/article/2015/03/19/un-tiers-des-communes-concernees-bafouent-la-loi-sru_4596195_4355770.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle . “Logements sociaux : François Hollande confirme son intention de « préempter » des terrains.” Le Monde, 24 septembre 2015.",
+                "text": "Rey-Lefebvre, Isabelle. “Logements sociaux : François Hollande confirme son intention de « préempter » des terrains.” Le Monde, 24 septembre 2015.",
                 "url": "https://www.lemonde.fr/logement/article/2015/09/24/logements-sociaux-francois-hollande-confirme-son-intention-de-preempter-des-terrains_4770485_1653445.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle . “Logements sociaux : onze nouvelles villes mises à l’index.” Le Monde, 13 avril 2016.",
+                "text": "Rey-Lefebvre, Isabelle. “Logements sociaux : onze nouvelles villes mises à l’index.” Le Monde, 13 avril 2016.",
                 "url": "https://www.lemonde.fr/logement/article/2016/04/13/logements-sociaux-onze-nouvelles-villes-mises-a-l-index_4901067_1653445.html"
             },
             {
@@ -353,7 +353,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/logement/article/2015/02/09/des-villes-toujours-retives-aux-logements-sociaux_4572539_1653445.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle. “A qui doivent servir les logements sociaux?” Le Monde, 28 juin 2016.",
+                "text": "Rey-Lefebvre, Isabelle. “À qui doivent servir les logements sociaux ?” Le Monde, 28 juin 2016.",
                 "url": "https://www.lemonde.fr/idees/article/2016/06/30/a-qui-doivent-servir-les-logements-sociaux_4960964_3232.html"
             },
             {
@@ -361,7 +361,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/logement/article/2016/09/23/logement-les-senateurs-contre-la-mixite-sociale-imposee_5002346_1653445.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle. “Les députés entérinent un meilleur accueil des publics modestes dans tout le parc social .” Le Monde, 2 juillet 2016.",
+                "text": "Rey-Lefebvre, Isabelle. “Les députés entérinent un meilleur accueil des publics modestes dans tout le parc social.” Le Monde, 2 juillet 2016.",
                 "url": "https://www.lemonde.fr/logement/article/2016/07/02/les-deputes-enterinent-un-meilleur-accueil-des-publics-modestes-dans-tout-le-parc-social_4962346_1653445.html"
             },
             {
@@ -369,7 +369,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/archives/article/2002/02/10/reduire-et-recouvrer-les-impayes_4214109_1819218.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle and Sylvia Zappi. “Construction de HLM : les 36 villes que le gouvernement montre du doigt.” Le Monde, 26 octobre 2015.",
+                "text": "Rey-Lefebvre, Isabelle et Sylvia Zappi. “Construction de HLM : les 36 villes que le gouvernement montre du doigt.” Le Monde, 26 octobre 2015.",
                 "url": "https://www.lemonde.fr/logement/article/2015/10/26/logements-sociaux-l-etat-pointe-du-doigt-36-communes-refractaires_4796965_1653445.html"
             },
             {
@@ -385,7 +385,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/logements-sociaux-a-versailles-la-politique-des-petits-pas-2125650"
             },
             {
-                "text": "Sivan, Nicholas. “Logement social : cinq communes de l’Essonne épinglées par l’Etat.” Le Parisien, 4 mars 2018.",
+                "text": "Sivan, Nicholas. “Logement social : cinq communes de l’Essonne épinglées par l’État.” Le Parisien, 4 mars 2018.",
                 "url": "https://www.leparisien.fr/essonne-91/logement-social-cinq-communes-de-l-essonne-epinglees-par-l-etat-04-03-2018-7590015.php"
             },
             {
@@ -418,11 +418,11 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/societe/article/2024/03/28/le-droit-au-logement-regresse-critique-la-commission-nationale-consultative-des-droits-de-l-homme_6224698_3224.html"
             },
             {
-                "text": "Ané, Claire and Véronique Chocron. “Logements vacants : de timides résultats.” Le Monde, 29 juillet 2023.",
+                "text": "Ané, Claire et Véronique Chocron. “Logements vacants : de timides résultats.” Le Monde, 29 juillet 2023.",
                 "url": "https://www.lemonde.fr/societe/article/2023/07/28/lutte-contre-les-logements-vacants-une-prise-de-conscience-mais-des-resultats-timides_6183666_3224.html"
             },
             {
-                "text": "Ané, Claire and Véronique Chocron. “Guillaume Kasbarian, l’homme de la loi « antisquat », au logement.” Le Monde, 10 février 2024.",
+                "text": "Ané, Claire et Véronique Chocron. “Guillaume Kasbarian, l’homme de la loi « antisquat », au logement.” Le Monde, 10 février 2024.",
                 "url": "https://www.lemonde.fr/societe/article/2024/02/09/guillaume-kasbarian-l-homme-de-la-loi-antisquat-nomme-ministre-du-logement_6215560_3224.html"
             },
             {
@@ -438,7 +438,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/logement-le-maire-de-nanterre-patrick-jarry-tire-la-sonnette-dalarme-1882813"
             },
             {
-                "text": "Bronner, Luc. “Les élus de banlieue dénoncent le désintérêt de l’Etat.” Le Monde, 7 octobre 2008.",
+                "text": "Bronner, Luc. “Les élus de banlieue dénoncent le désintérêt de l’État.” Le Monde, 7 octobre 2008.",
                 "url": "https://www.lemonde.fr/societe/article/2008/10/06/les-elus-de-banlieue-denoncent-le-desinteret-de-l-etat_1103500_3224.html"
             },
             {
@@ -454,11 +454,11 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/societe/article/2005/11/03/les-banlieues-en-rupture_706239_3224.html"
             },
             {
-                "text": "Cazi, Emeline. “A quoi ressemblera l’Ile-de-France en 2040.” Le Monde, 28 février 2024.",
+                "text": "Cazi, Emeline. “À quoi ressemblera l’Île-de-France en 2040.” Le Monde, 28 février 2024.",
                 "url": "https://www.lemonde.fr/economie/article/2024/02/27/a-quoi-ressemblera-l-ile-de-france-en-2040_6218878_3234.html"
             },
             {
-                "text": "Cazi, Emeline, Yan Gauchard, Alexandre Lenoir, Claire Mayer, and Gilles Rof. “Les métropoles européennes face à une gentrification galopante.” Le Monde, 12 juillet 2023.",
+                "text": "Cazi, Emeline, Yan Gauchard, Alexandre Lenoir, Claire Mayer et Gilles Rof. “Les métropoles européennes face à une gentrification galopante.” Le Monde, 12 juillet 2023.",
                 "url": "https://www.lemonde.fr/economie/article/2023/07/11/les-metropoles-europeennes-face-a-une-gentrification-galopante_6181395_3234.html"
             },
             {
@@ -474,7 +474,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/societe/article/2022/11/16/paris-espere-atteindre-40-de-logement-social-ou-abordable-en-2035_6150036_3224.html"
             },
             {
-                "text": "Cosnard, Denis and Isabelle Rey-Lefebvre. “Le succès de l’accession solidaire à la propriété.” Le Monde, 16 novembre 2021.",
+                "text": "Cosnard, Denis et Isabelle Rey-Lefebvre. “Le succès de l’accession solidaire à la propriété.” Le Monde, 16 novembre 2021.",
                 "url": "https://www.lemonde.fr/societe/article/2021/11/15/logement-le-succes-des-organismes-de-foncier-solidaire-outil-antispeculatif_6102057_3224.html"
             },
             {
@@ -514,7 +514,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/archives/article/2002/01/11/la-cote-basque-etouffe-sous-la-demande-de-logements_4222368_1819218.html"
             },
             {
-                "text": "Gouge, Francis. “A Saint-Maur, le préfet veut imposer des HLM au maire.” Le Monde, 14 juin 2006.",
+                "text": "Gouge, Francis. “À Saint-Maur, le préfet veut imposer des HLM au maire.” Le Monde, 14 juin 2006.",
                 "url": "https://www.lemonde.fr/societe/article/2006/06/13/a-saint-maur-le-prefet-veut-imposer-des-hlm-au-maire_782898_3224.html"
             },
             {
@@ -538,7 +538,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/archives/article/2001/05/04/paris-lyon-et-marseille-font-la-chasse-au-plomb-dans-les-logements_4172797_1819218.html"
             },
             {
-                "text": "Le Monde. “La politique économique et sociale sous contrôle de l’Elysée.” Le Monde, 20 février 2003.",
+                "text": "Le Monde. “La politique économique et sociale sous contrôle de l’Élysée.” Le Monde, 20 février 2003.",
                 "url": "https://www.lemonde.fr/archives/article/2003/02/19/les-ministres-de-m-raffarin-sous-la-surveillance-de-m-chirac_309858_1819218.html"
             },
             {
@@ -574,7 +574,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lesechos.fr/pme-regions/outre-mer/la-reunion-un-ecoquartier-va-voir-le-jour-a-saint-leu-1280977"
             },
             {
-                "text": "Lepercq, Vincent. “Immobilier Ile-de-France : ces communes où les logements peuvent remplacer les bureaux vides.” Les Échos, 12 mars 2025.",
+                "text": "Lepercq, Vincent. “Immobilier Île-de-France : ces communes où les logements peuvent remplacer les bureaux vides.” Les Échos, 12 mars 2025.",
                 "url": "https://www.lesechos.fr/thema/articles/immobilier-ile-de-france-ces-communes-ou-les-logements-peuvent-remplacer-les-bureaux-vides-2153462"
             },
             {
@@ -610,7 +610,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/idees/article/2024/04/04/le-grand-paris-agent-de-gentrification-express_6225925_3232.html"
             },
             {
-                "text": "Revault d'Allonnes, David. “Face aux accusations d’immobilisme, M. Ayrault met en scène son calendrier: Budget, fiscalité, traité européen et logement sont prioritaires.” Le Monde, 23 août 2012.",
+                "text": "Revault d'Allonnes, David. “Face aux accusations d’immobilisme, M. Ayrault met en scène son calendrier : Budget, fiscalité, traité européen et logement sont prioritaires.” Le Monde, 23 août 2012.",
                 "url": null
             },
             {
@@ -618,7 +618,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/logement/article/2018/01/12/copropriete-normes-simplifiees-attribution-des-hlm-les-grandes-lignes-du-projet-de-loi_5240829_1653445.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle. “Villefranche-sur-Mer :Les astuces d’un maire pour échapper aux HLM.” Le Monde, 30 avril 2018.",
+                "text": "Rey-Lefebvre, Isabelle. “Villefranche-sur-Mer : Les astuces d’un maire pour échapper aux HLM.” Le Monde, 30 avril 2018.",
                 "url": "https://www.lemonde.fr/logement/article/2018/04/30/villefranche-sur-mer-les-astuces-d-un-maire-pour-echapper-aux-hlm_5292600_1653445.html"
             },
             {
@@ -650,11 +650,11 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/societe/article/2021/03/18/les-modestes-debuts-de-la-vente-de-hlm-par-action-logement_6073588_3224.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle. “Le renchérissement des logements creuse les inégalités entre communes, en Ile-de-France.” Le Monde, 23 janvier 2015.",
+                "text": "Rey-Lefebvre, Isabelle. “Le renchérissement des logements creuse les inégalités entre communes, en Île-de-France.” Le Monde, 23 janvier 2015.",
                 "url": "https://www.lemonde.fr/immobilier/article/2015/01/23/le-rencherissement-des-logements-creuse-les-inegalites-entre-communes-en-ile-de-france_4562658_1306281.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle . “Les députés entérinent un meilleur accueil des publics modestes dans tout le parc social.” Le Monde, 2 juillet 2016.",
+                "text": "Rey-Lefebvre, Isabelle. “Les députés entérinent un meilleur accueil des publics modestes dans tout le parc social.” Le Monde, 2 juillet 2016.",
                 "url": "https://www.lemonde.fr/logement/article/2016/07/02/les-deputes-enterinent-un-meilleur-accueil-des-publics-modestes-dans-tout-le-parc-social_4962346_1653445.html"
             },
             {
@@ -674,11 +674,11 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lemonde.fr/archives/article/2003/07/06/p-immobilier-de-loisir-piege-ou-plaisir_4277821_1819218.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle . “Les logements sociaux victimes de la crise et des municipales.” Le Monde, 28 janvier 2015.",
+                "text": "Rey-Lefebvre, Isabelle. “Les logements sociaux victimes de la crise et des municipales.” Le Monde, 28 janvier 2015.",
                 "url": "https://www.lemonde.fr/logement/article/2015/01/28/les-logements-sociaux-victimes-de-la-crise-et-des-municipales_4564966_1653445.html"
             },
             {
-                "text": "Rey-Lefebvre, Isabelle . “Les ventes de logements sociaux ne décollent pas.” Le Monde, 13 janvier 2015.",
+                "text": "Rey-Lefebvre, Isabelle. “Les ventes de logements sociaux ne décollent pas.” Le Monde, 13 janvier 2015.",
                 "url": "https://www.lemonde.fr/logement/article/2015/01/13/les-ventes-de-logements-sociaux-ne-decollent-pas_4555164_1653445.html"
             },
             {
@@ -686,7 +686,7 @@ export const resourceSectionsFr: { title: string; items: ResourceItem[] }[] = [
                 "url": "https://www.lesechos.fr/pme-regions/ile-de-france/val-doise-la-chambre-regionale-des-comptes-veut-une-politique-du-logement-plus-ambitieuse-1876939"
             },
             {
-                "text": "Rollot, Catherine. “La crise du logement s’impose dans la campagne: La Fondation Abbé Pierre propose aux candidats un \" contrat social \" sur le modèle du \" pacte écologique \" de 2007.” Le Monde, 2 février 2012.",
+                "text": "Rollot, Catherine. “La crise du logement s’impose dans la campagne : La Fondation Abbé Pierre propose aux candidats un \" contrat social \" sur le modèle du \" pacte écologique \" de 2007.” Le Monde, 2 février 2012.",
                 "url": "https://www.lemonde.fr/societe/article/2012/02/01/la-crise-du-logement-s-impose-dans-la-campagne_1637311_3224.html"
             },
             {

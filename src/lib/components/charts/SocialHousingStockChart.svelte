@@ -15,8 +15,10 @@
     interface Props {
         /** Normalized scroll progress through the story section, 0 → 1. */
         progress?: number;
+        /** Use the page's mobile breakpoint for the sequential news layout. */
+        mobileLayout?: boolean;
     }
-    let { progress = 0 }: Props = $props();
+    let { progress = 0, mobileLayout }: Props = $props();
 
     // --- Scroll choreography ------------------------------------------------
     // Each beat reads its own 0 → 1 slice of the overall scroll progress.
@@ -126,7 +128,7 @@
     }
 
     // -- Headline grid ------------------------------------------------------
-    // Headlines flow into a 9-column × 3-row grid below the chart. Each
+    // Headlines start in a 9-column × 3-row grid below the chart. Each
     // entry's column corresponds to its rough year cluster; rows go
     // top-to-bottom by date within the column.
     type HeadlineGridPos = { col: number; row: number };
@@ -164,7 +166,6 @@
     const COL_GAP = 12;
     const ROW_GAP = 8;
     const GRID_COLS = 9;
-    const GRID_WIDTH = GRID_COLS * HL_BOX_W + (GRID_COLS - 1) * COL_GAP;
     const HL_HOVER_SCALE = 2.5;
 
     let hoveredId = $state<string | null>(null);
@@ -258,7 +259,26 @@
 
     // Wix gives the embedded page a phone-sized layout viewport. Keep the
     // chart's desktop gutters from consuming nearly all of that width.
-    const compact = $derived(width > 0 && width < MOBILE_BREAKPOINT);
+    const compact = $derived(mobileLayout ?? (width > 0 && width < MOBILE_BREAKPOINT));
+    // Merge neighboring year clusters inward as the container narrows.
+    // Preserve the original layout when all nine columns fit, and keep dates
+    // independent of these positions so connectors still land on the data line.
+    const headlineColumns = $derived(Math.max(1, Math.min(
+        GRID_COLS,
+        Math.floor((width - 2 * CARD_INSET + COL_GAP) / (HL_BOX_W + COL_GAP)),
+    )));
+    const headlineGrid = $derived.by(() => {
+        const positions: Record<string, HeadlineGridPos> = {};
+        const rows = Array<number>(headlineColumns).fill(0);
+        const entries = Object.entries(HEADLINE_GRID).sort(
+            ([, a], [, b]) => a.col - b.col || a.row - b.row,
+        );
+        for (const [id, position] of entries) {
+            const column = Math.round((position.col - 1) * (headlineColumns - 1) / (GRID_COLS - 1));
+            positions[id] = {col: column + 1, row: ++rows[column]};
+        }
+        return {positions, rows: Math.max(...rows)};
+    });
     const topMargin = $derived(compact ? MOBILE_TOP_MARGIN : DESKTOP_TOP_MARGIN);
     const sideMargin = $derived(
         compact ? MOBILE_SIDE_MARGIN : DESKTOP_SIDE_MARGIN,
@@ -279,11 +299,12 @@
     let cardsHeight = $state(0);
 
     // Below-axis budget: the year labels plus whichever block — the policy cards
-    // or the 3-row news grid — is taller (they share the same band at different
+    // or the responsive news grid — is taller (they share the same band at different
     // scroll beats). Deriving it means trimming the cards grows the plot
     // automatically, with no hardcoded chart height.
     const newsBlock = $derived(
-        GRID_OFFSET + (compact ? HL_BOX_H : 3 * HL_BOX_H + 2 * ROW_GAP),
+        GRID_OFFSET + (compact ? HL_BOX_H : headlineGrid.rows * HL_BOX_H
+            + (headlineGrid.rows - 1) * ROW_GAP + HL_BOX_H * (HL_HOVER_SCALE - 1)),
     );
     const marginBottom = $derived(
         Math.max(BOX_OFFSET + cardsHeight, newsBlock) + 8,
@@ -334,16 +355,16 @@
         x: number;
         y: number;
     } {
-        const g = HEADLINE_GRID[h.id];
+        const g = headlineGrid.positions[h.id];
         if (g) {
-            // Center the grid within the chart's drawable area so the news
-            // block sits centered under the data line.
-            const gLeft =
-                sideMargin +
-                (Math.max(0, width - 2 * sideMargin) - GRID_WIDTH) /
-                    2;
+            const gridWidth = headlineColumns * HL_BOX_W + (headlineColumns - 1) * COL_GAP;
+            const gLeft = (width - gridWidth) / 2;
+            const centerX = gLeft + (g.col - 1) * (HL_BOX_W + COL_GAP) + HL_BOX_W / 2;
+            const halfWidth = HL_BOX_W * HL_HOVER_SCALE / 2;
             return {
-                x: gLeft + (g.col - 1) * (HL_BOX_W + COL_GAP) + HL_BOX_W / 2,
+                x: hoveredId === h.id
+                    ? Math.max(CARD_INSET + halfWidth, Math.min(width - CARD_INSET - halfWidth, centerX))
+                    : centerX,
                 y:
                     height -
                     marginBottom +
@@ -494,6 +515,7 @@
 
 <div
     bind:this={containerEl}
+    data-housing-chart
     class="relative isolate m-4 flex-1 w-[calc(100%-2rem)] bg-white"
     style="min-height: {minimumHeight}px;"
 >
@@ -682,9 +704,10 @@
                             {@const lineY = yScale(h.units)}
                             {@const below = pos.y > lineY}
                             {@const startY = below ? lineY + 3 : lineY - 3}
-                            {#if Math.abs(lineX - pos.x) < 12}
+                            {#if Math.abs(lineX - pos.x) < 0.01}
                                 <line
-                                    x1={pos.x}
+                                    data-headline-connector={h.id}
+                                    x1={lineX}
                                     y1={startY}
                                     x2={pos.x}
                                     y2={pos.y}
@@ -694,6 +717,7 @@
                             {:else}
                                 {@const midY = (startY + pos.y) / 2}
                                 <polyline
+                                    data-headline-connector={h.id}
                                     points="{lineX},{startY} {lineX},{midY} {pos.x},{midY} {pos.x},{pos.y}"
                                     fill="none"
                                     stroke={GRAPHICS_COLORS.contextStrong}
@@ -841,15 +865,13 @@
                 {#if h.frac >= domainLeft - 0.001}
                     {@const pos = getHeadlinePos(h)}
                     {@const isHovered = hoveredId === h.id}
-                    {@const col = HEADLINE_GRID[h.id]?.col}
-                    {@const xOrigin =
-                        col === 1 ? "0%" : col === GRID_COLS ? "100%" : "50%"}
                     <div
+                        data-headline={h.id}
                         role="presentation"
                         class="absolute border border-gray-300 bg-white select-none cursor-pointer"
                         style="left: {pos.x}px; top: {pos.y}px; width: {HL_BOX_W}px; height: {HL_BOX_H}px; transform: translateX(-50%) scale({isHovered
                             ? HL_HOVER_SCALE
-                            : 1}); transform-origin: {xOrigin} 0; transition: transform 180ms ease-out, opacity {CARDS_DUR_MS}ms ease-out {newsVisible
+                            : 1}); transform-origin: 50% 0; transition: left 180ms ease-out, transform 180ms ease-out, opacity {CARDS_DUR_MS}ms ease-out {newsVisible
                             ? i * HL_STAGGER_MS
                             : 0}ms; z-index: {isHovered
                             ? 20

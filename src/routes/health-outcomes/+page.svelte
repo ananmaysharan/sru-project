@@ -20,7 +20,7 @@
         <p class="page-intro-body">{text.intro}</p>
     </div>
 
-    <div class="wide-column visual-block map-frame">{#key $language}<HealthMap />{/key}</div>
+    <div class="wide-column visual-block map-frame health-overview-frame">{#key $language}<HealthMap />{/key}</div>
 
     <div class="prose-column section-copy"><h2 class="section-title">{text.cornerTitle}</h2></div>
     <div class="wide-column visual-block map-frame">{#key $language}<HealthMap mapState={cornerMapState} />{/key}</div>
@@ -47,3 +47,16 @@
 
     <EditorialMarkdown content={data.content.methods[$language]} section="health-method" compact />
 </section>
+
+<style>
+    @media (min-width: 768px) {
+        .health-overview-frame {
+            height: auto;
+        }
+
+        .health-overview-frame :global(.health-map) {
+            height: auto;
+            min-height: 40rem;
+        }
+    }
+</style>

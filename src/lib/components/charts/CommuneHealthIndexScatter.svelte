@@ -203,6 +203,13 @@
 	let xDomain = $state<[number, number]>([xDomainMin, xDomainMax]);
 	let yDomain = $state<[number, number]>(metricConfig.weighted.domain);
 	let brushZoomed = $state(false);
+	const canReset = $derived(
+		activeMetric !== 'weighted' || activeRanking !== null || hiddenRegions.size > 0 ||
+		searchQuery !== '' || !!searchValue || selectedPoint !== null || brushZoomed ||
+		Math.abs(xDomain[0] - xDomainMin) > 0.000001 || Math.abs(xDomain[1] - xDomainMax) > 0.000001 ||
+		Math.abs(yDomain[0] - metricConfig.weighted.domain[0]) > 0.000001 ||
+		Math.abs(yDomain[1] - metricConfig.weighted.domain[1]) > 0.000001
+	);
 	let yBounds = $derived(metricConfig[activeMetric].domain);
 	let transformedXScale = $derived(xScale.copy().domain(xDomain));
 	let transformedYScale = $derived(yScale.copy().domain(yDomain));
@@ -339,19 +346,16 @@
 	}
 
 	function fillForPoint(point: CommuneScatterPoint) {
-		if (hovered?.code === point.code) {
-			return GRAPHICS_COLORS.focus;
-		}
-
 		return colorForRegionName(point.region);
 	}
 
 	function opacityForPoint(point: CommuneScatterPoint) {
+		if (activePoint?.code === point.code) return 1;
 		if (selectedPoint && selectedPoint.code !== point.code) {
 			return 0.36;
 		}
 
-		return activePoint?.code === point.code ? 1 : 0.72;
+		return 0.72;
 	}
 
 	function radiusForPoint(point: CommuneScatterPoint) {
@@ -451,12 +455,13 @@
 	}
 
 	function resetChart() {
+		activeMetric = 'weighted';
 		activeRanking = null;
 		hiddenRegions.clear();
 		hovered = null;
 		brushZoomed = false;
 		clearSearch();
-		animateDomains([xDomainMin, xDomainMax], yBounds);
+		animateDomains([xDomainMin, xDomainMax], metricConfig.weighted.domain);
 	}
 
 	function buildLabelPlacements(labelPoints: CommuneScatterPoint[]) {
@@ -870,7 +875,7 @@
 					<Button
 						variant={activeRanking === 'Top 20' ? 'default' : 'outline'}
 						size="sm"
-						class="flex-1"
+						class="flex-1 active:translate-y-0"
 						onclick={() => setRankingFilter('Top 20')}
 					>
 						Top 20
@@ -878,7 +883,7 @@
 					<Button
 						variant={activeRanking === 'Bottom 20' ? 'default' : 'outline'}
 						size="sm"
-						class="flex-1"
+						class="flex-1 active:translate-y-0"
 						onclick={() => setRankingFilter('Bottom 20')}
 					>
 						{$language === 'fr' ? '20 derniers' : 'Worst 20'}
@@ -887,27 +892,12 @@
 			</div>
 		{/if}
 
-		<div class="region-legend" aria-label={$language === 'fr' ? 'Légende des régions' : 'Region legend'}>
-			<p class="control-label">{$language === 'fr' ? 'Régions' : 'Regions'}</p>
-			{#each regions as region (region)}
-				<button
-					type="button"
-					class="legend-item"
-					class:legend-off={hiddenRegions.has(region)}
-					class:legend-unrepresented={!representedRegions.has(region)}
-					aria-pressed={!hiddenRegions.has(region)}
-					onclick={() => toggleRegion(region)}
-				>
-					<span class="legend-swatch" style={`background:${colorForRegionName(region)}`}></span>
-					<span>{region}</span>
-				</button>
-			{/each}
-			<Button variant="outline" size="sm" class="mt-2 w-full" onclick={resetChart}>
-				{$language === 'fr' ? 'Réinitialiser' : 'Reset'}
-			</Button>
-		</div>
+		<Button variant="outline" size="sm" class="w-full active:translate-y-0" disabled={!canReset} onclick={resetChart}>
+			{$language === 'fr' ? 'Réinitialiser' : 'Reset'}
+		</Button>
 	</aside>
 
+	<div class="chart-column">
 		<div class="chart-panel" bind:this={chartPanelEl}>
 			<svg
 			viewBox={`0 0 ${width} ${height}`}
@@ -1085,6 +1075,24 @@
 			</div>
 		{/if}
 	</div>
+		<div class="region-legend" aria-label={$language === 'fr' ? 'Légende des régions' : 'Region legend'}>
+			<p class="control-label">{$language === 'fr' ? 'Régions' : 'Regions'}</p>
+			<div class="region-options">
+				{#each regions as region (region)}
+					<Button
+						variant="outline"
+						size="sm"
+						class={`legend-item rounded-full active:translate-y-0 max-w-full min-w-0 h-auto min-h-7 whitespace-normal text-left ${hiddenRegions.has(region) || !representedRegions.has(region) ? 'opacity-35' : 'opacity-100'}`}
+						aria-pressed={!hiddenRegions.has(region)}
+						onclick={() => toggleRegion(region)}
+					>
+						<span class="legend-swatch" style={`background:${colorForRegionName(region)}`}></span>
+						<span>{region}</span>
+					</Button>
+				{/each}
+			</div>
+		</div>
+	</div>
 </div>
 
 <style>
@@ -1112,6 +1120,13 @@
 		border-bottom: 1px solid #dadad7;
 		background: white;
 		padding: 16px;
+	}
+
+	.chart-column {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-width: 0;
 	}
 
 	.chart-panel {
@@ -1175,33 +1190,14 @@
 	}
 
 	.region-legend {
+		border-top: 1px solid #dadad7;
+		padding: 12px 16px;
+	}
+
+	.region-options {
 		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.legend-item {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		border: 0;
-		background: transparent;
-		color: #5f5f5f;
-		padding: 2px 0;
-		font-size: 12px;
-		text-align: left;
-	}
-
-	.legend-item:hover {
-		color: #121212;
-	}
-
-	.legend-off {
-		opacity: 0.35;
-	}
-
-	.legend-unrepresented {
-		opacity: 0.3;
+		flex-wrap: wrap;
+		gap: 8px;
 	}
 
 	.legend-swatch {
@@ -1210,6 +1206,19 @@
 		width: 10px;
 		height: 10px;
 		border: 1px solid #dadad7;
+		border-radius: 50%;
+	}
+
+	@media (max-width: 640px) {
+		.region-options {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.region-options :global(button) {
+			min-height: 2.5rem;
+			line-height: 1.15;
+		}
 	}
 
 	.brush-layer {

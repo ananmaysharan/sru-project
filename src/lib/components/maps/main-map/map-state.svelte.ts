@@ -38,8 +38,8 @@ export const OVERSEAS_REGIONS = [
 	{ name: 'Mayotte', center: [45.17, -12.84] as [number, number], zoom: 10 }
 ];
 
-export const MAINLAND_CENTER: [number, number] = [2.2, 46.6];
-export const MAINLAND_ZOOM = 5;
+export const MAINLAND_CENTER: [number, number] = [3.4, 46.6];
+export const MAINLAND_ZOOM = 4.5;
 
 export const REGION_LOOKUP: { name: string; center: [number, number]; zoom: number }[] = [
 	{ name: 'Auvergne-Rhône-Alpes', center: [4.5, 45.5], zoom: 7 },

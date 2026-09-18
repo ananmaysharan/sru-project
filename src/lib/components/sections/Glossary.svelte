@@ -16,9 +16,9 @@
 		<div>
 			<p class="font-semibold text-gray-900">{content.financingTitle}</p>
 			<ul class="mt-2 list-disc space-y-1 pl-5">
-				<li><strong>PLAI</strong> = {content.plai};</li>
-				<li><strong>PLUS</strong> = {content.plus};</li>
-				<li><strong>PLS</strong> = {content.pls};</li>
+				<li><strong>PLAI</strong> = {content.plai}{$language === 'fr' ? '\u00a0;' : ';'}</li>
+				<li><strong>PLUS</strong> = {content.plus}{$language === 'fr' ? '\u00a0;' : ';'}</li>
+				<li><strong>PLS</strong> = {content.pls}{$language === 'fr' ? '\u00a0;' : ';'}</li>
 				<li><strong>PLI</strong> = {content.pli}.</li>
 			</ul>
 		</div>
@@ -26,8 +26,8 @@
 		<div>
 			<p class="font-semibold text-gray-900">{content.providersTitle}</p>
 			<ul class="mt-2 list-disc space-y-1 pl-5">
-				<li><strong>OPH</strong> = {content.oph};</li>
-				<li><strong>ESH</strong> = {content.esh};</li>
+				<li><strong>OPH</strong> = {content.oph}{$language === 'fr' ? '\u00a0;' : ';'}</li>
+				<li><strong>ESH</strong> = {content.esh}{$language === 'fr' ? '\u00a0;' : ';'}</li>
 				<li><strong>SEM</strong> = {content.sem}.</li>
 			</ul>
 		</div>

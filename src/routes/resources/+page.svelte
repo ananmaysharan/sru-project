@@ -28,7 +28,7 @@
 										href={item.url}
 										target="_blank"
 										rel="noreferrer"
-										class="ml-1 text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900"
+										class="text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900"
 									>
 					{text.sourceLinkLabel}
 									</a>

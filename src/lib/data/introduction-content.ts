@@ -69,7 +69,7 @@ export const localAcknowledgements: Record<Language, EditorialStory> = {
             {type: 'paragraph', html: '<strong>Paris :</strong> toutes les images ont été réalisées en partenariat avec docar films (Rocío Calzado Lopez + Jasper Meurer).'},
             {type: 'paragraph', html: '<strong>Bretagne :</strong> Pierre Ewald, pour Palast.'},
             {type: 'paragraph', html: '<strong>Provence :</strong> Florence Vesval, pour Atelier Régis Roudil Architectes, 2021.'},
-            {type: 'paragraph', html: '<strong>DROM :</strong> Images 1 à 3: L’Atelier Architectes &amp; Ingénieurs, 2018. Image 4: La Possession, SEMADER, AERIS/A.DISS, 2025.'},
+            {type: 'paragraph', html: '<strong>DROM :</strong> Images 1 à 3 : L’Atelier Architectes &amp; Ingénieurs, 2018. Image 4 : La Possession, SEMADER, AERIS/A.DISS, 2025.'},
             {type: 'heading', level: 3, id: 'acknowledgements-team-fr', html: 'Équipe d’assistants de recherche'},
             {type: 'paragraph', html: 'Ananmay Sharan, Sebastian Rodriguez, Matt Thibodeau, Yihan Zhang, Anishta Khan'},
         ],

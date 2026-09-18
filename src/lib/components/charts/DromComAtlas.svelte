@@ -36,12 +36,12 @@
 		return value.toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US');
 	}
 
-	function territoryName(name: string) {
-		return $language === 'fr' && name === 'Guyane (French Guiana)' ? 'Guyane' : name;
+	function territoryName(name: string, locale = $language) {
+		return locale === 'fr' && name === 'Guyane (French Guiana)' ? 'Guyane' : name;
 	}
 
-	function translateMeta(value: string) {
-		if ($language === 'en') return value;
+	function translateMeta(value: string, locale = $language) {
+		if (locale === 'en') return value;
 		return ({
 			'South America': 'Amérique du Sud',
 			'Atlantic Ocean': 'Océan Atlantique',
@@ -115,8 +115,16 @@
 	});
 </script>
 
+{#snippet stableLabel(english: string, french: string)}
+	<span class="stable-label">
+		<span class="label-measure" aria-hidden="true">{english}</span>
+		<span class="label-measure" aria-hidden="true">{french}</span>
+		<span>{$language === 'fr' ? french : english}</span>
+	</span>
+{/snippet}
+
 <div class="overseas-atlas" data-visual="small-multiples">
-	<h4>{territoryName(selected.name)}</h4>
+	<h4>{@render stableLabel(territoryName(selected.name, 'en'), territoryName(selected.name, 'fr'))}</h4>
 	<div class="overseas-summary">
 		<div class="overseas-stat">
 			<p class="overseas-stat-value">{formatNumber(selected.population)}</p>
@@ -124,17 +132,17 @@
 		</div>
 		<div class="overseas-stat">
 			{#if selected.socialHousingRate !== null}
-				<p class="overseas-stat-value">{selected.socialHousingRate}%</p>
+				<p class="overseas-stat-value">{formatNumber(selected.socialHousingRate)}{$language === 'fr' ? '\u00a0%' : '%'}</p>
 			{:else}
 				<p class="overseas-stat-value overseas-stat-value--missing">{$language === 'fr' ? 'N/D' : 'N/A'}</p>
 			{/if}
-			<p class="overseas-stat-label">{$language === 'fr' ? 'Taux de logements sociaux' : 'Social Housing Rate'} ({selected.socialHousingYear})</p>
+			<p class="overseas-stat-label">{@render stableLabel(`Social Housing Rate (${selected.socialHousingYear})`, `Taux de logements sociaux (${selected.socialHousingYear})`)}</p>
 		</div>
 		<div class="overseas-meta-card">
-			{translateMeta(selected.location)}
+			{@render stableLabel(translateMeta(selected.location, 'en'), translateMeta(selected.location, 'fr'))}
 		</div>
 		<div class="overseas-meta-card">
-			{translateMeta(selected.status)}
+			{@render stableLabel(translateMeta(selected.status, 'en'), translateMeta(selected.status, 'fr'))}
 		</div>
 	</div>
 
@@ -159,13 +167,31 @@
 						vector-effect="non-scaling-stroke"
 					/>
 				</svg>
-				<span>{territoryName(territory.name)}</span>
+				{@render stableLabel(territoryName(territory.name, 'en'), territoryName(territory.name, 'fr'))}
 			</button>
 		{/each}
 	</div>
 </div>
 
 <style>
+	/* Both translations contribute to layout; only the active text is exposed. */
+	.stable-label {
+		display: grid;
+		min-width: 0;
+		width: 100%;
+	}
+
+	.stable-label > span {
+		grid-area: 1 / 1;
+		min-width: 0;
+	}
+
+	.label-measure {
+		visibility: hidden;
+		pointer-events: none;
+		user-select: none;
+	}
+
 	.overseas-atlas {
 		--atlas-gap: 0.75rem;
 

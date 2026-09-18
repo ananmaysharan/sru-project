@@ -85,13 +85,16 @@
 	]);
 
 	let tooltip = $state<Tooltip | null>(null);
+	let tooltipHeight = $state(0);
+	const tooltipTop = $derived(tooltip
+		? Math.max(12, Math.min(tooltip.y - tooltipHeight - 12, (typeof window === 'undefined' ? 900 : window.innerHeight) - tooltipHeight - 12))
+		: 12);
 
 	function tooltipPosition(x: number, y: number) {
 		const width = 330;
 		const maxX = Math.max(12, window.innerWidth - width - 12);
 		const nextX = Math.min(Math.max(12, x + 16), maxX);
-		const nextY = y > 170 ? y - 20 : y + 26;
-		return { x: nextX, y: nextY };
+		return { x: nextX, y };
 	}
 
 	function showPointerTooltip(
@@ -100,7 +103,9 @@
 		study: HealthHousingStudy,
 		color: string
 	) {
-		tooltip = { key, study, color, ...tooltipPosition(event.clientX, event.clientY) };
+		if (event.pointerType === 'touch') return;
+		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+		tooltip = { key, study, color, ...tooltipPosition(rect.right, rect.top) };
 	}
 
 	function showFocusTooltip(
@@ -121,7 +126,22 @@
 	function clearTooltip(key: string) {
 		if (tooltip?.key === key) tooltip = null;
 	}
+
+	function handleScroll() {
+		if (!tooltip) return;
+		const focused = document.activeElement;
+		if (focused instanceof HTMLElement && focused.matches('.study-link:focus')) {
+			const rect = focused.getBoundingClientRect();
+			if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
+				tooltip = {...tooltip, ...tooltipPosition(rect.right, rect.top)};
+				return;
+			}
+		}
+		tooltip = null;
+	}
 </script>
+
+<svelte:window onscroll={handleScroll} onresize={() => (tooltip = null)} onkeydown={(event) => { if (event.key === 'Escape') tooltip = null; }} />
 
 <figure
 	class="diagram"
@@ -130,7 +150,7 @@
 	<div
 		class="diagram-scroll"
 		role="region"
-		aria-label={$language === 'fr' ? 'Tableau interactif, défilement horizontal' : 'Interactive table, horizontal scrolling'}
+		aria-label={$language === 'fr' ? 'Tableau interactif des études' : 'Interactive study table'}
 	>
 		<div class="diagram-board">
 			<header class="skyline-header">
@@ -216,8 +236,6 @@
 									aria-describedby={tooltip?.key === key ? 'health-housing-study-tooltip' : undefined}
 									onpointerenter={(event) =>
 										showPointerTooltip(event, key, study, groupColors[row.group])}
-									onpointermove={(event) =>
-										showPointerTooltip(event, key, study, groupColors[row.group])}
 									onpointerleave={() => clearTooltip(key)}
 									onfocus={(event) =>
 										showFocusTooltip(event, key, study, groupColors[row.group])}
@@ -283,7 +301,8 @@
 			id="health-housing-study-tooltip"
 			class="study-tooltip"
 			role="tooltip"
-			style={`left:${tooltip.x}px;top:${tooltip.y}px;--tooltip-color:${tooltip.color};`}
+			bind:clientHeight={tooltipHeight}
+			style={`left:${tooltip.x}px;top:${tooltipTop}px;--tooltip-color:${tooltip.color};`}
 		>
 			<div class="study-tooltip-title">{tooltip.study.title}</div>
 			<div class="study-tooltip-citation">
@@ -295,6 +314,8 @@
 
 <style>
 	.diagram {
+		container-type: inline-size;
+		min-width: 0;
 		margin: 0;
 		font-family: 'Open Sans', Arial, ui-sans-serif, system-ui, sans-serif;
 		font-stretch: normal;
@@ -338,7 +359,7 @@
 		position: relative;
 		z-index: 1;
 		scroll-margin-top: 80px;
-		width: 210px;
+		width: 310px;
 		margin: 0;
 		padding: 22px 0 0 20px;
 		font-size: 21px;
@@ -351,11 +372,11 @@
 		display: grid;
 		grid-template-columns: 56px 208px repeat(7, minmax(138px, 1fr));
 		grid-template-rows:
-			30px 64px
-			20px repeat(2, 30px)
-			20px repeat(4, 30px)
-			20px repeat(3, 30px)
-			20px repeat(3, 30px);
+			minmax(36px, auto) minmax(112px, auto)
+			minmax(32px, auto) repeat(2, minmax(44px, auto))
+			minmax(32px, auto) repeat(4, minmax(44px, auto))
+			minmax(32px, auto) repeat(3, minmax(44px, auto))
+			minmax(32px, auto) repeat(3, minmax(44px, auto));
 		min-width: 1230px;
 	}
 
@@ -409,8 +430,6 @@
 	.outcome-spacer {
 		grid-column: 1 / 3;
 		grid-row: 1 / 3;
-		position: sticky;
-		left: 0;
 		z-index: 4;
 		border-bottom: 1px solid #dadad7;
 		background: #fff;
@@ -423,7 +442,7 @@
 		padding: 5px 7px;
 		border-right: 1px solid #dadad7;
 		border-bottom: 1px solid #dadad7;
-		font-size: 9px;
+		font-size: 11px;
 		font-weight: 600;
 		line-height: 1.15;
 		text-align: center;
@@ -435,8 +454,6 @@
 	}
 
 	.parent-category {
-		position: sticky;
-		left: 0;
 		z-index: 3;
 		display: flex;
 		align-items: center;
@@ -449,7 +466,7 @@
 	}
 
 	.parent-category span {
-		font-size: 9.5px;
+		font-size: 12px;
 		font-weight: 700;
 		letter-spacing: 0.02em;
 		line-height: 1.05;
@@ -459,8 +476,6 @@
 	}
 
 	.subcategory-label {
-		position: sticky;
-		left: 56px;
 		z-index: 3;
 		display: flex;
 		align-items: center;
@@ -469,7 +484,7 @@
 		border-bottom: 1px solid var(--group-color);
 		background: color-mix(in srgb, var(--group-color) 7%, white);
 		color: var(--group-color);
-		font-size: 8.5px;
+		font-size: 11px;
 		font-weight: 700;
 		line-height: 1.05;
 	}
@@ -480,8 +495,6 @@
 	}
 
 	.factor-label {
-		position: sticky;
-		left: 56px;
 		z-index: 2;
 		display: flex;
 		align-items: center;
@@ -489,7 +502,7 @@
 		border-right: 1px solid #dadad7;
 		border-bottom: 1px solid #dadad7;
 		background: #fff;
-		font-size: 10px;
+		font-size: 12px;
 		font-weight: 500;
 		line-height: 1.1;
 	}
@@ -554,7 +567,8 @@
 		position: fixed;
 		z-index: 100;
 		width: min(330px, calc(100vw - 24px));
-		transform: translateY(-100%);
+		max-height: calc(100dvh - 24px);
+		overflow-y: auto;
 		border: 1px solid #dadad7;
 		background: #fff;
 		box-shadow: 0 12px 28px rgb(18 18 18 / 0.16);
@@ -580,7 +594,7 @@
 		line-height: 1.4;
 	}
 
-	@media (max-width: 767px) {
+	@container (max-width: 1231px) {
 		.diagram-scroll {
 			display: none;
 		}
@@ -598,7 +612,7 @@
 
 		.mobile-header h2 {
 			margin: 0;
-			font-size: clamp(1.8rem, 9vw, 2.35rem);
+			font-size: clamp(1.8rem, 5cqi, 2.35rem);
 			font-weight: 750;
 			letter-spacing: -0.04em;
 			line-height: 0.98;
@@ -664,7 +678,7 @@
 
 		.mobile-outcomes summary {
 			display: grid;
-			grid-template-columns: 0.65rem minmax(0, 1fr);
+			grid-template-columns: 0.65rem minmax(0, 1fr) auto;
 			gap: 0.55rem;
 			align-items: start;
 			padding: 0.7rem 0.75rem;
@@ -679,6 +693,15 @@
 			display: none;
 		}
 
+		.mobile-outcomes summary::after {
+			content: '+';
+			color: #666;
+		}
+
+		.mobile-outcomes details[open] > summary::after {
+			content: '−';
+		}
+
 		.mobile-study-dot {
 			display: block;
 			width: 0.55rem;
@@ -689,6 +712,7 @@
 		}
 
 		.mobile-study {
+			overflow-wrap: anywhere;
 			padding: 0 0.75rem 0.8rem 1.95rem;
 			font-size: 0.76rem;
 			line-height: 1.45;
@@ -705,6 +729,16 @@
 		.mobile-study p {
 			margin: 0.45rem 0 0;
 			color: #666;
+		}
+	}
+
+	@container (min-width: 640px) and (max-width: 1231px) {
+		.mobile-factor-list {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.mobile-factor:nth-child(even) {
+			border-left: 1px solid #e6e6e3;
 		}
 	}
 

@@ -251,7 +251,7 @@
 
         <!-- Fill the viewport, allowing the frame to scroll in short embeds. -->
         <div class="flex flex-col flex-1 w-full">
-            <SocialHousingStockChart progress={chartProgress} />
+            <SocialHousingStockChart progress={chartProgress} mobileLayout={compactStory} />
         </div>
     </div>
 </section>

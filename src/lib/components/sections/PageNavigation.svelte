@@ -38,7 +38,7 @@
 	{#if nextRoute}
 		<a
 			href={resolve(nextRoute.href as '/')}
-			class="border border-gray-300 px-3 py-3 text-right text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900 sm:ml-auto"
+			class="border border-gray-300 px-3 py-3 text-right text-sm text-gray-700 hover:border-gray-900 hover:text-gray-900 sm:col-start-2"
 		>
 			<span class="block text-xs text-gray-500">
 				{settings.nextPage[$language]}

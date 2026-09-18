@@ -282,7 +282,7 @@
 			<Button
 				variant={selectedRegions.length === 0 ? 'default' : 'outline'}
 				size="sm"
-				class="rounded-full"
+				class="rounded-full active:translate-y-0"
 				aria-pressed={selectedRegions.length === 0}
 				aria-controls="noncompliance-list"
 				onclick={() => (selectedRegions = [])}
@@ -293,7 +293,7 @@
 				<Button
 					variant={selectedRegions.includes(region) ? 'default' : 'outline'}
 					size="sm"
-					class="rounded-full"
+					class="rounded-full active:translate-y-0"
 					aria-pressed={selectedRegions.includes(region)}
 					aria-controls="noncompliance-list"
 					onclick={() => toggleRegion(region)}
