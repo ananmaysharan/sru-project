@@ -19,7 +19,6 @@ if (!documents.some((document) => document._id === 'postOccupancyPage')) throw n
 let transaction = client.transaction()
 const expectedDocuments: Document[] = []
 for (const document of documents) {
-  let patch = client.patch(document._id).ifRevisionId(document._rev)
   const expected = structuredClone(document)
   let changed = false
   for (const [language, field] of [['en', 'projectCardsEn'], ['fr', 'projectCardsFr']] as const) {
@@ -44,13 +43,15 @@ for (const document of documents) {
     }
     console.log(`${document._id}.${field}: preserving ${cards.length} cards; adding ${missing.map((card) => card.projectId).join(', ') || 'none'}`)
     if (missing.length) {
-      patch = patch.append(field, missing)
       expected[field] = [...cards, ...missing]
       changed = true
     }
   }
   if (changed) {
-    transaction = transaction.patch(patch)
+    transaction = transaction.patch(client.patch(document._id).ifRevisionId(document._rev).set({
+      projectCardsEn: expected.projectCardsEn,
+      projectCardsFr: expected.projectCardsFr,
+    }))
     expectedDocuments.push(expected)
   }
 }
