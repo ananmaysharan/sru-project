@@ -46,10 +46,18 @@
         <h3>{card.title[$language]}</h3>
         <dl>
             {#each card.fields as field (`${field.label.en}-${field.value.en}`)}
-                <div>
-                    <dt>{field.label[$language]}</dt>
-                    <dd>{field.value[$language]}</dd>
-                </div>
+                {#if field.value[$language].trim()}
+                    <div>
+                        <dt>{field.label[$language]}</dt>
+                        <dd>
+                            {#if field.href}
+                                <a href={field.href} target="_blank" rel="noopener noreferrer">{field.value[$language]}</a>
+                            {:else}
+                                {field.value[$language]}
+                            {/if}
+                        </dd>
+                    </div>
+                {/if}
             {/each}
         </dl>
     </aside>
@@ -112,6 +120,12 @@
         color: #252525;
         font-size: 0.82rem;
         line-height: 1.45;
+    }
+
+    dd a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 0.15em;
     }
 
     @media (max-width: 639.98px) {

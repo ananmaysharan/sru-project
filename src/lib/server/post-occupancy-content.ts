@@ -171,7 +171,7 @@ function validateAndConvert(value: unknown): PostOccupancyPageContent {
 
         const cards = document.projectCards?.[language];
         if (!Array.isArray(cards) || cards.length !== PROJECT_CARD_IDS.length) {
-            throw new Error(`Expected five ${language} project information cards.`);
+            throw new Error(`Expected ${PROJECT_CARD_IDS.length} ${language} project information cards.`);
         }
         localizedCards[language] = cards as SanityProjectCard[];
 
@@ -226,8 +226,17 @@ function validateAndConvert(value: unknown): PostOccupancyPageContent {
             }
             requireText(englishField.label, `projectCards.en.${projectId}.${fieldId}.label`);
             requireText(frenchField.label, `projectCards.fr.${projectId}.${fieldId}.label`);
-            requireText(englishField.value, `projectCards.en.${projectId}.${fieldId}.value`);
-            requireText(frenchField.value, `projectCards.fr.${projectId}.${fieldId}.value`);
+            if (fieldId === 'notes') {
+                // Notes may be blank, but the fixed field remains available in Studio.
+                englishField.value ??= '';
+                frenchField.value ??= '';
+                if (typeof englishField.value !== 'string' || typeof frenchField.value !== 'string') {
+                    throw new Error(`Expected text for project ${projectId} notes.`);
+                }
+            } else {
+                requireText(englishField.value, `projectCards.en.${projectId}.${fieldId}.value`);
+                requireText(frenchField.value, `projectCards.fr.${projectId}.${fieldId}.value`);
+            }
             const englishHref = optionalLink(englishField.href, `projectCards.en.${projectId}.${fieldId}.href`);
             const frenchHref = optionalLink(frenchField.href, `projectCards.fr.${projectId}.${fieldId}.href`);
             if (englishHref !== frenchHref) {

@@ -103,7 +103,11 @@ export const projectCardField = defineType({
       title: 'Value',
       type: 'text',
       rows: 3,
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.custom((value, context) => {
+        const parent = context.parent as {fieldId?: string} | undefined
+        if (parent?.fieldId === 'notes') return true
+        return typeof value === 'string' && value.trim() ? true : 'A value is required.'
+      }),
     }),
     defineField({
       name: 'url',

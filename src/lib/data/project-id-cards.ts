@@ -13,6 +13,8 @@ export const PROJECT_CARD_IDS = [
     'rue-jean-bart',
     'talgen',
     'les-jasmins',
+    'gignac-la-nerthe',
+    'marechal-fayolle',
 ] as const satisfies readonly CaseStudyProjectId[];
 
 export const PROJECT_CARD_FIELD_IDS = [
@@ -38,6 +40,32 @@ const labels = {
 } satisfies Record<string, Localized>;
 
 export const projectIdCards: Partial<Record<CaseStudyProjectId, ProjectIdCard>> = {
+    'gignac-la-nerthe': {
+        title: { fr: '8 logements intermédiaires sociaux', en: '8 logements intermédiaires sociaux' },
+        fields: [
+            { label: labels.place, value: { fr: 'Gignac-la-Nerthe, Côte d’Azur (Alpes-Maritimes)', en: 'Gignac-la-Nerthe, French Riviera (Alpes-Maritimes)' } },
+            { label: labels.year, value: { fr: '2021', en: '2021' } },
+            { label: labels.units, value: { fr: '8', en: '8' } },
+            { label: labels.architect, value: { fr: 'Atelier Régis Roudil Architectes', en: 'Atelier Régis Roudil Architectes' }, href: 'https://www.regisroudil.fr/projet/8-logements-intermediaires-sociaux/' },
+            { label: labels.cost, value: { fr: '1,08 million d’euros', en: '€1.08 million' } },
+            { label: labels.period, value: { fr: '18–21 mois', en: '18–21 months' } },
+            { label: labels.finance, value: { fr: 'PLS, PLUS, PLAI', en: 'PLS, PLUS, PLAI' }, href: 'https://basedespermis.fr/autorisation-pc-01304317f0041-2017-08-10#caracteristiques-projet' },
+            { label: labels.notes, value: { fr: '', en: '' } },
+        ],
+    },
+    'marechal-fayolle': {
+        title: { fr: 'Logements de l’avenue du Maréchal-Fayolle', en: 'Apartments on Ave. Maréchal Fayolle' },
+        fields: [
+            { label: labels.place, value: { fr: '16e arrondissement, Paris, Île-de-France', en: '16th arrondissement, Paris, Île-de-France' } },
+            { label: labels.year, value: { fr: '2018', en: '2018' } },
+            { label: labels.units, value: { fr: '100', en: '100' } },
+            { label: labels.architect, value: { fr: 'SANAA', en: 'SANAA' } },
+            { label: labels.cost, value: { fr: 'environ 17 millions d’euros', en: '~€17 million' }, href: 'https://www.darchitectures.com/magazine/rubriques/breves/3626-paris-16e-inauguration-des-logements-sociaux-controverses-de-lagence-sanaa.html' },
+            { label: labels.period, value: { fr: '9 ans* (*concours en 2007)', en: '9 years* (*competition in 2007)' } },
+            { label: labels.finance, value: { fr: 'PLAI, PLUS, PLS, bail emphytéotique', en: 'PLAI, PLUS, PLS, emphyteutic lease' } },
+            { label: labels.notes, value: { fr: 'Résultat d’un concours d’architecture.', en: 'Result of an architecture competition.' } },
+        ],
+    },
     samaritaine: {
         title: { fr: 'La Samaritaine', en: 'La Samaritaine' },
         fields: [

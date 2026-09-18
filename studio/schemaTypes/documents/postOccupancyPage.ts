@@ -51,7 +51,7 @@ export const postOccupancyPage = defineType({
         disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
       },
       of: [defineArrayMember({type: 'projectCard'})],
-      validation: (rule) => rule.required().length(5),
+      validation: (rule) => rule.required().length(7),
     }),
     defineField({
       name: 'projectCardsFr',
@@ -64,7 +64,7 @@ export const postOccupancyPage = defineType({
         disableActions: ['add', 'addBefore', 'addAfter', 'remove', 'duplicate', 'copy'],
       },
       of: [defineArrayMember({type: 'projectCard'})],
-      validation: (rule) => rule.required().length(5),
+      validation: (rule) => rule.required().length(7),
     }),
     defineField({
       name: 'residentTopicsEn',

@@ -55,6 +55,8 @@ for (const language of ['en', 'fr']) {
             ['Rue Jean-Bart', language === 'fr' ? '12, rue Jean-Bart' : '12 Rue Jean-Bart'],
             ['Talgen', 'Talgen'],
             ['Les Jasmins · La Réunion', language === 'fr' ? 'Les Jasmins, écoquartier Cœur de Ville' : 'Les Jasmins, Cœur de Ville Eco-District'],
+            ['Gignac-la-Nerthe', '8 logements intermédiaires sociaux'],
+            ['Maréchal Fayolle', language === 'fr' ? 'Logements de l’avenue du Maréchal-Fayolle' : 'Apartments on Ave. Maréchal Fayolle'],
         ]) {
             await page.mouse.move(5, 5);
             await expect(card).toHaveCount(0);
@@ -65,8 +67,32 @@ for (const language of ['en', 'fr']) {
         await page.screenshot({ path: `test-results/project-profile-${language}.png` });
         await page.mouse.move(5, 5);
         await expect(card).toHaveCount(0);
-        await band.getByRole('button', { name: /Maréchal Fayolle/ }).hover();
-        await expect(card).toHaveCount(0, { timeout: 500 });
+    });
+
+    test(`new project cards preserve supplied details and source links (${language})`, async ({page}) => {
+        const band = await openProjectBand(page, language);
+        const card = page.getByRole('tooltip');
+        await band.getByRole('button', {name: /Gignac-la-Nerthe/}).hover();
+        await expect(card.locator('dl > div')).toHaveCount(7);
+        await expect(card).toContainText(language === 'fr' ? '18–21 mois' : '18–21 months');
+        await expect(card).toContainText(language === 'fr' ? '1,08 million d’euros' : '€1.08 million');
+        const architect = card.getByRole('link', {name: 'Atelier Régis Roudil Architectes'});
+        await expect(architect).toHaveAttribute('href', 'https://www.regisroudil.fr/projet/8-logements-intermediaires-sociaux/');
+        await expect(architect).toHaveAttribute('target', '_blank');
+        await expect(card.getByRole('link', {name: 'PLS, PLUS, PLAI'})).toHaveAttribute('href', 'https://basedespermis.fr/autorisation-pc-01304317f0041-2017-08-10#caracteristiques-projet');
+        // Links remain reachable while the pointer moves from the trigger into the card.
+        const bounds = (await card.boundingBox())!;
+        await page.mouse.move(bounds.x + 30, bounds.y + 30);
+        await architect.hover();
+        await expect(card).toBeVisible();
+        await page.mouse.move(5, 5);
+        await expect(card).toHaveCount(0);
+        await band.getByRole('button', {name: /Maréchal Fayolle/}).hover();
+        await expect(card.locator('dl > div')).toHaveCount(8);
+        await expect(card).toContainText('SANAA');
+        await expect(card).toContainText(language === 'fr' ? '9 ans* (*concours en 2007)' : '9 years* (*competition in 2007)');
+        await expect(card).toContainText(language === 'fr' ? 'Résultat d’un concours d’architecture.' : 'Result of an architecture competition.');
+        await expect(card.getByRole('link')).toHaveAttribute('href', 'https://www.darchitectures.com/magazine/rubriques/breves/3626-paris-16e-inauguration-des-logements-sociaux-controverses-de-lagence-sanaa.html');
     });
 }
 
@@ -116,7 +142,7 @@ for (const language of ['fr', 'en']) {
         const band = await openProjectBand(page, language);
         const card = page.getByRole('tooltip');
         await page.keyboard.press('Tab');
-        for (const name of ['Samaritaine', 'Tour Bois-le-Prêtre', 'Rue Jean-Bart', 'Talgen', 'Les Jasmins · La Réunion']) {
+        for (const name of ['Samaritaine', 'Tour Bois-le-Prêtre', 'Rue Jean-Bart', 'Talgen', 'Les Jasmins · La Réunion', 'Gignac-la-Nerthe', 'Maréchal Fayolle']) {
             await page.keyboard.press('Escape');
             await page.mouse.move(5, 5);
             await expect(card).toHaveCount(0);
@@ -135,7 +161,7 @@ for (const language of ['fr', 'en']) {
             expect(bounds.y).toBeGreaterThanOrEqual(11);
             expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height - 11);
             expect(await card.evaluate(el => el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth)).toBe(true);
-            await expect(card.locator('dl > div')).toHaveCount(8);
+            await expect(card.locator('dl > div')).toHaveCount(name === 'Gignac-la-Nerthe' ? 7 : 8);
         }
         await page.screenshot({ path: `test-results/project-profile-${viewport.width}-${language}.png` });
     });
